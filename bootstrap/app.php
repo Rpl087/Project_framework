@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
+
+        // Enforce dynamic session lifetime (3 jam / 1 hari) on every web request
+        $middleware->web(append: [
+            \App\Http\Middleware\EnforceSessionLifetime::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -4,7 +4,16 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="description" content="Sistem Manajemen & Peminjaman Infrastruktur Laboratorium">
+        <meta name="description" content="Sistem Manajemen &amp; Peminjaman Infrastruktur Laboratorium">
+
+        {{-- Early theme init — prevents flash of wrong theme --}}
+        <script>
+            (function() {
+                var t = localStorage.getItem('theme') ||
+                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', t);
+            })();
+        </script>
 
         <title>{{ config('app.name', 'LabManager') }} - @yield('title', 'Dashboard')</title>
 
@@ -19,7 +28,84 @@
         <style>
             * { font-family: 'Inter', sans-serif; }
 
-            /* Sidebar */
+            /* ═══════════════════════════════════════════════════
+               CSS Custom Properties — Light Mode (default)
+            ═══════════════════════════════════════════════════ */
+            :root {
+                --bg:          #f1f5f9;
+                --surface:     rgba(255,255,255,0.85);
+                --surface-g:   rgba(255,255,255,0.90);
+                --border:      rgba(226,232,240,0.60);
+                --border-s:    #e2e8f0;
+                --border-l:    #f1f5f9;
+                --txt-1:       #0f172a;
+                --txt-2:       #64748b;
+                --txt-3:       #94a3b8;
+                --txt-4:       #334155;
+                --row-hover:   #f8fafc;
+                --th-bg:       #f8fafc;
+                --topbar:      rgba(255,255,255,0.85);
+                --input-bg:    #ffffff;
+                --scrollbar:   #cbd5e1;
+                --ham-bar:     #64748b;
+                --ham-hover:   #1e293b;
+                --shadow:      rgba(0,0,0,0.08);
+                --shadow-lg:   rgba(0,0,0,0.28);
+                --alert-ok-bg: #d1fae5;
+                --alert-ok-c:  #065f46;
+                --alert-ok-b:  #a7f3d0;
+                --alert-er-bg: #fee2e2;
+                --alert-er-c:  #991b1b;
+                --alert-er-b:  #fca5a5;
+            }
+
+            /* ═══════════════════════════════════════════════════
+               CSS Custom Properties — Dark Mode
+            ═══════════════════════════════════════════════════ */
+            [data-theme="dark"] {
+                --bg:          #0f172a;
+                --surface:     rgba(30,41,59,0.95);
+                --surface-g:   rgba(30,41,59,0.98);
+                --border:      rgba(51,65,85,0.70);
+                --border-s:    #334155;
+                --border-l:    #1e293b;
+                --txt-1:       #f1f5f9;
+                --txt-2:       #94a3b8;
+                --txt-3:       #64748b;
+                --txt-4:       #cbd5e1;
+                --row-hover:   #1e293b;
+                --th-bg:       #1e293b;
+                --topbar:      rgba(15,23,42,0.95);
+                --input-bg:    #1e293b;
+                --scrollbar:   #334155;
+                --ham-bar:     #94a3b8;
+                --ham-hover:   #f1f5f9;
+                --shadow:      rgba(0,0,0,0.40);
+                --shadow-lg:   rgba(0,0,0,0.55);
+                --alert-ok-bg: rgba(5,150,105,0.15);
+                --alert-ok-c:  #34d399;
+                --alert-ok-b:  rgba(52,211,153,0.25);
+                --alert-er-bg: rgba(239,68,68,0.15);
+                --alert-er-c:  #f87171;
+                --alert-er-b:  rgba(248,113,113,0.25);
+            }
+
+            /* ═══════════════════════════════════════════════════
+               Theme-switch transition helper
+               (only active for 500ms during toggle, avoids
+               killing normal hover/animation transitions)
+            ═══════════════════════════════════════════════════ */
+            .theme-transition,
+            .theme-transition * {
+                transition: background-color 0.35s ease,
+                            color 0.35s ease,
+                            border-color 0.35s ease,
+                            box-shadow 0.35s ease !important;
+            }
+
+            /* ═══════════════════════════════════════════════════
+               Sidebar
+            ═══════════════════════════════════════════════════ */
             .sidebar {
                 background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
                 width: 260px;
@@ -28,7 +114,8 @@
                 left: 0;
                 top: 0;
                 z-index: 40;
-                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 overflow: hidden;
             }
             .sidebar-hidden { transform: translateX(-100%); }
@@ -68,17 +155,20 @@
                 padding: 1.25rem 1rem 0.5rem;
             }
 
-            /* Main */
+            /* ═══════════════════════════════════════════════════
+               Main Layout
+            ═══════════════════════════════════════════════════ */
             .main-content {
                 margin-left: 260px;
                 min-height: 100vh;
-                background: #f1f5f9;
-                transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: var(--bg);
+                transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                            background-color 0.35s ease;
             }
             .top-bar {
-                background: rgba(255,255,255,0.85);
+                background: var(--topbar);
                 backdrop-filter: blur(12px);
-                border-bottom: 1px solid #e2e8f0;
+                border-bottom: 1px solid var(--border-s);
                 padding: 0.75rem 1.5rem;
                 display: flex;
                 align-items: center;
@@ -86,30 +176,36 @@
                 position: sticky;
                 top: 0;
                 z-index: 30;
+                transition: background-color 0.35s ease, border-color 0.35s ease;
             }
 
-            /* Cards */
+            /* ═══════════════════════════════════════════════════
+               Cards
+            ═══════════════════════════════════════════════════ */
             .stat-card {
-                background: rgba(255,255,255,0.85);
+                background: var(--surface);
                 backdrop-filter: blur(12px);
-                border: 1px solid rgba(226,232,240,0.6);
+                border: 1px solid var(--border);
                 border-radius: 1rem;
                 padding: 1.5rem;
                 transition: all 0.3s ease;
             }
             .stat-card:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+                box-shadow: 0 12px 28px var(--shadow);
             }
             .glass-card {
-                background: rgba(255,255,255,0.9);
+                background: var(--surface-g);
                 backdrop-filter: blur(16px);
-                border: 1px solid rgba(226,232,240,0.5);
+                border: 1px solid var(--border);
                 border-radius: 1rem;
                 overflow: hidden;
+                transition: background-color 0.35s ease, border-color 0.35s ease;
             }
 
-            /* Badge */
+            /* ═══════════════════════════════════════════════════
+               Badge
+            ═══════════════════════════════════════════════════ */
             .badge {
                 display: inline-flex;
                 align-items: center;
@@ -118,18 +214,20 @@
                 font-size: 0.75rem;
                 font-weight: 600;
             }
-            .badge-amber { background: #fef3c7; color: #92400e; }
-            .badge-blue { background: #dbeafe; color: #1e40af; }
-            .badge-indigo { background: #e0e7ff; color: #3730a3; }
-            .badge-cyan { background: #cffafe; color: #155e75; }
+            .badge-amber   { background: #fef3c7; color: #92400e; }
+            .badge-blue    { background: #dbeafe; color: #1e40af; }
+            .badge-indigo  { background: #e0e7ff; color: #3730a3; }
+            .badge-cyan    { background: #cffafe; color: #155e75; }
             .badge-emerald { background: #d1fae5; color: #065f46; }
-            .badge-green { background: #dcfce7; color: #166534; }
-            .badge-red { background: #fee2e2; color: #991b1b; }
-            .badge-orange { background: #ffedd5; color: #9a3412; }
-            .badge-rose { background: #ffe4e6; color: #9f1239; }
-            .badge-gray { background: #f1f5f9; color: #475569; }
+            .badge-green   { background: #dcfce7; color: #166534; }
+            .badge-red     { background: #fee2e2; color: #991b1b; }
+            .badge-orange  { background: #ffedd5; color: #9a3412; }
+            .badge-rose    { background: #ffe4e6; color: #9f1239; }
+            .badge-gray    { background: #f1f5f9; color: #475569; }
 
-            /* Buttons */
+            /* ═══════════════════════════════════════════════════
+               Buttons
+            ═══════════════════════════════════════════════════ */
             .btn {
                 display: inline-flex;
                 align-items: center;
@@ -143,58 +241,82 @@
                 border: none;
                 text-decoration: none;
             }
-            .btn-primary {
-                background: linear-gradient(135deg, #4f46e5, #6366f1);
-                color: #fff;
-            }
+            .btn-primary { background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff; }
             .btn-primary:hover {
                 background: linear-gradient(135deg, #4338ca, #4f46e5);
                 box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
                 transform: translateY(-1px);
             }
-            .btn-success {
-                background: linear-gradient(135deg, #059669, #10b981);
-                color: #fff;
-            }
+            .btn-success { background: linear-gradient(135deg, #059669, #10b981); color: #fff; }
             .btn-success:hover {
                 background: linear-gradient(135deg, #047857, #059669);
                 box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
             }
-            .btn-danger {
-                background: linear-gradient(135deg, #dc2626, #ef4444);
-                color: #fff;
-            }
+            .btn-danger { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; }
             .btn-danger:hover {
                 background: linear-gradient(135deg, #b91c1c, #dc2626);
                 box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
             }
-            .btn-warning {
-                background: linear-gradient(135deg, #d97706, #f59e0b);
-                color: #fff;
-            }
+            .btn-warning { background: linear-gradient(135deg, #d97706, #f59e0b); color: #fff; }
             .btn-outline {
                 background: transparent;
-                border: 1px solid #e2e8f0;
-                color: #475569;
+                border: 1px solid var(--border-s);
+                color: var(--txt-2);
             }
             .btn-outline:hover {
-                background: #f8fafc;
-                border-color: #cbd5e1;
+                background: var(--row-hover);
+                border-color: var(--txt-3);
             }
-            .btn-sm {
-                padding: 0.375rem 0.875rem;
-                font-size: 0.8rem;
-            }
+            .btn-sm { padding: 0.375rem 0.875rem; font-size: 0.8rem; }
 
-            /* Form */
+            /* ═══════════════════════════════════════════════════
+               Theme Toggle Button
+            ═══════════════════════════════════════════════════ */
+            .theme-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                border-radius: 0.5rem;
+                border: 1px solid var(--border-s);
+                background: transparent;
+                color: var(--txt-2);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                position: relative;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+            .theme-toggle:hover {
+                background: var(--row-hover);
+                color: var(--txt-1);
+                transform: scale(1.05);
+            }
+            .theme-toggle svg {
+                position: absolute;
+                transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+                            opacity 0.25s ease;
+            }
+            /* Light mode: sun visible, moon hidden */
+            .theme-toggle .icon-sun  { transform: scale(1)  rotate(0deg);   opacity: 1; }
+            .theme-toggle .icon-moon { transform: scale(0)  rotate(-90deg); opacity: 0; }
+            /* Dark mode: moon visible, sun hidden */
+            [data-theme="dark"] .theme-toggle .icon-sun  { transform: scale(0)  rotate(90deg);  opacity: 0; }
+            [data-theme="dark"] .theme-toggle .icon-moon { transform: scale(1)  rotate(0deg);   opacity: 1; }
+
+            /* ═══════════════════════════════════════════════════
+               Form
+            ═══════════════════════════════════════════════════ */
             .form-input {
                 width: 100%;
                 padding: 0.625rem 0.875rem;
-                border: 1px solid #e2e8f0;
+                border: 1px solid var(--border-s);
                 border-radius: 0.5rem;
                 font-size: 0.875rem;
                 transition: all 0.2s ease;
-                background: #fff;
+                background: var(--input-bg);
+                color: var(--txt-1);
             }
             .form-input:focus {
                 outline: none;
@@ -205,54 +327,61 @@
                 display: block;
                 font-size: 0.8rem;
                 font-weight: 600;
-                color: #374151;
+                color: var(--txt-4);
                 margin-bottom: 0.375rem;
             }
 
-            /* Table */
+            /* ═══════════════════════════════════════════════════
+               Table
+            ═══════════════════════════════════════════════════ */
             .data-table {
                 width: 100%;
                 border-collapse: separate;
                 border-spacing: 0;
             }
             .data-table thead th {
-                background: #f8fafc;
+                background: var(--th-bg);
                 padding: 0.75rem 1rem;
                 font-size: 0.75rem;
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
-                color: #64748b;
+                color: var(--txt-2);
                 text-align: left;
-                border-bottom: 1px solid #e2e8f0;
+                border-bottom: 1px solid var(--border-s);
+                transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
             }
             .data-table tbody td {
                 padding: 0.875rem 1rem;
                 font-size: 0.875rem;
-                color: #334155;
-                border-bottom: 1px solid #f1f5f9;
+                color: var(--txt-4);
+                border-bottom: 1px solid var(--border-l);
+                transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
             }
-            .data-table tbody tr {
-                transition: background 0.15s ease;
-            }
-            .data-table tbody tr:hover {
-                background: #f8fafc;
-            }
+            .data-table tbody tr { transition: background 0.15s ease; }
+            .data-table tbody tr:hover { background: var(--row-hover); }
 
-            /* Animations */
+            /* ═══════════════════════════════════════════════════
+               Page Transitions
+            ═══════════════════════════════════════════════════ */
             @keyframes fadeInUp {
                 from { opacity: 0; transform: translateY(16px); }
-                to { opacity: 1; transform: translateY(0); }
+                to   { opacity: 1; transform: translateY(0);    }
             }
-            .animate-in {
-                animation: fadeInUp 0.4s ease-out forwards;
+            @keyframes pageExit {
+                from { opacity: 1; transform: translateY(0);     }
+                to   { opacity: 0; transform: translateY(-12px); }
             }
-            .animate-delay-1 { animation-delay: 0.1s; opacity: 0; }
-            .animate-delay-2 { animation-delay: 0.2s; opacity: 0; }
-            .animate-delay-3 { animation-delay: 0.3s; opacity: 0; }
-            .animate-delay-4 { animation-delay: 0.4s; opacity: 0; }
+            .animate-in { animation: fadeInUp 0.38s ease-out forwards; }
+            .animate-delay-1 { animation-delay: 0.07s; opacity: 0; }
+            .animate-delay-2 { animation-delay: 0.14s; opacity: 0; }
+            .animate-delay-3 { animation-delay: 0.21s; opacity: 0; }
+            .animate-delay-4 { animation-delay: 0.28s; opacity: 0; }
+            body.page-exiting main { animation: pageExit 0.22s ease-in forwards; }
 
-            /* Overlay */
+            /* ═══════════════════════════════════════════════════
+               Overlay
+            ═══════════════════════════════════════════════════ */
             .sidebar-overlay {
                 display: none;
                 position: fixed;
@@ -261,7 +390,9 @@
                 z-index: 35;
             }
 
-            /* Hamburger Button */
+            /* ═══════════════════════════════════════════════════
+               Hamburger Button
+            ═══════════════════════════════════════════════════ */
             .hamburger-btn {
                 display: flex;
                 align-items: center;
@@ -275,14 +406,8 @@
                 width: 40px;
                 height: 40px;
             }
-            .hamburger-btn:hover {
-                background: #f1f5f9;
-            }
-            .hamburger-btn:active {
-                transform: scale(0.92);
-            }
-
-            /* Animated hamburger bars */
+            .hamburger-btn:hover  { background: var(--row-hover); }
+            .hamburger-btn:active { transform: scale(0.92); }
             .hamburger-bars {
                 width: 20px;
                 height: 14px;
@@ -295,90 +420,25 @@
                 display: block;
                 width: 100%;
                 height: 2px;
-                background: #64748b;
+                background: var(--ham-bar);
                 border-radius: 2px;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 transform-origin: center;
             }
-            .hamburger-btn:hover .hamburger-bars span {
-                background: #1e293b;
-            }
+            .hamburger-btn:hover .hamburger-bars span { background: var(--ham-hover); }
 
-            /* Responsive table wrapper */
+            /* ═══════════════════════════════════════════════════
+               Table Responsive
+            ═══════════════════════════════════════════════════ */
             .table-responsive {
                 width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
 
-            /* Responsive: Tablet (<=1024px) */
-            @media (max-width: 1024px) {
-                .sidebar {
-                    transform: translateX(-100%);
-                }
-                .sidebar.sidebar-open {
-                    transform: translateX(0);
-                }
-                .main-content {
-                    margin-left: 0 !important;
-                }
-                .sidebar-overlay.active {
-                    display: block;
-                }
-            }
-
-            /* Responsive: Mobile (<=768px) */
-            @media (max-width: 768px) {
-                .top-bar {
-                    padding: 0.625rem 1rem;
-                }
-                .top-bar h2 {
-                    font-size: 0.95rem !important;
-                }
-                main {
-                    padding: 1rem !important;
-                }
-                .stat-card {
-                    padding: 1.15rem;
-                }
-                .data-table thead th,
-                .data-table tbody td {
-                    padding: 0.625rem 0.75rem;
-                    font-size: 0.8rem;
-                    white-space: nowrap;
-                }
-                .btn {
-                    padding: 0.45rem 1rem;
-                    font-size: 0.8rem;
-                }
-            }
-
-            /* Responsive: Small Mobile (<=480px) */
-            @media (max-width: 480px) {
-                .top-bar {
-                    padding: 0.5rem 0.75rem;
-                }
-                main {
-                    padding: 0.75rem !important;
-                }
-                .stat-card {
-                    padding: 1rem;
-                }
-                .btn {
-                    padding: 0.4rem 0.75rem;
-                    font-size: 0.75rem;
-                }
-                .btn-sm {
-                    padding: 0.3rem 0.625rem;
-                    font-size: 0.7rem;
-                }
-                .badge {
-                    font-size: 0.65rem;
-                    padding: 0.2rem 0.5rem;
-                }
-            }
-
-            /* Alert */
+            /* ═══════════════════════════════════════════════════
+               Alert
+            ═══════════════════════════════════════════════════ */
             .alert {
                 padding: 0.875rem 1.25rem;
                 border-radius: 0.75rem;
@@ -388,23 +448,86 @@
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
+                transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
             }
-            .alert-success {
-                background: #d1fae5;
-                color: #065f46;
-                border: 1px solid #a7f3d0;
+            .alert-success { background: var(--alert-ok-bg); color: var(--alert-ok-c); border: 1px solid var(--alert-ok-b); }
+            .alert-error   { background: var(--alert-er-bg); color: var(--alert-er-c); border: 1px solid var(--alert-er-b); }
+
+            /* ═══════════════════════════════════════════════════
+               Scrollbar
+            ═══════════════════════════════════════════════════ */
+            ::-webkit-scrollbar       { width: 6px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+            ::-webkit-scrollbar-thumb:hover { background: var(--txt-3); }
+
+            /* ═══════════════════════════════════════════════════
+               Dark Mode — Global body/main bg
+            ═══════════════════════════════════════════════════ */
+            [data-theme="dark"] body { background: var(--bg); }
+            [data-theme="dark"] main { background: var(--bg); }
+
+            /* ═══════════════════════════════════════════════════
+               Dark Mode — Inline style overrides for content pages
+               (Scoped to .main-content so sidebar is unaffected)
+            ═══════════════════════════════════════════════════ */
+            [data-theme="dark"] .main-content [style*="color:#0f172a"] { color: var(--txt-1) !important; }
+            [data-theme="dark"] .main-content [style*="color:#1e293b"] { color: var(--txt-1) !important; }
+            [data-theme="dark"] .main-content [style*="color:#334155"] { color: var(--txt-4) !important; }
+            [data-theme="dark"] .main-content [style*="color:#374151"] { color: var(--txt-4) !important; }
+            [data-theme="dark"] .main-content [style*="color:#64748b"] { color: var(--txt-2) !important; }
+            [data-theme="dark"] .main-content [style*="color:#475569"] { color: var(--txt-2) !important; }
+            [data-theme="dark"] .main-content [style*="color:#94a3b8"] { color: var(--txt-2) !important; }
+            [data-theme="dark"] .main-content [style*="background:linear-gradient(135deg,#f8fafc,#f1f5f9)"] {
+                background: linear-gradient(135deg, #1e293b, #263349) !important;
             }
-            .alert-error {
-                background: #fee2e2;
-                color: #991b1b;
-                border: 1px solid #fca5a5;
+            [data-theme="dark"] .main-content [style*="border-top:1px solid #f1f5f9"] {
+                border-top-color: var(--border-s) !important;
+            }
+            [data-theme="dark"] .main-content [style*="border-top:1px solid #e2e8f0"] {
+                border-top-color: var(--border-s) !important;
+            }
+            [data-theme="dark"] .main-content [style*="border-bottom:1px solid #e2e8f0"] {
+                border-bottom-color: var(--border-s) !important;
+            }
+            [data-theme="dark"] .main-content [style*="background:#f8fafc"] {
+                background: var(--th-bg) !important;
             }
 
-            /* Scrollbar */
-            ::-webkit-scrollbar { width: 6px; }
-            ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-            ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+            /* ═══════════════════════════════════════════════════
+               Responsive — Tablet (≤1024px)
+            ═══════════════════════════════════════════════════ */
+            @media (max-width: 1024px) {
+                .sidebar { transform: translateX(-100%); }
+                .sidebar.sidebar-open { transform: translateX(0); }
+                .main-content { margin-left: 0 !important; }
+                .sidebar-overlay.active { display: block; }
+            }
+
+            /* ═══════════════════════════════════════════════════
+               Responsive — Mobile (≤768px)
+            ═══════════════════════════════════════════════════ */
+            @media (max-width: 768px) {
+                .top-bar { padding: 0.625rem 1rem; }
+                .top-bar h2 { font-size: 0.95rem !important; }
+                main { padding: 1rem !important; }
+                .stat-card { padding: 1.15rem; }
+                .data-table thead th,
+                .data-table tbody td { padding: 0.625rem 0.75rem; font-size: 0.8rem; white-space: nowrap; }
+                .btn { padding: 0.45rem 1rem; font-size: 0.8rem; }
+            }
+
+            /* ═══════════════════════════════════════════════════
+               Responsive — Small Mobile (≤480px)
+            ═══════════════════════════════════════════════════ */
+            @media (max-width: 480px) {
+                .top-bar { padding: 0.5rem 0.75rem; }
+                main { padding: 0.75rem !important; }
+                .stat-card { padding: 1rem; }
+                .btn { padding: 0.4rem 0.75rem; font-size: 0.75rem; }
+                .btn-sm { padding: 0.3rem 0.625rem; font-size: 0.7rem; }
+                .badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
+            }
         </style>
     </head>
     <body class="antialiased">
@@ -514,10 +637,31 @@
                             <span></span>
                         </div>
                     </button>
-                    <h2 style="font-size:1.1rem;font-weight:700;color:#1e293b;">@yield('title', 'Dashboard')</h2>
+                    <h2 style="font-size:1.1rem;font-weight:700;color:var(--txt-1);">@yield('title', 'Dashboard')</h2>
                 </div>
-                <div style="display:flex;align-items:center;gap:1rem;">
-                    <span style="font-size:0.8rem;color:#64748b;">{{ now()->format('d M Y') }}</span>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span style="font-size:0.8rem;color:var(--txt-2);">{{ now()->format('d M Y') }}</span>
+
+                    <!-- Dark / Light Mode Toggle -->
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Ganti mode gelap/terang">
+                        <!-- Sun icon (shown in light mode) -->
+                        <svg class="icon-sun" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1"  x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22"   x2="5.64"  y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1"  y1="12" x2="3"  y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36"/>
+                            <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+                        </svg>
+                        <!-- Moon icon (shown in dark mode) -->
+                        <svg class="icon-moon" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                        </svg>
+                    </button>
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="btn btn-outline btn-sm">
@@ -555,17 +699,20 @@
         </div>
 
         <script>
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const hamburger = document.getElementById('hamburgerBtn');
+            /* ────────────────────────────────────────────────────
+               Sidebar toggle (hover + click pin on desktop,
+               overlay tap on mobile)
+            ──────────────────────────────────────────────────── */
+            const sidebar     = document.getElementById('sidebar');
+            const overlay     = document.getElementById('sidebarOverlay');
+            const hamburger   = document.getElementById('hamburgerBtn');
             const mainContent = document.getElementById('mainContent');
             let sidebarVisible = window.innerWidth > 1024;
-            let sidebarPinned = sidebarVisible;
-            let hoverTimeout = null;
+            let sidebarPinned  = sidebarVisible;
+            let hoverTimeout   = null;
 
-            // Init state
             if (!sidebarVisible) {
-                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.style.transform    = 'translateX(-100%)';
                 mainContent.style.marginLeft = '0';
             }
 
@@ -573,7 +720,7 @@
                 clearTimeout(hoverTimeout);
                 sidebarVisible = true;
                 if (window.innerWidth > 1024) {
-                    sidebar.style.transform = 'translateX(0)';
+                    sidebar.style.transform      = 'translateX(0)';
                     mainContent.style.marginLeft = '260px';
                 } else {
                     sidebar.classList.add('sidebar-open');
@@ -585,7 +732,7 @@
             function hideSidebar() {
                 sidebarVisible = false;
                 if (window.innerWidth > 1024) {
-                    sidebar.style.transform = 'translateX(-100%)';
+                    sidebar.style.transform      = 'translateX(-100%)';
                     mainContent.style.marginLeft = '0';
                 } else {
                     sidebar.classList.remove('sidebar-open');
@@ -594,7 +741,6 @@
                 }
             }
 
-            // Click: toggle pinned state
             hamburger.addEventListener('click', () => {
                 if (sidebarVisible && sidebarPinned) {
                     sidebarPinned = false;
@@ -605,7 +751,6 @@
                 }
             });
 
-            // Hover: expand on desktop (only if not pinned open)
             hamburger.addEventListener('mouseenter', () => {
                 if (window.innerWidth > 1024 && !sidebarVisible) {
                     sidebarPinned = false;
@@ -613,21 +758,14 @@
                 }
             });
 
-            // Mouse leave sidebar area: collapse if not pinned
-            sidebar.addEventListener('mouseleave', (e) => {
+            sidebar.addEventListener('mouseleave', () => {
                 if (window.innerWidth > 1024 && !sidebarPinned) {
-                    hoverTimeout = setTimeout(() => {
-                        hideSidebar();
-                    }, 300);
+                    hoverTimeout = setTimeout(hideSidebar, 300);
                 }
             });
 
-            // Keep open while hovering sidebar
-            sidebar.addEventListener('mouseenter', () => {
-                clearTimeout(hoverTimeout);
-            });
+            sidebar.addEventListener('mouseenter', () => clearTimeout(hoverTimeout));
 
-            // Overlay click (mobile)
             overlay.addEventListener('click', () => {
                 sidebarPinned = false;
                 hideSidebar();
@@ -638,19 +776,19 @@
                     sidebar.classList.remove('sidebar-open');
                     overlay.classList.remove('active');
                     document.body.style.overflow = '';
-                    sidebar.style.transform = sidebarVisible ? 'translateX(0)' : 'translateX(-100%)';
+                    sidebar.style.transform      = sidebarVisible ? 'translateX(0)' : 'translateX(-100%)';
                     mainContent.style.marginLeft = sidebarVisible ? '260px' : '0';
                 } else {
-                    sidebar.style.transform = '';
+                    sidebar.style.transform      = '';
                     mainContent.style.marginLeft = '0';
                     if (!sidebar.classList.contains('sidebar-open')) {
                         sidebarVisible = false;
-                        sidebarPinned = false;
+                        sidebarPinned  = false;
                     }
                 }
             });
 
-            // Wrap tables for responsive scroll
+            // Wrap tables for horizontal scroll on small screens
             document.querySelectorAll('.data-table').forEach(table => {
                 if (!table.parentElement.classList.contains('table-responsive')) {
                     const wrapper = document.createElement('div');
@@ -658,6 +796,53 @@
                     table.parentNode.insertBefore(wrapper, table);
                     wrapper.appendChild(table);
                 }
+            });
+
+            /* ────────────────────────────────────────────────────
+               Dark / Light Mode Toggle
+            ──────────────────────────────────────────────────── */
+            const themeToggle = document.getElementById('themeToggle');
+            const htmlEl      = document.documentElement;
+
+            function applyTheme(theme, animate) {
+                if (animate) {
+                    document.body.classList.add('theme-transition');
+                    setTimeout(() => document.body.classList.remove('theme-transition'), 500);
+                }
+                htmlEl.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            }
+
+            // Sync with what the early-init script already set
+            const savedTheme = localStorage.getItem('theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            htmlEl.setAttribute('data-theme', savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const current = htmlEl.getAttribute('data-theme') || 'light';
+                applyTheme(current === 'dark' ? 'light' : 'dark', true);
+            });
+
+            /* ────────────────────────────────────────────────────
+               Smooth Page Transitions
+               Intercept link clicks → fade-out → navigate
+            ──────────────────────────────────────────────────── */
+            document.querySelectorAll('a[href]').forEach(link => {
+                const href = link.getAttribute('href');
+                if (!href ||
+                    href.startsWith('#') ||
+                    href.startsWith('javascript:') ||
+                    href.startsWith('mailto:') ||
+                    link.target === '_blank') return;
+
+                link.addEventListener('click', function(e) {
+                    // Allow browser-modified clicks to work normally
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    e.preventDefault();
+                    const url = this.href;
+                    document.body.classList.add('page-exiting');
+                    setTimeout(() => { window.location.href = url; }, 220);
+                });
             });
         </script>
         @stack('scripts')

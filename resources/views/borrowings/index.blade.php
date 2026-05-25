@@ -3,7 +3,7 @@
 
 @section('content')
 <div>
-    <div class="animate-in" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <div class="animate-in" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
         <div>
             <h1 style="font-size:1.5rem;font-weight:800;color:#0f172a;">Daftar Peminjaman</h1>
             <p style="color:#64748b;font-size:0.9rem;margin-top:0.25rem;">
@@ -76,7 +76,7 @@
         </table>
 
         @if($borrowings->hasPages())
-        <div style="padding:1rem 1.5rem;border-top:1px solid #f1f5f9;">
+        <div style="padding:1rem 1.5rem;border-top:1px solid var(--border-s);">
             {{ $borrowings->links() }}
         </div>
         @endif

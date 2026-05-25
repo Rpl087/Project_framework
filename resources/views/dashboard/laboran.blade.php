@@ -33,10 +33,10 @@
         </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
         <!-- Pending Requests -->
         <div class="glass-card animate-in animate-delay-2">
-            <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+            <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-s);display:flex;align-items:center;justify-content:space-between;">
                 <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">⏳ Permintaan Menunggu</h3>
                 <span class="badge badge-red">{{ $stats['pending_requests'] }}</span>
             </div>
@@ -63,7 +63,7 @@
 
         <!-- Active Borrowings -->
         <div class="glass-card animate-in animate-delay-3">
-            <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+            <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-s);display:flex;align-items:center;justify-content:space-between;">
                 <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">⚡ Peminjaman Aktif</h3>
                 <span class="badge badge-emerald">{{ $stats['active_borrowings'] }}</span>
             </div>

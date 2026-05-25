@@ -10,14 +10,14 @@
             </svg>
             Kembali ke Daftar
         </a>
-        <div style="display:flex;align-items:center;gap:1rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:1rem;">
             <h1 style="font-size:1.5rem;font-weight:800;color:#0f172a;">Detail Peminjaman #{{ $borrowing->id }}</h1>
             <span class="badge badge-{{ $borrowing->status_color }}" style="font-size:0.85rem;">{{ $borrowing->status_label }}</span>
         </div>
     </div>
 
     <!-- Info Cards -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;margin-bottom:1.5rem;">
         <!-- Borrower Info -->
         <div class="glass-card animate-in animate-delay-1" style="padding:1.5rem;">
             <h3 style="font-size:0.8rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;">Informasi Peminjam</h3>
@@ -132,9 +132,9 @@
 
             {{-- Laboran: Process Return --}}
             @if(auth()->user()->isLaboran() && $borrowing->status === 'active')
-                <form method="POST" action="{{ route('borrowings.return', $borrowing) }}" style="flex:1;min-width:300px;">
+                <form method="POST" action="{{ route('borrowings.return', $borrowing) }}" style="flex:1;min-width:260px;">
                     @csrf
-                    <div style="display:flex;gap:0.75rem;align-items:flex-end;">
+                    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;">
                         <div style="flex:1;">
                             <label class="form-label">Kondisi Pengembalian</label>
                             <input type="text" name="return_condition" class="form-input" required placeholder="Contoh: Baik, tidak ada kerusakan" minlength="5">
@@ -155,9 +155,9 @@
                 (auth()->user()->isLaboran() && $borrowing->status === 'pending') ||
                 (auth()->user()->isKepalaLab() && $borrowing->status === 'approved_by_laboran')
             )
-                <form method="POST" action="{{ route('borrowings.reject', $borrowing) }}" style="flex:1;min-width:300px;">
+                <form method="POST" action="{{ route('borrowings.reject', $borrowing) }}" style="flex:1;min-width:260px;">
                     @csrf
-                    <div style="display:flex;gap:0.75rem;align-items:flex-end;">
+                    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;">
                         <div style="flex:1;">
                             <label class="form-label">Alasan Penolakan</label>
                             <input type="text" name="reject_reason" class="form-input" required placeholder="Jelaskan alasan penolakan..." minlength="5">
@@ -182,7 +182,7 @@
 
     <!-- Activity Log -->
     <div class="glass-card animate-in animate-delay-3">
-        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #f1f5f9;">
+        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-s);">
             <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">📋 Riwayat Aktivitas</h3>
         </div>
         <div style="padding:1rem 1.5rem;">

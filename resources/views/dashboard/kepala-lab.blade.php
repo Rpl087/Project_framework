@@ -31,7 +31,7 @@
 
     <!-- Pending Approvals (Khusus Equipment) -->
     <div class="glass-card animate-in animate-delay-2">
-        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;">
+        <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-s);display:flex;align-items:center;justify-content:space-between;">
             <h3 style="font-size:1rem;font-weight:700;color:#0f172a;">🔐 Menunggu Persetujuan Anda (Alat Khusus)</h3>
             <span class="badge badge-amber">{{ $stats['pending_approvals'] }}</span>
         </div>

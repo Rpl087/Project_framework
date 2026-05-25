@@ -36,7 +36,7 @@
                 <div id="categoryInfo" style="display:none;margin-top:0.75rem;padding:0.75rem 1rem;border-radius:0.5rem;font-size:0.8rem;"></div>
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.25rem;">
                 <div>
                     <label class="form-label">Waktu Mulai Pinjam *</label>
                     <input type="time" name="start_date" value="{{ old('start_date') }}" class="form-input" required>
@@ -71,7 +71,7 @@
                 </div>
             </div>
 
-            <div style="display:flex;gap:0.75rem;">
+            <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
                 <button type="submit" class="btn btn-primary">
                     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>

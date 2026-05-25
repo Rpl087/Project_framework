@@ -3,7 +3,7 @@
 
 @section('content')
 <div>
-    <div class="animate-in" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <div class="animate-in" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
         <div>
             <h1 style="font-size:1.5rem;font-weight:800;color:#0f172a;">Kelola Alat Laboratorium 🔧</h1>
             <p style="color:#64748b;font-size:0.9rem;margin-top:0.25rem;">Tambah, edit, dan kelola stok alat lab.</p>

@@ -522,11 +522,21 @@
             ═══════════════════════════════════════════════════ */
             @media (max-width: 480px) {
                 .top-bar { padding: 0.5rem 0.75rem; }
+                .top-bar h2 { font-size: 0.875rem !important; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
                 main { padding: 0.75rem !important; }
                 .stat-card { padding: 1rem; }
                 .btn { padding: 0.4rem 0.75rem; font-size: 0.75rem; }
                 .btn-sm { padding: 0.3rem 0.625rem; font-size: 0.7rem; }
                 .badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
+                .top-bar-date { display: none; }
+            }
+
+            /* ═══════════════════════════════════════════════════
+               Responsive — Medium (≤640px)
+            ═══════════════════════════════════════════════════ */
+            @media (max-width: 640px) {
+                main { padding: 1rem !important; }
+                .top-bar-date { display: none; }
             }
         </style>
     </head>
@@ -640,7 +650,7 @@
                     <h2 style="font-size:1.1rem;font-weight:700;color:var(--txt-1);">@yield('title', 'Dashboard')</h2>
                 </div>
                 <div style="display:flex;align-items:center;gap:0.75rem;">
-                    <span style="font-size:0.8rem;color:var(--txt-2);">{{ now()->format('d M Y') }}</span>
+                    <span class="top-bar-date" style="font-size:0.8rem;color:var(--txt-2);">{{ now()->format('d M Y') }}</span>
 
                     <!-- Dark / Light Mode Toggle -->
                     <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Ganti mode gelap/terang">
@@ -833,7 +843,8 @@
                     href.startsWith('#') ||
                     href.startsWith('javascript:') ||
                     href.startsWith('mailto:') ||
-                    link.target === '_blank') return;
+                    link.target === '_blank' ||
+                    link.closest('form')) return;
 
                 link.addEventListener('click', function(e) {
                     // Allow browser-modified clicks to work normally

@@ -7,11 +7,11 @@ use Illuminate\View\View;
 class EquipmentImageComposer
 {
     /**
-     * Peta nama alat → nama file gambar.
-     * Gambar disimpan di public/images/equipments/
+     * Peta legacy: nama alat → nama file gambar (untuk data seeder yang sudah ada).
+     * Gambar yang diupload via form disimpan langsung di kolom `image` DB,
+     * sehingga tidak perlu mengedit file ini untuk alat baru.
      *
-     * Untuk menambah alat baru, cukup tambahkan entry di sini
-     * tanpa perlu menyentuh view manapun.
+     * Gambar disimpan di: public/images/equipments/
      */
     protected array $imageMap = [
         'Laptop ASUS ROG'               => 'laptop-asus-rog.png',
@@ -28,14 +28,41 @@ class EquipmentImageComposer
         'Sensor Kit IoT'                => 'sensor-kit-iot.png',
         'Oscilloscope Digital Rigol'    => 'oscilloscope-rigol.png',
         'Webcam Logitech C920'          => 'webcam-logitech-c920.png',
-        'External HDD 2TB'              => 'external-hdd-2tb.png',
+        'External HDD 2TB'             => 'external-hdd-2tb.png',
     ];
 
     /**
-     * Bind $imageMap ke semua view equipment (catalog & index).
+     * Bind $imageMap ke semua view equipment.
+     * FITUR-6: Jika equipment punya kolom `image` (uploaded), itu yang dipakai di view.
      */
     public function compose(View $view): void
     {
         $view->with('imageMap', $this->imageMap);
+    }
+
+    /**
+     * Helper statik: dapatkan URL gambar untuk satu equipment.
+     * Priority: DB image column → legacy imageMap → null (tampilkan placeholder)
+     */
+    public static function getImageUrl($equipment, array $imageMap): ?string
+    {
+        // 1. Prioritas: kolom image dari DB (hasil upload)
+        if (!empty($equipment->image)) {
+            $uploadedPath = public_path('images/equipments/' . $equipment->image);
+            if (file_exists($uploadedPath)) {
+                return asset('images/equipments/' . $equipment->image);
+            }
+        }
+
+        // 2. Fallback: legacy imageMap (data seeder)
+        if (isset($imageMap[$equipment->name])) {
+            $legacyPath = public_path('images/equipments/' . $imageMap[$equipment->name]);
+            if (file_exists($legacyPath)) {
+                return asset('images/equipments/' . $imageMap[$equipment->name]);
+            }
+        }
+
+        // 3. Tidak ada gambar — return null untuk tampilkan placeholder di view
+        return null;
     }
 }

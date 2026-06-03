@@ -14,7 +14,7 @@
     </div>
 
     <div class="glass-card animate-in animate-delay-1" style="padding:2rem;">
-        <form method="POST" action="{{ route('equipments.store') }}">
+        <form method="POST" action="{{ route('equipments.store') }}" enctype="multipart/form-data">
             @csrf
 
             <div style="margin-bottom:1.25rem;">
@@ -52,6 +52,13 @@
                     <option value="maintenance" {{ old('status') === 'maintenance' ? 'selected' : '' }}>Maintenance</option>
                 </select>
                 @error('status') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+            </div>
+
+            <div style="margin-bottom:1.5rem;">
+                <label class="form-label">Gambar Alat</label>
+                <input type="file" name="image" class="form-input" accept="image/*" style="padding:0.5rem;">
+                <p style="font-size:0.7rem;color:var(--txt-3);margin-top:0.25rem;">Format: JPG, PNG, GIF, WebP. Maks 2MB. (Opsional)</p>
+                @error('image') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
 
             <div style="display:flex;gap:0.75rem;">

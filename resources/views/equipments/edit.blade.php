@@ -14,7 +14,7 @@
     </div>
 
     <div class="glass-card animate-in animate-delay-1" style="padding:2rem;">
-        <form method="POST" action="{{ route('equipments.update', $equipment) }}">
+        <form method="POST" action="{{ route('equipments.update', $equipment) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -54,6 +54,19 @@
                     <option value="maintenance" {{ old('status', $equipment->status) === 'maintenance' ? 'selected' : '' }}>Maintenance</option>
                 </select>
                 @error('status') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+            </div>
+
+            <div style="margin-bottom:1.5rem;">
+                <label class="form-label">Gambar Alat</label>
+                @if($equipment->image && file_exists(public_path('images/equipments/' . $equipment->image)))
+                    <div style="margin-bottom:0.5rem;">
+                        <img src="{{ asset('images/equipments/' . $equipment->image) }}" alt="Gambar saat ini" style="width:80px;height:60px;object-fit:cover;border-radius:0.375rem;border:1px solid var(--border-s);">
+                        <p style="font-size:0.7rem;color:var(--txt-3);margin-top:0.25rem;">Gambar saat ini</p>
+                    </div>
+                @endif
+                <input type="file" name="image" class="form-input" accept="image/*" style="padding:0.5rem;">
+                <p style="font-size:0.7rem;color:var(--txt-3);margin-top:0.25rem;">Format: JPG, PNG, GIF, WebP. Maks 2MB. Kosongkan jika tidak ingin mengubah gambar.</p>
+                @error('image') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
 
             <div style="display:flex;gap:0.75rem;">

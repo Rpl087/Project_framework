@@ -18,6 +18,7 @@ class Equipment extends Model
         'available_stock',
         'category',
         'status',
+        'image',
     ];
 
     // ---- Relationships ----

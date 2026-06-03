@@ -35,9 +35,17 @@ class EquipmentController extends Controller
             'total_stock' => 'required|integer|min:1',
             'category'    => 'required|in:umum,khusus',
             'status'      => 'required|in:good,maintenance',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $validated['available_stock'] = $validated['total_stock'];
+
+        // FITUR-6: Handle upload gambar ke public/images/equipments/
+        if ($request->hasFile('image')) {
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $validated['name']) . '.' . $request->image->extension();
+            $request->image->move(public_path('images/equipments'), $filename);
+            $validated['image'] = $filename;
+        }
 
         Equipment::create($validated);
 
@@ -59,16 +67,28 @@ class EquipmentController extends Controller
     public function update(Request $request, Equipment $equipment)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'total_stock' => 'required|integer|min:0',
-            'category' => 'required|in:umum,khusus',
-            'status' => 'required|in:good,maintenance',
+            'category'    => 'required|in:umum,khusus',
+            'status'      => 'required|in:good,maintenance',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Adjust available stock if total_stock changed
         $stockDiff = $validated['total_stock'] - $equipment->total_stock;
         $validated['available_stock'] = max(0, $equipment->available_stock + $stockDiff);
+
+        // FITUR-6: Handle upload gambar baru
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada dan bukan default
+            if ($equipment->image && file_exists(public_path('images/equipments/' . $equipment->image))) {
+                unlink(public_path('images/equipments/' . $equipment->image));
+            }
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $validated['name']) . '.' . $request->image->extension();
+            $request->image->move(public_path('images/equipments'), $filename);
+            $validated['image'] = $filename;
+        }
 
         $equipment->update($validated);
 
@@ -81,17 +101,21 @@ class EquipmentController extends Controller
      */
     public function destroy(Equipment $equipment)
     {
-        // Cek apakah alat memiliki peminjaman yang sedang aktif/diproses
-        // FIX KRITIS-2: Sertakan 'approved_by_kepala_lab' agar alat khusus
-        // yang sudah disetujui Kepala Lab tidak bisa dihapus.
         if ($equipment->borrowings()->whereIn('status', [
             'pending',
             'approved_by_laboran',
-            'approved_by_kepala_lab',   // ← FIX: status ini tadinya tidak dicek
+            'approved_by_kepala_lab',
             'ready_for_pickup',
             'active',
+            'overdue',
+            'issue_reported',
         ])->exists()) {
             return back()->with('error', 'Tidak dapat menghapus alat yang sedang dipinjam atau dalam proses persetujuan.');
+        }
+
+        // FITUR-6: Hapus file gambar jika ada
+        if ($equipment->image && file_exists(public_path('images/equipments/' . $equipment->image))) {
+            unlink(public_path('images/equipments/' . $equipment->image));
         }
 
         $equipment->delete();

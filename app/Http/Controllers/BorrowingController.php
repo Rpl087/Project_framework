@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Borrowing;
 use App\Models\BorrowingLog;
 use App\Models\Equipment;
+use App\Models\Notification;
+use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +16,7 @@ class BorrowingController extends Controller
     /**
      * Display borrowings list (filtered by role).
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
@@ -23,9 +26,27 @@ class BorrowingController extends Controller
             $query->where('user_id', $user->id);
         }
 
-        $borrowings = $query->paginate(10);
+        // FITUR-3: Filter & search
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
 
-        return view('borrowings.index', compact('borrowings'));
+        if ($request->filled('search')) {
+            $search = '%' . $request->search . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn($u) => $u->where('name', 'like', $search)
+                                                  ->orWhere('email', 'like', $search))
+                  ->orWhereHas('equipment', fn($e) => $e->where('name', 'like', $search));
+            });
+        }
+
+        $borrowings = $query->paginate(10)->withQueryString();
+        $statuses   = Borrowing::STATUSES ?? [
+            'pending', 'approved_by_laboran', 'approved_by_kepala_lab',
+            'ready_for_pickup', 'active', 'completed', 'rejected', 'overdue', 'issue_reported',
+        ];
+
+        return view('borrowings.index', compact('borrowings', 'statuses'));
     }
 
     /**
@@ -150,9 +171,24 @@ class BorrowingController extends Controller
         if ($equipment->category === 'umum') {
             $borrowing->update(['status' => 'ready_for_pickup']);
             $statusMsg = 'Disetujui dan siap diambil.';
+            // FITUR-5: Kirim notifikasi ke mahasiswa
+            Notification::send(
+                $borrowing->user_id,
+                'Peminjaman Disetujui ✅',
+                "Peminjaman {$equipment->name} Anda telah disetujui dan siap diambil.",
+                'success',
+                route('borrowings.show', $borrowing->id)
+            );
         } else {
             $borrowing->update(['status' => 'approved_by_laboran']);
             $statusMsg = 'Disetujui Laboran, menunggu persetujuan Kepala Lab.';
+            Notification::send(
+                $borrowing->user_id,
+                'Peminjaman Disetujui Laboran 🔄',
+                "Peminjaman {$equipment->name} Anda disetujui Laboran dan sedang menunggu persetujuan Kepala Lab.",
+                'info',
+                route('borrowings.show', $borrowing->id)
+            );
         }
 
         BorrowingLog::create([
@@ -182,6 +218,15 @@ class BorrowingController extends Controller
             'action_description'=> 'Kepala Lab menyetujui peminjaman. Menunggu serah terima oleh Laboran.',
         ]);
 
+        // FITUR-5: Notifikasi ke mahasiswa
+        Notification::send(
+            $borrowing->user_id,
+            'Peminjaman Disetujui Kepala Lab ✅',
+            "Peminjaman {$borrowing->equipment->name} Anda telah disetujui penuh. Silakan ambil alat ke Laboran.",
+            'success',
+            route('borrowings.show', $borrowing->id)
+        );
+
         return back()->with('success', 'Peminjaman disetujui. Laboran dapat melakukan serah terima.');
     }
 
@@ -194,13 +239,23 @@ class BorrowingController extends Controller
             'reject_reason' => 'required|string|min:5',
         ]);
 
-        if (!in_array($borrowing->status, ['pending', 'approved_by_laboran', 'approved_by_kepala_lab'])) {
-            return back()->with('error', 'Peminjaman ini tidak dapat ditolak.');
+        // BUG-1 FIX: Validasi role di backend — hanya Laboran yang bisa tolak 'pending',
+        // Kepala Lab bisa tolak semua status yang masih bisa ditolak.
+        $user = auth()->user();
+        $allowedStatuses = $user->isLaboran()
+            ? ['pending']
+            : ['pending', 'approved_by_laboran', 'approved_by_kepala_lab'];
+
+        if (!in_array($borrowing->status, $allowedStatuses)) {
+            return back()->with('error', 'Anda tidak berwenang menolak peminjaman dengan status ini.');
         }
 
         DB::transaction(function () use ($borrowing, $request) {
-            // Return stock
-            $borrowing->equipment->increment('available_stock');
+            // BUG-2 FIX: Gunakan min() agar available_stock tidak melebihi total_stock
+            $equipment = $borrowing->equipment;
+            $equipment->update([
+                'available_stock' => min($equipment->available_stock + 1, $equipment->total_stock),
+            ]);
 
             $borrowing->update([
                 'status' => 'rejected',
@@ -212,6 +267,15 @@ class BorrowingController extends Controller
                 'user_id' => auth()->id(),
                 'action_description' => 'Peminjaman ditolak. Alasan: ' . $request->reject_reason,
             ]);
+
+            // FITUR-5: Notifikasi ke mahasiswa
+            Notification::send(
+                $borrowing->user_id,
+                'Peminjaman Ditolak ❌',
+                "Peminjaman {$equipment->name} Anda ditolak. Alasan: {$request->reject_reason}",
+                'danger',
+                route('borrowings.show', $borrowing->id)
+            );
         });
 
         return back()->with('success', 'Peminjaman berhasil ditolak.');
@@ -249,26 +313,192 @@ class BorrowingController extends Controller
             'return_condition' => 'required|string|min:5',
         ]);
 
-        if ($borrowing->status !== 'active') {
-            return back()->with('error', 'Peminjaman ini tidak dalam status aktif.');
+        // DESAIN-3 FIX: Izinkan peminjaman 'overdue' untuk diproses pengembaliannya
+        if (!in_array($borrowing->status, ['active', 'overdue'])) {
+            return back()->with('error', 'Peminjaman ini tidak dalam status aktif atau terlambat.');
         }
 
         DB::transaction(function () use ($borrowing, $request) {
-            // Return stock
-            $borrowing->equipment->increment('available_stock');
+            // BUG-2 FIX: Gunakan min() agar available_stock tidak melebihi total_stock
+            $equipment = $borrowing->equipment;
+            $equipment->update([
+                'available_stock' => min($equipment->available_stock + 1, $equipment->total_stock),
+            ]);
+
+            $wasOverdue = $borrowing->status === 'overdue';
 
             $borrowing->update([
                 'status' => 'completed',
                 'return_condition' => $request->return_condition,
             ]);
 
+            $note = $wasOverdue ? ' [Pengembalian terlambat]' : '';
             BorrowingLog::create([
                 'borrowing_id' => $borrowing->id,
                 'user_id' => auth()->id(),
-                'action_description' => 'Alat dikembalikan. Kondisi: ' . $request->return_condition,
+                'action_description' => 'Alat dikembalikan' . $note . '. Kondisi: ' . $request->return_condition,
             ]);
         });
 
         return back()->with('success', 'Pengembalian berhasil diproses.');
+    }
+
+    /**
+     * Mahasiswa melaporkan masalah pada alat yang sedang dipinjam.
+     * DESAIN-2: Implementasi fitur issue_reported.
+     */
+    public function reportIssue(Request $request, Borrowing $borrowing)
+    {
+        $request->validate([
+            'issue_description' => 'required|string|min:10',
+        ]);
+
+        $user = auth()->user();
+
+        // Hanya peminjam yang boleh melaporkan masalah
+        if ($borrowing->user_id !== $user->id) {
+            abort(403);
+        }
+
+        if ($borrowing->status !== 'active') {
+            return back()->with('error', 'Masalah hanya bisa dilaporkan saat peminjaman aktif.');
+        }
+
+        $borrowing->update(['status' => 'issue_reported']);
+
+        BorrowingLog::create([
+            'borrowing_id' => $borrowing->id,
+            'user_id'      => $user->id,
+            'action_description' => 'Peminjam melaporkan masalah: ' . $request->issue_description,
+        ]);
+
+        return back()->with('success', 'Laporan masalah berhasil dikirim. Laboran akan segera menangani.');
+    }
+
+    /**
+     * Laboran menyelesaikan laporan masalah (issue_reported → active atau completed).
+     */
+    public function resolveIssue(Request $request, Borrowing $borrowing)
+    {
+        $request->validate([
+            'resolve_description' => 'required|string|min:5',
+            'resolve_action'      => 'required|in:continue,complete',
+        ]);
+
+        if ($borrowing->status !== 'issue_reported') {
+            return back()->with('error', 'Peminjaman ini tidak dalam status laporan masalah.');
+        }
+
+        DB::transaction(function () use ($borrowing, $request) {
+            if ($request->resolve_action === 'complete') {
+                // Selesaikan peminjaman & kembalikan stok
+                $equipment = $borrowing->equipment;
+                $equipment->update([
+                    'available_stock' => min($equipment->available_stock + 1, $equipment->total_stock),
+                ]);
+                $borrowing->update([
+                    'status'           => 'completed',
+                    'return_condition' => $request->resolve_description,
+                ]);
+                $action = 'Masalah diselesaikan dan alat dikembalikan. Catatan: ' . $request->resolve_description;
+            } else {
+                // Lanjutkan peminjaman (masalah sudah ditangani)
+                $borrowing->update(['status' => 'active']);
+                $action = 'Masalah ditangani, peminjaman dilanjutkan. Catatan: ' . $request->resolve_description;
+            }
+
+            BorrowingLog::create([
+                'borrowing_id'       => $borrowing->id,
+                'user_id'            => auth()->id(),
+                'action_description' => $action,
+            ]);
+        });
+
+        return back()->with('success', 'Laporan masalah berhasil ditangani.');
+    }
+
+    /**
+     * FITUR-4: Export laporan peminjaman ke PDF menggunakan dompdf.
+     * Accessible by Laboran & Kepala Lab.
+     */
+    public function exportPdf(Request $request)
+    {
+        $query = Borrowing::with(['user', 'equipment'])->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('search')) {
+            $search = '%' . $request->search . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn($u) => $u->where('name', 'like', $search))
+                  ->orWhereHas('equipment', fn($e) => $e->where('name', 'like', $search));
+            });
+        }
+
+        $borrowings = $query->get();
+
+        $filterParts = [];
+        if ($request->filled('status'))  $filterParts[] = 'Status: ' . $request->status;
+        if ($request->filled('search'))  $filterParts[] = 'Pencarian: ' . $request->search;
+        $filterInfo = $filterParts ? implode(', ', $filterParts) : null;
+
+        $pdf = Pdf::loadView('borrowings.report-pdf', compact('borrowings', 'filterInfo'))
+                  ->setPaper('a4', 'landscape');
+
+        $filename = 'laporan-peminjaman-' . now()->format('Ymd-His') . '.pdf';
+        return $pdf->download($filename);
+    }
+
+    /**
+     * FITUR-4: Export laporan peminjaman ke CSV (tanpa package tambahan).
+     */
+    public function exportCsv(Request $request)
+    {
+        $query = Borrowing::with(['user', 'equipment'])->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('search')) {
+            $search = '%' . $request->search . '%';
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn($u) => $u->where('name', 'like', $search))
+                  ->orWhereHas('equipment', fn($e) => $e->where('name', 'like', $search));
+            });
+        }
+
+        $borrowings = $query->get();
+        $filename   = 'laporan-peminjaman-' . now()->format('Ymd-His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($borrowings) {
+            $file = fopen('php://output', 'w');
+            // BOM for Excel UTF-8
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, ['No', 'Peminjam', 'Email', 'Alat', 'Kategori', 'Waktu Pinjam', 'Waktu Kembali', 'Status', 'Alasan Tolak', 'Tanggal Ajuan']);
+
+            foreach ($borrowings as $i => $b) {
+                fputcsv($file, [
+                    $i + 1,
+                    $b->user->name,
+                    $b->user->email,
+                    $b->equipment->name,
+                    ucfirst($b->equipment->category),
+                    $b->start_date,
+                    $b->end_date,
+                    $b->status_label,
+                    $b->reject_reason ?? '',
+                    $b->created_at->format('d/m/Y H:i'),
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

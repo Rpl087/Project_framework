@@ -24,7 +24,40 @@
         @endif
     </div>
 
-    <div class="glass-card animate-in animate-delay-1">
+    {{-- FITUR-3: Filter & Search (untuk non-Mahasiswa) --}}
+    @if(!auth()->user()->isMahasiswa())
+    <div class="glass-card animate-in animate-delay-1" style="padding:1.25rem;margin-bottom:1.25rem;">
+        <form method="GET" action="{{ route('borrowings.index') }}" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:1;min-width:200px;">
+                <label class="form-label">Cari</label>
+                <input type="text" name="search" value="{{ request('search') }}" class="form-input" placeholder="Nama peminjam atau nama alat...">
+            </div>
+            <div style="min-width:200px;">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-input">
+                    <option value="">Semua Status</option>
+                    <option value="pending"                {{ request('status') === 'pending'                ? 'selected' : '' }}>Menunggu Persetujuan</option>
+                    <option value="approved_by_laboran"    {{ request('status') === 'approved_by_laboran'    ? 'selected' : '' }}>Disetujui Laboran</option>
+                    <option value="approved_by_kepala_lab" {{ request('status') === 'approved_by_kepala_lab' ? 'selected' : '' }}>Disetujui Kepala Lab</option>
+                    <option value="ready_for_pickup"       {{ request('status') === 'ready_for_pickup'       ? 'selected' : '' }}>Siap Diambil</option>
+                    <option value="active"                 {{ request('status') === 'active'                 ? 'selected' : '' }}>Aktif</option>
+                    <option value="overdue"                {{ request('status') === 'overdue'                ? 'selected' : '' }}>Terlambat</option>
+                    <option value="issue_reported"         {{ request('status') === 'issue_reported'         ? 'selected' : '' }}>Ada Masalah</option>
+                    <option value="completed"              {{ request('status') === 'completed'              ? 'selected' : '' }}>Selesai</option>
+                    <option value="rejected"               {{ request('status') === 'rejected'               ? 'selected' : '' }}>Ditolak</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                <a href="{{ route('borrowings.index') }}" class="btn btn-outline btn-sm">Reset</a>
+                <a href="{{ route('borrowings.export-pdf', request()->query()) }}" class="btn btn-outline btn-sm" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b;">📄 PDF</a>
+                <a href="{{ route('borrowings.export-csv', request()->query()) }}" class="btn btn-outline btn-sm" style="background:#d1fae5;border-color:#a7f3d0;color:#065f46;">📊 CSV</a>
+            </div>
+        </form>
+    </div>
+    @endif
+
+    <div class="glass-card animate-in animate-delay-2">
         <table class="data-table">
             <thead>
                 <tr>

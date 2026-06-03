@@ -493,6 +493,37 @@
             [data-theme="dark"] .main-content [style*="background:#f8fafc"] {
                 background: var(--th-bg) !important;
             }
+            /* ANEH-4 FIX: Tambahan dark mode override yang sebelumnya hilang */
+            [data-theme="dark"] .main-content [style*="background:#fee2e2"] {
+                background: rgba(239,68,68,0.12) !important;
+            }
+            [data-theme="dark"] .main-content [style*="background:#d1fae5"] {
+                background: rgba(16,185,129,0.12) !important;
+            }
+            [data-theme="dark"] .main-content [style*="background:#eff6ff"] {
+                background: rgba(59,130,246,0.12) !important;
+            }
+            [data-theme="dark"] .main-content [style*="background:#fef3c7"] {
+                background: rgba(245,158,11,0.12) !important;
+            }
+            [data-theme="dark"] .main-content [style*="background:#fff7ed"] {
+                background: rgba(249,115,22,0.12) !important;
+            }
+            [data-theme="dark"] .main-content [style*="background:#f0fdf4"] {
+                background: rgba(34,197,94,0.10) !important;
+            }
+            [data-theme="dark"] .main-content [style*="background:#fdf2f8"] {
+                background: rgba(168,85,247,0.10) !important;
+            }
+            [data-theme="dark"] .main-content [style*="color:#065f46"] { color: #34d399 !important; }
+            [data-theme="dark"] .main-content [style*="color:#991b1b"] { color: #f87171 !important; }
+            [data-theme="dark"] .main-content [style*="color:#1e40af"] { color: #93c5fd !important; }
+            [data-theme="dark"] .main-content [style*="color:#92400e"] { color: #fbbf24 !important; }
+            [data-theme="dark"] .main-content [style*="color:#9a3412"] { color: #fb923c !important; }
+            [data-theme="dark"] .main-content [style*="border:1px solid #a7f3d0"] { border-color: rgba(52,211,153,0.3) !important; }
+            [data-theme="dark"] .main-content [style*="border:1px solid #fca5a5"] { border-color: rgba(248,113,113,0.3) !important; }
+            [data-theme="dark"] .main-content [style*="border:1px solid #bfdbfe"] { border-color: rgba(147,197,253,0.3) !important; }
+            [data-theme="dark"] .main-content [style*="border:1px solid #fed7aa"] { border-color: rgba(251,146,60,0.3) !important; }
 
             /* ═══════════════════════════════════════════════════
                Responsive — Tablet (≤1024px)
@@ -665,30 +696,53 @@
                         </svg>
                         Daftar Peminjaman
                     </a>
+
+                    <div class="sidebar-section">Pengguna</div>
+                    <a href="{{ route('users.index') }}" class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        Kelola User
+                    </a>
                 @endif
 
                 @if(auth()->user()->isKepalaLab())
                     <div class="sidebar-section">Persetujuan</div>
-                    <a href="{{ route('borrowings.index') }}" class="sidebar-link {{ request()->routeIs('borrowings.*') ? 'active' : '' }}">
+                    <a href="{{ route('borrowings.index') }}?status=approved_by_laboran" class="sidebar-link {{ request()->routeIs('borrowings.*') && request('status') === 'approved_by_laboran' ? 'active' : '' }}">
                         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Persetujuan Alat Khusus
+                        Butuh Persetujuan
+                    </a>
+                    <a href="{{ route('borrowings.index') }}" class="sidebar-link {{ request()->routeIs('borrowings.index') && !request('status') ? 'active' : '' }}">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                        </svg>
+                        Semua Peminjaman
+                    </a>
+
+                    <div class="sidebar-section">Pengguna</div>
+                    <a href="{{ route('users.index') }}" class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        Kelola User
                     </a>
                 @endif
             </nav>
 
             <!-- User Info at bottom -->
-            <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem;border-top:1px solid rgba(255,255,255,0.08);">
-                <div style="display:flex;align-items:center;gap:0.75rem;">
-                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;">
+            <div style="position:absolute;bottom:0;left:0;right:0;border-top:1px solid rgba(255,255,255,0.08);">
+                <a href="{{ route('profile.edit') }}" style="display:flex;align-items:center;gap:0.75rem;padding:1rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.15)'" onmouseout="this.style.background='transparent'">
+                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;flex-shrink:0;">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                     <div style="flex:1;min-width:0;">
                         <p style="color:#e2e8f0;font-size:0.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ auth()->user()->name }}</p>
                         <p style="color:#64748b;font-size:0.7rem;text-transform:capitalize;">{{ str_replace('_', ' ', auth()->user()->role) }}</p>
                     </div>
-                </div>
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#475569" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </a>
             </div>
         </aside>
 
@@ -708,6 +762,17 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:0.75rem;">
                     <span class="top-bar-date" style="font-size:0.8rem;color:var(--txt-2);">{{ now()->format('d M Y') }}</span>
+
+                    {{-- Notification Bell --}}
+                    @php $unreadCount = auth()->user()->unreadNotificationsCount(); @endphp
+                    <a href="{{ route('notifications.index') }}" style="position:relative;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:0.5rem;border:1px solid var(--border-s);color:var(--txt-2);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--row-hover)';this.style.color='var(--txt-1)'" onmouseout="this.style.background='transparent';this.style.color='var(--txt-2)'" title="Notifikasi">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        @if($unreadCount > 0)
+                            <span style="position:absolute;top:4px;right:4px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid var(--topbar);"></span>
+                        @endif
+                    </a>
 
                     <!-- Dark / Light Mode Toggle -->
                     <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Ganti mode gelap/terang">
@@ -1080,6 +1145,7 @@
             }, CHECK_INTERVAL);
         })();
         </script>
+        @endif {{-- end isMahasiswa --}}
         @endauth
 
         @stack('scripts')

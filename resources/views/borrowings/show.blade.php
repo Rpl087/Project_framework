@@ -133,8 +133,8 @@
                 </form>
             @endif
 
-            {{-- Laboran: Process Return --}}
-            @if(auth()->user()->isLaboran() && $borrowing->status === 'active')
+            {{-- Laboran: Process Return (active OR overdue) --}}
+            @if(auth()->user()->isLaboran() && in_array($borrowing->status, ['active', 'overdue']))
                 <form method="POST" action="{{ route('borrowings.return', $borrowing) }}" style="flex:1;min-width:260px;">
                     @csrf
                     <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;">
@@ -142,11 +142,11 @@
                             <label class="form-label">Kondisi Pengembalian</label>
                             <input type="text" name="return_condition" class="form-input" required placeholder="Contoh: Baik, tidak ada kerusakan" minlength="5">
                         </div>
-                        <button type="submit" class="btn btn-warning" onclick="return confirm('Proses pengembalian alat?')">
+                        <button type="submit" class="btn {{ $borrowing->status === 'overdue' ? 'btn-danger' : 'btn-warning' }}" onclick="return confirm('Proses pengembalian alat?')">
                             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                             </svg>
-                            Proses Kembali
+                            {{ $borrowing->status === 'overdue' ? 'Proses Kembali (Terlambat)' : 'Proses Kembali' }}
                         </button>
                     </div>
                     @error('return_condition') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
@@ -154,8 +154,7 @@
             @endif
 
             {{-- Reject (Laboran/Kepala Lab) --}}
-            {{-- FIX SEDANG-1: Kepala Lab juga bisa menolak peminjaman 'pending'
-                 sebagai mekanisme koreksi admin, sesuai kapabilitas BorrowingController::reject() --}}
+            {{-- BUG-1 FIX: Laboran hanya bisa tolak 'pending', Kepala Lab bisa tolak lebih banyak --}}
             @if(
                 (auth()->user()->isLaboran() && $borrowing->status === 'pending') ||
                 (auth()->user()->isKepalaLab() && in_array($borrowing->status, ['pending', 'approved_by_laboran', 'approved_by_kepala_lab']))
@@ -178,7 +177,56 @@
                 </form>
             @endif
 
-            @if(!in_array($borrowing->status, ['pending', 'approved_by_laboran', 'approved_by_kepala_lab', 'ready_for_pickup', 'active']))
+            {{-- Mahasiswa: Laporkan Masalah (active only) --}}
+            @if(auth()->user()->isMahasiswa() && $borrowing->status === 'active' && $borrowing->user_id === auth()->id())
+                <form method="POST" action="{{ route('borrowings.report-issue', $borrowing) }}" style="flex:1;min-width:260px;">
+                    @csrf
+                    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;">
+                        <div style="flex:1;">
+                            <label class="form-label">Deskripsi Masalah</label>
+                            <input type="text" name="issue_description" class="form-input" required placeholder="Jelaskan masalah yang ditemukan..." minlength="10">
+                        </div>
+                        <button type="submit" class="btn btn-warning" onclick="return confirm('Laporkan masalah pada alat ini?')">
+                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Laporkan Masalah
+                        </button>
+                    </div>
+                    @error('issue_description') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+                </form>
+            @endif
+
+            {{-- Laboran: Selesaikan Laporan Masalah (issue_reported) --}}
+            @if(auth()->user()->isLaboran() && $borrowing->status === 'issue_reported')
+                <div style="flex:1;min-width:300px;background:#fff7ed;border:1px solid #fed7aa;border-radius:0.75rem;padding:1.25rem;">
+                    <p style="font-size:0.85rem;font-weight:700;color:#9a3412;margin-bottom:1rem;">⚠️ Ada Laporan Masalah — Pilih Tindakan</p>
+                    <form method="POST" action="{{ route('borrowings.resolve-issue', $borrowing) }}">
+                        @csrf
+                        <div style="margin-bottom:0.75rem;">
+                            <label class="form-label">Catatan Penanganan</label>
+                            <input type="text" name="resolve_description" class="form-input" required placeholder="Jelaskan penanganan yang dilakukan..." minlength="5">
+                            @error('resolve_description') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+                        </div>
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                            <button type="submit" name="resolve_action" value="continue" class="btn btn-success" onclick="return confirm('Tandai masalah selesai dan lanjutkan peminjaman?')">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Masalah Selesai, Lanjutkan Pinjam
+                            </button>
+                            <button type="submit" name="resolve_action" value="complete" class="btn btn-warning" onclick="return confirm('Selesaikan peminjaman dan kembalikan alat sekarang?')">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                </svg>
+                                Selesaikan & Kembalikan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            @endif
+
+            @if(!in_array($borrowing->status, ['pending', 'approved_by_laboran', 'approved_by_kepala_lab', 'ready_for_pickup', 'active', 'overdue', 'issue_reported']))
                 <p style="color:#94a3b8;font-size:0.85rem;">Tidak ada aksi yang diperlukan.</p>
             @endif
         </div>

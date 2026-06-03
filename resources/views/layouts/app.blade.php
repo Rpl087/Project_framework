@@ -1145,8 +1145,6 @@
             }, CHECK_INTERVAL);
         })();
         </script>
-        @endif {{-- end isMahasiswa --}}
-        @endauth
 
         @stack('scripts')
     </body>

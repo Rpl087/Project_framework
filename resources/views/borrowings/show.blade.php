@@ -85,7 +85,7 @@
     </div>
     @endif
 
-    <!-- Action Buttons -->
+    <!-- Action Buttons — Non-Mahasiswa (Laboran & Kepala Lab) -->
     @if(!auth()->user()->isMahasiswa())
     <div class="glass-card animate-in animate-delay-3" style="padding:1.5rem;margin-bottom:1.5rem;">
         <h3 style="font-size:0.8rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;">Aksi</h3>
@@ -177,26 +177,6 @@
                 </form>
             @endif
 
-            {{-- Mahasiswa: Laporkan Masalah (active only) --}}
-            @if(auth()->user()->isMahasiswa() && $borrowing->status === 'active' && $borrowing->user_id === auth()->id())
-                <form method="POST" action="{{ route('borrowings.report-issue', $borrowing) }}" style="flex:1;min-width:260px;">
-                    @csrf
-                    <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:flex-end;">
-                        <div style="flex:1;">
-                            <label class="form-label">Deskripsi Masalah</label>
-                            <input type="text" name="issue_description" class="form-input" required placeholder="Jelaskan masalah yang ditemukan..." minlength="10">
-                        </div>
-                        <button type="submit" class="btn btn-warning" onclick="return confirm('Laporkan masalah pada alat ini?')">
-                            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                            </svg>
-                            Laporkan Masalah
-                        </button>
-                    </div>
-                    @error('issue_description') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
-                </form>
-            @endif
-
             {{-- Laboran: Selesaikan Laporan Masalah (issue_reported) --}}
             @if(auth()->user()->isLaboran() && $borrowing->status === 'issue_reported')
                 <div style="flex:1;min-width:300px;background:#fff7ed;border:1px solid #fed7aa;border-radius:0.75rem;padding:1.25rem;">
@@ -231,6 +211,47 @@
             @endif
         </div>
     </div>
+    @endif
+
+    {{-- BUG-2 FIX: Aksi Mahasiswa dipindahkan ke luar blok non-Mahasiswa
+         agar tombol Laporkan Masalah bisa tampil dan diakses oleh Mahasiswa. --}}
+    @if(auth()->user()->isMahasiswa() && $borrowing->user_id === auth()->id())
+        @if($borrowing->status === 'active')
+        <div class="glass-card animate-in animate-delay-3" style="padding:1.5rem;margin-bottom:1.5rem;">
+            <h3 style="font-size:0.8rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;">Aksi Saya</h3>
+            <form method="POST" action="{{ route('borrowings.report-issue', $borrowing) }}" style="max-width:480px;">
+                @csrf
+                <div style="margin-bottom:0.75rem;">
+                    <label class="form-label">Deskripsi Masalah</label>
+                    <input type="text" name="issue_description" class="form-input" required placeholder="Jelaskan masalah yang ditemukan pada alat..." minlength="10">
+                    @error('issue_description') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+                </div>
+                <button type="submit" class="btn btn-warning" onclick="return confirm('Laporkan masalah pada alat ini?')">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    Laporkan Masalah
+                </button>
+            </form>
+        </div>
+        @endif
+
+        {{-- PERBAIKAN: Mahasiswa batalkan peminjaman pending --}}
+        @if($borrowing->status === 'pending')
+        <div class="glass-card animate-in animate-delay-3" style="padding:1.5rem;margin-bottom:1.5rem;background:#fff7ed;border:1px solid #fed7aa;">
+            <h3 style="font-size:0.8rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;">⚠️ Batalkan Pengajuan</h3>
+            <p style="font-size:0.85rem;color:#9a3412;margin-bottom:1rem;">Pengajuan peminjaman ini masih menunggu persetujuan. Anda dapat membatalkannya jika sudah tidak diperlukan. Stok alat akan dikembalikan.</p>
+            <form method="POST" action="{{ route('borrowings.cancel', $borrowing) }}">
+                @csrf
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin membatalkan pengajuan peminjaman ini?')">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Batalkan Pengajuan
+                </button>
+            </form>
+        </div>
+        @endif
     @endif
 
     <!-- Activity Log -->

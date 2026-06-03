@@ -28,7 +28,6 @@ Route::middleware('auth')->group(function () {
 
     // ---- Notifications (semua role) ----
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
     // ---- Mahasiswa Routes ----
@@ -38,6 +37,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/borrowings', [BorrowingController::class, 'store'])->name('borrowings.store');
         // DESAIN-2: Mahasiswa laporkan masalah alat
         Route::post('/borrowings/{borrowing}/report-issue', [BorrowingController::class, 'reportIssue'])->name('borrowings.report-issue');
+        // PERBAIKAN: Mahasiswa batalkan pengajuan pending
+        Route::post('/borrowings/{borrowing}/cancel', [BorrowingController::class, 'cancel'])->name('borrowings.cancel');
     });
 
     // ---- Laboran Routes ----

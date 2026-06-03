@@ -126,10 +126,21 @@ class EquipmentController extends Controller
 
     /**
      * Display equipment catalog for Mahasiswa (read-only).
+     * PERBAIKAN: Menambahkan filter pencarian dan kategori.
      */
-    public function catalog()
+    public function catalog(Request $request)
     {
-        $equipments = Equipment::available()->latest()->paginate(12);
+        $query = Equipment::available()->latest();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        $equipments = $query->paginate(12)->withQueryString();
         return view('equipments.catalog', compact('equipments'));
     }
 }

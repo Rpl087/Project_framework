@@ -55,11 +55,6 @@ class User extends Authenticatable
         return $this->hasMany(Borrowing::class);
     }
 
-    public function borrowingLogs()
-    {
-        return $this->hasMany(BorrowingLog::class);
-    }
-
     public function notifications()
     {
         return $this->hasMany(AppNotification::class);

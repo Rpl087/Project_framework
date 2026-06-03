@@ -17,32 +17,17 @@ class NotificationController extends Controller
             ->latest()
             ->paginate(20);
 
-        // Tandai semua yang baru dimuat sebagai sudah dibaca
-        auth()->user()->notifications()->whereNull('read_at')->update(['read_at' => now()]);
+        // Tandai hanya notifikasi di halaman ini sebagai sudah dibaca,
+        // bukan SEMUA notifikasi. Notifikasi di halaman 2+ tidak langsung
+        // terbaca sebelum user sempat melihatnya.
+        $ids = $notifications->pluck('id');
+        auth()->user()->notifications()->whereIn('id', $ids)->whereNull('read_at')->update(['read_at' => now()]);
 
         return view('notifications.index', compact('notifications'));
     }
 
     /**
-     * Tandai satu notifikasi sebagai sudah dibaca.
-     */
-    public function markRead(Notification $notification)
-    {
-        if ($notification->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        $notification->markAsRead();
-
-        if ($notification->link) {
-            return redirect($notification->link);
-        }
-
-        return back();
-    }
-
-    /**
-     * Tandai semua notifikasi sebagai sudah dibaca (AJAX atau POST).
+     * Tandai semua notifikasi sebagai sudah dibaca.
      */
     public function markAllRead()
     {

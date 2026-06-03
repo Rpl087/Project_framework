@@ -6,7 +6,6 @@ use App\Models\Borrowing;
 use App\Models\BorrowingLog;
 use App\Models\Equipment;
 use App\Models\Notification;
-use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,12 +40,8 @@ class BorrowingController extends Controller
         }
 
         $borrowings = $query->paginate(10)->withQueryString();
-        $statuses   = Borrowing::STATUSES ?? [
-            'pending', 'approved_by_laboran', 'approved_by_kepala_lab',
-            'ready_for_pickup', 'active', 'completed', 'rejected', 'overdue', 'issue_reported',
-        ];
 
-        return view('borrowings.index', compact('borrowings', 'statuses'));
+        return view('borrowings.index', compact('borrowings'));
     }
 
     /**
@@ -341,6 +336,44 @@ class BorrowingController extends Controller
         });
 
         return back()->with('success', 'Pengembalian berhasil diproses.');
+    }
+
+    /**
+     * Mahasiswa membatalkan pengajuan peminjaman yang masih pending.
+     * PERBAIKAN: Fitur baru yang sebelumnya tidak ada.
+     */
+    public function cancel(Borrowing $borrowing)
+    {
+        $user = auth()->user();
+
+        // Hanya pemilik peminjaman yang boleh membatalkan
+        if ($borrowing->user_id !== $user->id) {
+            abort(403);
+        }
+
+        // Hanya bisa dibatalkan saat masih pending
+        if ($borrowing->status !== 'pending') {
+            return back()->with('error', 'Peminjaman hanya bisa dibatalkan saat masih menunggu persetujuan.');
+        }
+
+        DB::transaction(function () use ($borrowing, $user) {
+            // Kembalikan stok alat
+            $equipment = $borrowing->equipment;
+            $equipment->update([
+                'available_stock' => min($equipment->available_stock + 1, $equipment->total_stock),
+            ]);
+
+            $borrowing->update(['status' => 'rejected', 'reject_reason' => 'Dibatalkan oleh peminjam.']);
+
+            BorrowingLog::create([
+                'borrowing_id'       => $borrowing->id,
+                'user_id'            => $user->id,
+                'action_description' => 'Peminjaman dibatalkan oleh mahasiswa.',
+            ]);
+        });
+
+        return redirect()->route('borrowings.index')
+            ->with('success', 'Pengajuan peminjaman berhasil dibatalkan.');
     }
 
     /**

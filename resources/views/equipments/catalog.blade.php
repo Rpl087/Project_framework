@@ -16,6 +16,27 @@
         </a>
     </div>
 
+    {{-- PERBAIKAN: Filter & Search Katalog --}}
+    <div class="glass-card animate-in animate-delay-1" style="padding:1.25rem;margin-bottom:1.25rem;">
+        <form method="GET" action="{{ route('catalog') }}" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:1;min-width:200px;">
+                <label class="form-label">Cari Alat</label>
+                <input type="text" name="search" value="{{ request('search') }}" class="form-input" placeholder="Nama alat...">
+            </div>
+            <div style="min-width:160px;">
+                <label class="form-label">Kategori</label>
+                <select name="category" class="form-input">
+                    <option value="">Semua Kategori</option>
+                    <option value="umum"   {{ request('category') === 'umum'   ? 'selected' : '' }}>Umum</option>
+                    <option value="khusus" {{ request('category') === 'khusus' ? 'selected' : '' }}>Khusus</option>
+                </select>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                <a href="{{ route('catalog') }}" class="btn btn-outline btn-sm">Reset</a>
+            </div>
+        </form>
+    </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;">
         @forelse($equipments as $index => $eq)

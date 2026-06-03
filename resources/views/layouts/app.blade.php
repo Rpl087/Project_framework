@@ -1145,6 +1145,7 @@
             }, CHECK_INTERVAL);
         })();
         </script>
+        @endauth
 
         @stack('scripts')
     </body>

@@ -30,11 +30,11 @@ class EquipmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'total_stock' => 'required|integer|min:0',
-            'category' => 'required|in:umum,khusus',
-            'status' => 'required|in:good,maintenance',
+            'total_stock' => 'required|integer|min:1',
+            'category'    => 'required|in:umum,khusus',
+            'status'      => 'required|in:good,maintenance',
         ]);
 
         $validated['available_stock'] = $validated['total_stock'];
@@ -81,9 +81,17 @@ class EquipmentController extends Controller
      */
     public function destroy(Equipment $equipment)
     {
-        // Check if equipment has active borrowings
-        if ($equipment->borrowings()->whereIn('status', ['pending', 'approved_by_laboran', 'ready_for_pickup', 'active'])->exists()) {
-            return back()->with('error', 'Tidak dapat menghapus alat yang sedang dipinjam.');
+        // Cek apakah alat memiliki peminjaman yang sedang aktif/diproses
+        // FIX KRITIS-2: Sertakan 'approved_by_kepala_lab' agar alat khusus
+        // yang sudah disetujui Kepala Lab tidak bisa dihapus.
+        if ($equipment->borrowings()->whereIn('status', [
+            'pending',
+            'approved_by_laboran',
+            'approved_by_kepala_lab',   // ← FIX: status ini tadinya tidak dicek
+            'ready_for_pickup',
+            'active',
+        ])->exists()) {
+            return back()->with('error', 'Tidak dapat menghapus alat yang sedang dipinjam atau dalam proses persetujuan.');
         }
 
         $equipment->delete();

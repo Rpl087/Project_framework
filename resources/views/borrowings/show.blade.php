@@ -118,7 +118,10 @@
             @endif
 
             {{-- Laboran: Handover --}}
-            @if(auth()->user()->isLaboran() && $borrowing->status === 'ready_for_pickup')
+            {{-- FIX KRITIS-1: Mencakup KEDUA status siap serah terima:
+                 - ready_for_pickup  : alat umum (disetujui Laboran)
+                 - approved_by_kepala_lab : alat khusus (disetujui Kepala Lab) --}}
+            @if(auth()->user()->isLaboran() && in_array($borrowing->status, ['ready_for_pickup', 'approved_by_kepala_lab']))
                 <form method="POST" action="{{ route('borrowings.handover', $borrowing) }}">
                     @csrf
                     <button type="submit" class="btn btn-primary" onclick="return confirm('Serahkan alat kepada peminjam?')">
@@ -151,9 +154,11 @@
             @endif
 
             {{-- Reject (Laboran/Kepala Lab) --}}
+            {{-- FIX SEDANG-1: Kepala Lab juga bisa menolak peminjaman 'pending'
+                 sebagai mekanisme koreksi admin, sesuai kapabilitas BorrowingController::reject() --}}
             @if(
                 (auth()->user()->isLaboran() && $borrowing->status === 'pending') ||
-                (auth()->user()->isKepalaLab() && $borrowing->status === 'approved_by_laboran')
+                (auth()->user()->isKepalaLab() && in_array($borrowing->status, ['pending', 'approved_by_laboran', 'approved_by_kepala_lab']))
             )
                 <form method="POST" action="{{ route('borrowings.reject', $borrowing) }}" style="flex:1;min-width:260px;">
                     @csrf
@@ -173,7 +178,7 @@
                 </form>
             @endif
 
-            @if(!in_array($borrowing->status, ['pending', 'approved_by_laboran', 'ready_for_pickup', 'active']))
+            @if(!in_array($borrowing->status, ['pending', 'approved_by_laboran', 'approved_by_kepala_lab', 'ready_for_pickup', 'active']))
                 <p style="color:#94a3b8;font-size:0.85rem;">Tidak ada aksi yang diperlukan.</p>
             @endif
         </div>

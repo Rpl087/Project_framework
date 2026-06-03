@@ -23,8 +23,8 @@ class Borrowing extends Model
     protected function casts(): array
     {
         return [
-            'start_date' => 'string',
-            'end_date' => 'string',
+            'start_date' => 'string',  // format HH:MM (waktu dalam sehari)
+            'end_date'   => 'string',  // format HH:MM (waktu dalam sehari)
         ];
     }
 

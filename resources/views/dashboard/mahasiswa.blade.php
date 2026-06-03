@@ -42,7 +42,9 @@
         <div class="stat-card animate-in animate-delay-3">
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <div>
-                    <p style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Menunggu</p>
+                    {{-- FIX SEDANG-2: Label diubah 'Dalam Proses' karena stat ini
+                         mencakup pending + approved_by_laboran + approved_by_kepala_lab --}}
+                    <p style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Dalam Proses</p>
                     <p style="font-size:2rem;font-weight:800;color:#d97706;margin-top:0.25rem;">{{ $stats['pending_borrowings'] }}</p>
                 </div>
                 <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;">

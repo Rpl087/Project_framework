@@ -39,12 +39,14 @@
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.25rem;">
                 <div>
                     <label class="form-label">Waktu Mulai Pinjam *</label>
-                    <input type="time" name="start_date" value="{{ old('start_date') }}" class="form-input" required>
+                    <input type="time" name="start_date" value="{{ old('start_date') }}" class="form-input" required min="08:00" max="19:55" step="300">
+                    <p style="font-size:0.72rem;color:#94a3b8;margin-top:0.3rem;">Jam operasional: 08:00 &ndash; sebelum 20:00</p>
                     @error('start_date') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="form-label">Waktu Pengembalian *</label>
-                    <input type="time" name="end_date" value="{{ old('end_date') }}" class="form-input" required>
+                    <input type="time" name="end_date" value="{{ old('end_date') }}" class="form-input" required min="08:05" max="20:00" step="300">
+                    <p style="font-size:0.72rem;color:#94a3b8;margin-top:0.3rem;">Maksimal pukul 20:00</p>
                     @error('end_date') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
             </div>

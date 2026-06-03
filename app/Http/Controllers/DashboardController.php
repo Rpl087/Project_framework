@@ -28,10 +28,15 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $stats = [
-            'total_borrowings' => $user->borrowings()->count(),
-            'active_borrowings' => $user->borrowings()->where('status', 'active')->count(),
-            'pending_borrowings' => $user->borrowings()->where('status', 'pending')->count(),
-            'completed_borrowings' => $user->borrowings()->where('status', 'completed')->count(),
+            'total_borrowings'    => $user->borrowings()->count(),
+            'active_borrowings'   => $user->borrowings()->where('status', 'active')->count(),
+            // FIX SEDANG-2: Sertakan semua status 'dalam proses' agar stat informatif.
+            // Sebelumnya hanya menghitung 'pending', melewatkan alat yang sedang
+            // dalam review Laboran/Kepala Lab.
+            'pending_borrowings'  => $user->borrowings()
+                ->whereIn('status', ['pending', 'approved_by_laboran', 'approved_by_kepala_lab'])
+                ->count(),
+            'completed_borrowings'=> $user->borrowings()->where('status', 'completed')->count(),
         ];
 
         $recentBorrowings = $user->borrowings()
@@ -45,12 +50,17 @@ class DashboardController extends Controller
 
     private function laboranDashboard()
     {
+        // Status yang artinya "siap diserahterimakan" oleh Laboran:
+        // - ready_for_pickup   : alat umum (sudah disetujui Laboran)
+        // - approved_by_kepala_lab : alat khusus (sudah disetujui Kepala Lab)
+        $handoverStatuses = ['ready_for_pickup', 'approved_by_kepala_lab'];
+
         $stats = [
-            'total_equipment' => Equipment::count(),
-            'maintenance_equipment' => Equipment::where('status', 'maintenance')->count(),
-            'pending_requests' => Borrowing::where('status', 'pending')->count(),
-            'active_borrowings' => Borrowing::where('status', 'active')->count(),
-            'ready_for_pickup' => Borrowing::where('status', 'ready_for_pickup')->count(),
+            'total_equipment'      => Equipment::count(),
+            'maintenance_equipment'=> Equipment::where('status', 'maintenance')->count(),
+            'pending_requests'     => Borrowing::where('status', 'pending')->count(),
+            'active_borrowings'    => Borrowing::where('status', 'active')->count(),
+            'ready_for_pickup'     => Borrowing::whereIn('status', $handoverStatuses)->count(),
         ];
 
         $pendingRequests = Borrowing::with(['user', 'equipment'])
@@ -65,17 +75,31 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        return view('dashboard.laboran', compact('stats', 'pendingRequests', 'activeBorrowings'));
+        // Alat yang sudah siap diserahterimakan (umum & khusus)
+        $readyForHandover = Borrowing::with(['user', 'equipment'])
+            ->whereIn('status', $handoverStatuses)
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('dashboard.laboran', compact(
+            'stats',
+            'pendingRequests',
+            'activeBorrowings',
+            'readyForHandover'
+        ));
     }
 
     private function kepalaLabDashboard()
     {
         $stats = [
-            'pending_approvals' => Borrowing::where('status', 'approved_by_laboran')->count(),
-            'total_equipment' => Equipment::count(),
-            'active_borrowings' => Borrowing::where('status', 'active')->count(),
-            'completed_this_month' => Borrowing::where('status', 'completed')
+            'pending_approvals'   => Borrowing::where('status', 'approved_by_laboran')->count(),
+            'approved_count'      => Borrowing::where('status', 'approved_by_kepala_lab')->count(),
+            'total_equipment'     => Equipment::count(),
+            'active_borrowings'   => Borrowing::where('status', 'active')->count(),
+            'completed_this_month'=> Borrowing::where('status', 'completed')
                 ->whereMonth('updated_at', now()->month)
+                ->whereYear('updated_at', now()->year)
                 ->count(),
         ];
 

@@ -44,9 +44,29 @@ class BorrowingController extends Controller
     {
         $validated = $request->validate([
             'equipment_id' => 'required|exists:equipments,id',
-            'start_date' => 'required|date_format:H:i',
-            'end_date' => 'required|date_format:H:i|after:start_date',
-            'purpose' => 'required|string|min:10',
+            'start_date'   => [
+                'required',
+                'date_format:H:i',
+                function ($attribute, $value, $fail) {
+                    // FIX SEDANG-3: Gunakan >= bukan > agar 20:00 tidak bisa dipilih
+                    // sebagai waktu mulai (tidak mungkin menentukan end_date yang valid
+                    // karena end_date harus after:start_date dan max 20:00).
+                    if ($value < '08:00' || $value >= '20:00') {
+                        $fail('Waktu mulai pinjam harus antara pukul 08:00 hingga sebelum 20:00.');
+                    }
+                },
+            ],
+            'end_date'     => [
+                'required',
+                'date_format:H:i',
+                'after:start_date',
+                function ($attribute, $value, $fail) {
+                    if ($value > '20:00') {
+                        $fail('Waktu pengembalian tidak boleh melebihi pukul 20:00.');
+                    }
+                },
+            ],
+            'purpose'      => 'required|string|min:10',
         ]);
 
         try {
@@ -62,7 +82,10 @@ class BorrowingController extends Controller
                     throw new \Exception('Alat sedang dalam maintenance.');
                 }
 
-                // Decrement available stock
+                // FIX RINGAN-1: Stok dikurangi saat pending — bukan bug, ini desain.
+                // Tujuan: mencegah double-booking (dua mahasiswa meminjam alat yang sama).
+                // Stok dikembalikan jika: (a) permintaan ditolak via reject(), atau
+                //                         (b) pengembalian diproses via processReturn().
                 $equipment->decrement('available_stock');
 
                 // Create borrowing record
@@ -143,6 +166,7 @@ class BorrowingController extends Controller
 
     /**
      * Kepala Lab approves request (khusus equipment only).
+     * Status menjadi approved_by_kepala_lab — Laboran masih perlu melakukan serah terima.
      */
     public function approveKepalaLab(Borrowing $borrowing)
     {
@@ -150,15 +174,15 @@ class BorrowingController extends Controller
             return back()->with('error', 'Peminjaman ini tidak dalam status menunggu persetujuan Kepala Lab.');
         }
 
-        $borrowing->update(['status' => 'ready_for_pickup']);
+        $borrowing->update(['status' => 'approved_by_kepala_lab']);
 
         BorrowingLog::create([
-            'borrowing_id' => $borrowing->id,
-            'user_id' => auth()->id(),
-            'action_description' => 'Kepala Lab menyetujui peminjaman. Status: siap diambil.',
+            'borrowing_id'      => $borrowing->id,
+            'user_id'           => auth()->id(),
+            'action_description'=> 'Kepala Lab menyetujui peminjaman. Menunggu serah terima oleh Laboran.',
         ]);
 
-        return back()->with('success', 'Peminjaman disetujui dan siap diambil.');
+        return back()->with('success', 'Peminjaman disetujui. Laboran dapat melakukan serah terima.');
     }
 
     /**
@@ -170,7 +194,7 @@ class BorrowingController extends Controller
             'reject_reason' => 'required|string|min:5',
         ]);
 
-        if (!in_array($borrowing->status, ['pending', 'approved_by_laboran'])) {
+        if (!in_array($borrowing->status, ['pending', 'approved_by_laboran', 'approved_by_kepala_lab'])) {
             return back()->with('error', 'Peminjaman ini tidak dapat ditolak.');
         }
 
@@ -195,18 +219,21 @@ class BorrowingController extends Controller
 
     /**
      * Laboran hands over equipment to student.
+     * Menerima status ready_for_pickup (alat umum) dan approved_by_kepala_lab (alat khusus).
      */
     public function handover(Borrowing $borrowing)
     {
-        if ($borrowing->status !== 'ready_for_pickup') {
+        $readyStatuses = ['ready_for_pickup', 'approved_by_kepala_lab'];
+
+        if (!in_array($borrowing->status, $readyStatuses)) {
             return back()->with('error', 'Peminjaman belum siap untuk diserahkan.');
         }
 
         $borrowing->update(['status' => 'active']);
 
         BorrowingLog::create([
-            'borrowing_id' => $borrowing->id,
-            'user_id' => auth()->id(),
+            'borrowing_id'       => $borrowing->id,
+            'user_id'            => auth()->id(),
             'action_description' => 'Alat diserahkan kepada peminjam. Status: aktif.',
         ]);
 

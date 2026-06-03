@@ -32,7 +32,7 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
                 <div>
                     <label class="form-label">Total Stok *</label>
-                    <input type="number" name="total_stock" value="{{ old('total_stock', 1) }}" class="form-input" min="0" required>
+                    <input type="number" name="total_stock" value="{{ old('total_stock', 1) }}" class="form-input" min="1" required>
                     @error('total_stock') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
                 <div>

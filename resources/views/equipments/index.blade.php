@@ -16,25 +16,6 @@
         </a>
     </div>
 
-    @php
-    $imageMap = [
-        'Laptop ASUS ROG'               => 'laptop-asus-rog.png',
-        'Raspberry Pi 5'                => 'raspberry-pi-5.png',
-        'Arduino Mega 2560'             => 'arduino-mega.png',
-        'Cisco Router 2901'             => 'cisco-router-2901.png',
-        'Cisco Switch Catalyst 2960'    => 'cisco-switch-2960.png',
-        'Server Dell PowerEdge'         => 'server-dell-poweredge.png',
-        'Monitor LG UltraWide 34"'      => 'monitor-lg-ultrawide.png',
-        'VR Headset Meta Quest 3'       => 'vr-headset-meta-quest3.png',
-        '3D Printer Creality Ender'     => 'printer-3d-creality.png',
-        'Kabel UTP Cat6 + RJ45 Kit'     => 'kabel-utp-rj45.png',
-        'GPU Workstation NVIDIA A4000'  => 'gpu-nvidia-a4000.png',
-        'Sensor Kit IoT'                => 'sensor-kit-iot.png',
-        'Oscilloscope Digital Rigol'    => 'oscilloscope-rigol.png',
-        'Webcam Logitech C920'          => 'webcam-logitech-c920.png',
-        'External HDD 2TB'              => 'external-hdd-2tb.png',
-    ];
-    @endphp
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;">
         @forelse($equipments as $index => $eq)

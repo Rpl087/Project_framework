@@ -538,6 +538,63 @@
                 main { padding: 1rem !important; }
                 .top-bar-date { display: none; }
             }
+
+            /* ═══════════════════════════════════════════════════
+               Deadline Alert Bar — Peringatan batas waktu pinjam
+            ═══════════════════════════════════════════════════ */
+            #deadline-alert-bar {
+                display: none;
+                position: sticky;
+                top: 0;
+                z-index: 900;
+                margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+            }
+            .deadline-bar-item {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.6rem 1.25rem;
+                font-size: 0.82rem;
+                font-weight: 600;
+                border-left: 4px solid transparent;
+                animation: slideBarIn 0.4s cubic-bezier(0.22,1,0.36,1);
+            }
+            .deadline-bar-warning {
+                background: #fffbeb;
+                color: #92400e;
+                border-left-color: #f59e0b;
+            }
+            .deadline-bar-danger {
+                background: linear-gradient(90deg, #fef2f2, #fee2e2);
+                color: #991b1b;
+                border-left-color: #ef4444;
+                animation: slideBarIn 0.4s cubic-bezier(0.22,1,0.36,1),
+                           pulseBg 2s ease-in-out infinite;
+            }
+            .deadline-bar-item .dbar-icon {
+                font-size: 1rem;
+                flex-shrink: 0;
+            }
+            .deadline-bar-item .dbar-dismiss {
+                margin-left: auto;
+                background: none;
+                border: none;
+                cursor: pointer;
+                opacity: 0.5;
+                font-size: 1.1rem;
+                line-height: 1;
+                padding: 0 0.25rem;
+                color: inherit;
+            }
+            .deadline-bar-item .dbar-dismiss:hover { opacity: 1; }
+            @keyframes slideBarIn {
+                from { opacity: 0; transform: translateY(-8px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes pulseBg {
+                0%, 100% { background: linear-gradient(90deg,#fef2f2,#fee2e2); }
+                50%       { background: linear-gradient(90deg,#fee2e2,#fecaca); }
+            }
         </style>
     </head>
     <body class="antialiased">
@@ -704,6 +761,13 @@
                     </div>
                 @endif
 
+                {{-- ─────────────────────────────────────────────────────────
+                     Deadline Alert Bar
+                     Ditampilkan secara dinamis oleh JavaScript di bawah.
+                     Mengingatkan user tentang batas waktu pengembalian alat.
+                ───────────────────────────────────────────────────────── --}}
+                <div id="deadline-alert-bar"></div>
+
                 @yield('content')
             </main>
         </div>
@@ -856,6 +920,168 @@
                 });
             });
         </script>
+
+        @auth
+        {{-- ──────────────────────────────────────────────────────────
+             Deadline Alert Engine
+             Menampilkan peringatan real-time saat mendekati batas
+             waktu pengembalian alat (jam operasional 08:00 - 20:00).
+        ────────────────────────────────────────────────────────── --}}
+        @php
+            // FIX ANEH-2: Hapus filter whereDate('created_at', today) agar
+            // peminjaman aktif dari HARI SEBELUMNYA juga masuk ke data alert.
+            // Sebelumnya, borrowing yang tidak dikembalikan kemarin tidak mendapat alert.
+            $deadlineAlertData = auth()->user()->borrowings()
+                ->where('status', 'active')
+                ->with('equipment:id,name')
+                ->select('id', 'end_date', 'equipment_id', 'created_at')
+                ->latest()
+                ->get()
+                ->map(fn($b) => [
+                    'id'           => $b->id,
+                    'end_date'     => $b->end_date,
+                    'name'         => $b->equipment->name,
+                    'url'          => route('borrowings.show', $b->id),
+                    'created_today'=> $b->created_at->isToday(), // flag untuk JS
+                ]);
+        @endphp
+        <script>
+        (function () {
+            /* ── Konfigurasi ─────────────────────────────── */
+            const LAB_CLOSE      = '20:00'; // Batas tutup lab
+            const WARN_MINUTES   = 60;      // Mulai peringatan X menit sebelum
+            const DANGER_MINUTES = 15;      // Level bahaya X menit sebelum
+            const CHECK_INTERVAL = 30000;   // Cek setiap 30 detik
+
+            const activeBorrowings = @json($deadlineAlertData);
+
+            /* ── Helper ──────────────────────────────────── */
+            function toMins(hhmm) {
+                const [h, m] = hhmm.substring(0,5).split(':').map(Number);
+                return h * 60 + m;
+            }
+            function nowHHMM() {
+                const d = new Date();
+                return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+            }
+
+            /* ── Bangun daftar alert ────────────────────────── */
+            function buildAlerts() {
+                const nowMin   = toMins(nowHHMM());
+                const closeMin = toMins(LAB_CLOSE);
+                const alerts   = [];
+
+                /* [1] Peringatan penutupan lab (untuk semua user) */
+                const minsToClose = closeMin - nowMin;
+                if (minsToClose > 0 && minsToClose <= WARN_MINUTES) {
+                    const isDanger = minsToClose <= DANGER_MINUTES;
+                    alerts.push({
+                        id:    'lab-close',
+                        level: isDanger ? 'danger' : 'warning',
+                        icon:  isDanger ? '🚨' : '⏰',
+                        html:  isDanger
+                            ? 'Lab <strong>tutup dalam ' + minsToClose + ' menit</strong> (pukul 20:00). Segera kembalikan semua alat!'
+                            : 'Lab tutup dalam <strong>' + minsToClose + ' menit</strong> (pukul 20:00). Pastikan alat kembali tepat waktu.',
+                    });
+                }
+
+                /* [2] Peringatan per-peminjaman (untuk mahasiswa) */
+                /* FIX ANEH-2: Tambahkan kasus borrowing dari hari SEBELUMNYA
+                   yang masih aktif (tidak dikembalikan kemarin = kondisi darurat). */
+                activeBorrowings.forEach(function (b) {
+                    // Kasus darurat: dipinjam kemarin/sebelumnya dan belum dikembalikan
+                    if (!b.created_today) {
+                        alerts.push({
+                            id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                            html: '<strong>' + b.name + '</strong>: Peminjaman dari <strong>hari sebelumnya</strong> belum dikembalikan! <a href="' + b.url + '" style="text-decoration:underline;font-weight:700;color:inherit;">Segera kembalikan &rarr;</a>',
+                        });
+                        return; // skip time-based check untuk borrowing lama
+                    }
+
+                    // Kasus normal: borrowing hari ini, cek berdasarkan waktu
+                    const endMin   = toMins(b.end_date);
+                    const minsLeft = endMin - nowMin;
+
+                    if (minsLeft <= 0) {
+                        alerts.push({
+                            id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                            html: '<strong>' + b.name + '</strong>: Batas waktu pengembalian pukul ' + b.end_date + ' <strong>telah lewat!</strong> <a href="' + b.url + '" style="text-decoration:underline;font-weight:700;color:inherit;">Lihat detail &rarr;</a>',
+                        });
+                    } else if (minsLeft <= DANGER_MINUTES) {
+                        alerts.push({
+                            id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                            html: '<strong>' + b.name + '</strong>: Harus dikembalikan dalam <strong>' + minsLeft + ' menit</strong> (pukul ' + b.end_date + ')! <a href="' + b.url + '" style="text-decoration:underline;color:inherit;">Detail &rarr;</a>',
+                        });
+                    } else if (minsLeft <= WARN_MINUTES) {
+                        alerts.push({
+                            id: 'borrow-' + b.id, level: 'warning', icon: '⚠️',
+                            html: '<strong>' + b.name + '</strong>: Batas pengembalian dalam <strong>' + minsLeft + ' menit</strong> (pukul ' + b.end_date + '). <a href="' + b.url + '" style="text-decoration:underline;color:inherit;">Lihat &rarr;</a>',
+                        });
+                    }
+                });
+
+                return alerts;
+            }
+
+            /* ── Render ke DOM ─────────────────────────────── */
+            var dismissed = new Set();
+
+            function render() {
+                var container = document.getElementById('deadline-alert-bar');
+                if (!container) return;
+
+                var alerts  = buildAlerts();
+                var visible = alerts.filter(function (a) { return !dismissed.has(a.id); });
+
+                if (visible.length === 0) {
+                    container.style.display = 'none';
+                    container.innerHTML = '';
+                    return;
+                }
+
+                container.style.display = 'block';
+
+                var existingIds = [].slice.call(container.querySelectorAll('[data-alert-id]'))
+                    .map(function (el) { return el.dataset.alertId; });
+                var newIds = visible.map(function (a) { return a.id; });
+
+                // Hapus item yang tidak relevan lagi
+                existingIds.filter(function (id) { return !newIds.includes(id); }).forEach(function (id) {
+                    var el = container.querySelector('[data-alert-id="' + id + '"]');
+                    if (el) el.remove();
+                });
+
+                // Tambahkan item baru
+                visible.forEach(function (a) {
+                    if (existingIds.includes(a.id)) return;
+                    var div = document.createElement('div');
+                    div.className        = 'deadline-bar-item deadline-bar-' + a.level;
+                    div.dataset.alertId  = a.id;
+                    div.innerHTML        = '<span class="dbar-icon">' + a.icon + '</span>' +
+                                           '<span>' + a.html + '</span>' +
+                                           '<button class="dbar-dismiss" aria-label="Tutup peringatan" title="Tutup">&times;</button>';
+                    div.querySelector('.dbar-dismiss').addEventListener('click', function () {
+                        dismissed.add(a.id);
+                        div.remove();
+                        if (!container.querySelector('.deadline-bar-item')) container.style.display = 'none';
+                    });
+                    container.appendChild(div);
+                });
+            }
+
+            /* ── Jalankan ──────────────────────────────────── */
+            render();
+            setInterval(function () {
+                // Alert level danger selalu muncul kembali meski sudah di-dismiss
+                buildAlerts().forEach(function (a) {
+                    if (a.level === 'danger') dismissed.delete(a.id);
+                });
+                render();
+            }, CHECK_INTERVAL);
+        })();
+        </script>
+        @endauth
+
         @stack('scripts')
     </body>
 </html>

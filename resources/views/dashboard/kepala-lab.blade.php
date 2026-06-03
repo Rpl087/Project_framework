@@ -15,6 +15,10 @@
             <p style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Menunggu Persetujuan</p>
             <p style="font-size:2rem;font-weight:800;color:#ef4444;margin-top:0.25rem;">{{ $stats['pending_approvals'] }}</p>
         </div>
+        <div class="stat-card animate-in animate-delay-2" style="border-left:3px solid #06b6d4;">
+            <p style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Sudah Disetujui</p>
+            <p style="font-size:2rem;font-weight:800;color:#06b6d4;margin-top:0.25rem;">{{ $stats['approved_count'] }}</p>
+        </div>
         <div class="stat-card animate-in animate-delay-2">
             <p style="font-size:0.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;">Total Alat</p>
             <p style="font-size:2rem;font-weight:800;color:#4f46e5;margin-top:0.25rem;">{{ $stats['total_equipment'] }}</p>

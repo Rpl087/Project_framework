@@ -39,18 +39,25 @@ Setiap transaksi dicatat dalam **audit log** (riwayat aktivitas) untuk keperluan
 | 🔐 Autentikasi | Login, logout, "ingat saya" (3 jam / 1 hari) |
 | 👥 Multi-Role | Mahasiswa, Laboran, Kepala Lab |
 | 📦 Manajemen Alat | CRUD alat, kategori, status, stok |
-| 🖼️ Gambar Alat | Tampilan kartu dengan gambar alat (via `EquipmentImageComposer`) |
+| 🖼️ Gambar Alat | Upload & tampilan gambar alat (via upload form + `EquipmentImageComposer`) |
 | 📋 Katalog Alat | Halaman katalog bagi Mahasiswa untuk melihat alat tersedia |
 | 📝 Pengajuan Peminjaman | Form peminjaman dengan validasi waktu (08:00–20:00) |
 | ✅ Approval Multi-Level | Laboran + Kepala Lab (untuk alat khusus) |
 | 🤝 Serah Terima | Laboran mengkonfirmasi penyerahan alat ke peminjam |
 | 🔄 Pengembalian | Proses pengembalian dengan catatan kondisi alat |
 | ❌ Penolakan | Laboran / Kepala Lab dapat menolak dengan alasan |
+| 🚫 Pembatalan | Mahasiswa dapat membatalkan pengajuan yang masih pending |
+| ⚠️ Laporan Masalah | Mahasiswa laporkan masalah alat, Laboran menangani/resolve |
+| 🔔 Notifikasi | Notifikasi otomatis ke mahasiswa saat status berubah |
+| 👤 Manajemen User | CRUD user oleh Laboran & Kepala Lab |
+| 📄 Export Laporan | Export data peminjaman ke PDF (dompdf) & CSV |
 | 📊 Dashboard | Dashboard spesifik per role dengan statistik |
 | 📜 Audit Log | Riwayat setiap aksi tersimpan di `borrowing_logs` |
 | ⏰ Overdue Otomatis | Scheduler harian menandai peminjaman yang terlambat |
 | 🛡️ Race Condition Guard | Locking DB saat pengajuan untuk mencegah double-booking |
 | 🔒 Session Management | Middleware custom untuk enforce session lifetime dinamis |
+| 🌗 Dark Mode | Toggle mode gelap/terang dengan transisi animasi halus |
+| 👤 Profil | User dapat mengedit nama, email, dan password |
 
 ---
 
@@ -94,20 +101,28 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 ### Mahasiswa
 - Melihat katalog alat yang tersedia
 - Mengajukan permintaan peminjaman
+- Membatalkan pengajuan yang masih pending
+- Melaporkan masalah pada alat yang sedang dipinjam
 - Melihat riwayat peminjaman sendiri
 - Melihat detail & status peminjaman
+- Menerima notifikasi otomatis saat status berubah
 
 ### Laboran
 - Melihat semua permintaan peminjaman
 - Menyetujui / menolak permintaan (`pending`)
 - Melakukan serah terima alat (`ready_for_pickup`, `approved_by_kepala_lab`)
-- Memproses pengembalian alat (`active`)
-- Mengelola alat (tambah, edit, hapus)
+- Memproses pengembalian alat (`active`, `overdue`)
+- Menangani laporan masalah dari mahasiswa (`issue_reported`)
+- Mengelola alat (tambah, edit, hapus, upload gambar)
+- Mengelola user (tambah, edit, hapus)
+- Export laporan peminjaman ke PDF & CSV
 - Dashboard dengan statistik lengkap
 
 ### Kepala Lab
 - Menyetujui / menolak peminjaman alat khusus (`approved_by_laboran`)
 - Melihat semua data peminjaman
+- Mengelola user (tambah, edit, hapus)
+- Export laporan peminjaman ke PDF & CSV
 - Dashboard dengan ringkasan persetujuan
 
 ---
@@ -121,6 +136,7 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | **PHP** | `^8.2` |
 | **Laravel** | `^11.31` |
 | **Laravel Breeze** | `^2.4` (Auth scaffolding) |
+| **Laravel DomPDF** | `barryvdh/laravel-dompdf` (Export PDF) |
 | **Laravel Tinker** | `^2.9` |
 | **Database** | SQLite (default), dapat diubah ke MySQL/PostgreSQL |
 | **Session Driver** | Database |
@@ -178,6 +194,7 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `available_stock` | integer | Stok yang tersedia untuk dipinjam |
 | `category` | enum | `umum` / `khusus` |
 | `status` | enum | `good` / `maintenance` |
+| `image` | varchar | Nama file gambar (nullable, hasil upload) |
 | `created_at` / `updated_at` | datetime | Timestamps |
 
 ### Tabel `borrowings`
@@ -207,6 +224,19 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `action_description` | text | Deskripsi aksi yang dilakukan |
 | `created_at` / `updated_at` | datetime | Timestamps |
 
+### Tabel `notifications`
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| `id` | integer | Primary key |
+| `user_id` | FK → users | Penerima notifikasi |
+| `title` | varchar | Judul notifikasi |
+| `message` | text | Isi pesan notifikasi |
+| `type` | varchar | Tipe: `success` / `info` / `danger` |
+| `link` | varchar | URL terkait (nullable) |
+| `read_at` | datetime | Waktu dibaca (nullable) |
+| `created_at` / `updated_at` | datetime | Timestamps |
+
 ---
 
 ## 📁 Struktur Direktori
@@ -224,6 +254,9 @@ project-frame(lab IT)/
 │   │   │   ├── BorrowingController.php     # Logika peminjaman lengkap
 │   │   │   ├── DashboardController.php     # Dashboard per-role
 │   │   │   ├── EquipmentController.php     # CRUD alat + katalog
+│   │   │   ├── NotificationController.php  # Daftar & mark-read notifikasi
+│   │   │   ├── ProfileController.php       # Edit profil & password
+│   │   │   ├── UserController.php          # CRUD user (Laboran & KepLab)
 │   │   │   └── Controller.php
 │   │   ├── Middleware/
 │   │   │   ├── RoleMiddleware.php          # Guard akses berbasis role
@@ -235,6 +268,7 @@ project-frame(lab IT)/
 │   │   ├── Borrowing.php      # Model + status helpers
 │   │   ├── BorrowingLog.php   # Model audit log
 │   │   ├── Equipment.php      # Model + scope available()
+│   │   ├── Notification.php   # Model + static send() helper
 │   │   └── User.php           # Model + role helpers
 │   ├── Providers/
 │   │   └── AppServiceProvider.php          # Register EquipmentImageComposer
@@ -242,7 +276,7 @@ project-frame(lab IT)/
 │       └── Composers/
 │           └── EquipmentImageComposer.php  # Inject $imageMap ke views alat
 ├── database/
-│   ├── migrations/             # 7 migration files
+│   ├── migrations/             # 9 migration files
 │   ├── seeders/
 │   │   ├── DatabaseSeeder.php
 │   │   ├── EquipmentSeeder.php # 15 alat lab IT
@@ -252,9 +286,10 @@ project-frame(lab IT)/
 │   └── views/
 │       ├── auth/               # Halaman login
 │       ├── borrowings/
-│       │   ├── create.blade.php  # Form pengajuan peminjaman
-│       │   ├── index.blade.php   # Daftar peminjaman
-│       │   └── show.blade.php    # Detail + aksi peminjaman
+│       │   ├── create.blade.php    # Form pengajuan peminjaman
+│       │   ├── index.blade.php     # Daftar peminjaman
+│       │   ├── report-pdf.blade.php # Template laporan PDF
+│       │   └── show.blade.php      # Detail + aksi peminjaman
 │       ├── dashboard/
 │       │   ├── mahasiswa.blade.php
 │       │   ├── laboran.blade.php
@@ -264,9 +299,18 @@ project-frame(lab IT)/
 │       │   ├── create.blade.php   # Form tambah alat
 │       │   ├── edit.blade.php     # Form edit alat
 │       │   └── index.blade.php    # Manajemen alat (laboran)
+│       ├── errors/              # Halaman error custom
+│       ├── notifications/
+│       │   └── index.blade.php  # Daftar notifikasi user
+│       ├── profile/
+│       │   └── edit.blade.php   # Edit profil & password
+│       ├── users/
+│       │   ├── create.blade.php # Form tambah user
+│       │   ├── edit.blade.php   # Form edit user
+│       │   └── index.blade.php  # Daftar user
 │       └── layouts/
-│           ├── app.blade.php      # Layout utama (sidebar + navbar)
-│           └── guest.blade.php    # Layout login
+│           ├── app.blade.php    # Layout utama (sidebar + navbar)
+│           └── guest.blade.php  # Layout login
 ├── routes/
 │   ├── web.php      # Semua route aplikasi
 │   ├── auth.php     # Route autentikasi (Breeze)
@@ -470,9 +514,12 @@ Session driver: `database` (tabel `sessions`).
 
 ### Gambar Alat
 
-Gambar alat disimpan di `public/images/equipments/` dalam format `.png`.
+Gambar alat disimpan di `public/images/equipments/` dan dapat ditambahkan melalui **dua cara**:
 
-Pemetaan nama alat → file gambar dikelola melalui `EquipmentImageComposer` (`app/View/Composers/`). Untuk menambah gambar alat baru, cukup tambahkan entry di array `$imageMap` tanpa perlu mengubah view manapun.
+1. **Upload via form** — Saat menambah/mengedit alat, Laboran bisa upload gambar (JPEG, PNG, GIF, WebP, max 2MB). Gambar disimpan di kolom `image` pada tabel `equipments`.
+2. **Legacy imageMap** — Pemetaan nama alat → file gambar di-hardcode pada `EquipmentImageComposer` (`app/View/Composers/`), digunakan untuk data seeder bawaan.
+
+Prioritas tampilan: Upload (kolom `image`) → Legacy imageMap → Placeholder.
 
 ---
 

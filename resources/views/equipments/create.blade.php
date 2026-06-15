@@ -38,9 +38,10 @@
                 <div>
                     <label class="form-label">Kategori *</label>
                     <select name="category" class="form-input" required>
-                        <option value="umum" {{ old('category') === 'umum' ? 'selected' : '' }}>Umum</option>
-                        <option value="khusus" {{ old('category') === 'khusus' ? 'selected' : '' }}>Khusus</option>
+                        <option value="umum" {{ old('category') === 'umum' ? 'selected' : '' }}>🔵 Alat Umum (Standar/Murah)</option>
+                        <option value="khusus" {{ old('category') === 'khusus' ? 'selected' : '' }}>⭐ Alat Khusus (Mahal/Premium)</option>
                     </select>
+                    <p style="font-size:0.7rem;color:var(--txt-3);margin-top:0.25rem;">Alat khusus memerlukan persetujuan Kepala Lab.</p>
                     @error('category') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
             </div>

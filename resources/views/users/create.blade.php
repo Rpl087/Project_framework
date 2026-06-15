@@ -1,22 +1,32 @@
 @extends('layouts.app')
-@section('title', 'Tambah User Baru')
+@section('title', 'Tambah ' . ucfirst($targetRole) . ' Baru')
 
 @section('content')
 <div style="max-width:640px;">
     <div class="animate-in" style="margin-bottom:1.5rem;">
         <a href="{{ route('users.index') }}" style="display:inline-flex;align-items:center;gap:0.5rem;color:var(--txt-2);font-size:0.85rem;text-decoration:none;margin-bottom:0.75rem;" onmouseover="this.style.color='#4f46e5'" onmouseout="this.style.color=''">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-            Kembali ke Daftar User
+            Kembali ke Daftar {{ ucfirst($targetRole) }}
         </a>
-        <h1 style="font-size:1.5rem;font-weight:800;color:var(--txt-1);">Tambah User Baru</h1>
+        <h1 style="font-size:1.5rem;font-weight:800;color:var(--txt-1);">Tambah {{ ucfirst($targetRole) }} Baru</h1>
+        <p style="color:var(--txt-2);font-size:0.875rem;margin-top:0.25rem;">
+            @if($targetRole === 'mahasiswa')
+                Tambahkan akun mahasiswa yang dapat meminjam alat laboratorium.
+            @else
+                Tambahkan akun laboran yang bertugas mengelola alat laboratorium.
+            @endif
+        </p>
     </div>
 
     <div class="glass-card animate-in animate-delay-1" style="padding:2rem;">
         <form method="POST" action="{{ route('users.store') }}">
             @csrf
+            {{-- Role tersembunyi, otomatis sesuai hak akses --}}
+            <input type="hidden" name="role" value="{{ $targetRole }}">
+
             <div style="margin-bottom:1.25rem;">
                 <label class="form-label">Nama Lengkap *</label>
-                <input type="text" name="name" value="{{ old('name') }}" class="form-input" required placeholder="Nama lengkap user">
+                <input type="text" name="name" value="{{ old('name') }}" class="form-input" required placeholder="Nama lengkap {{ $targetRole }}">
                 @error('name') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
             <div style="margin-bottom:1.25rem;">
@@ -35,15 +45,19 @@
                     <input type="password" name="password_confirmation" class="form-input" required placeholder="••••••••">
                 </div>
             </div>
-            <div style="margin-bottom:1.5rem;">
-                <label class="form-label">Role *</label>
-                <select name="role" class="form-input" required>
-                    <option value="mahasiswa"  {{ old('role') === 'mahasiswa'  ? 'selected' : '' }}>🎓 Mahasiswa</option>
-                    <option value="laboran"    {{ old('role') === 'laboran'    ? 'selected' : '' }}>🔬 Laboran</option>
-                    <option value="kepala_lab" {{ old('role') === 'kepala_lab' ? 'selected' : '' }}>🏛️ Kepala Lab</option>
-                </select>
-                @error('role') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+
+            {{-- Info role yang akan ditambahkan --}}
+            <div style="margin-bottom:1.5rem;padding:0.75rem 1rem;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:0.5rem;">
+                <p style="font-size:0.8rem;color:var(--txt-2);">
+                    <strong>Role:</strong>
+                    @if($targetRole === 'mahasiswa')
+                        🎓 <strong>Mahasiswa</strong> — Dapat mengajukan peminjaman alat laboratorium.
+                    @else
+                        🔬 <strong>Laboran</strong> — Bertugas mengelola alat dan memproses peminjaman.
+                    @endif
+                </p>
             </div>
+
             <div style="display:flex;gap:0.75rem;">
                 <button type="submit" class="btn btn-primary">
                     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>

@@ -27,8 +27,8 @@
                 <label class="form-label">Kategori</label>
                 <select name="category" class="form-input">
                     <option value="">Semua Kategori</option>
-                    <option value="umum"   {{ request('category') === 'umum'   ? 'selected' : '' }}>Umum</option>
-                    <option value="khusus" {{ request('category') === 'khusus' ? 'selected' : '' }}>Khusus</option>
+                    <option value="umum"   {{ request('category') === 'umum'   ? 'selected' : '' }}>🔵 Alat Umum (Standar/Murah)</option>
+                    <option value="khusus" {{ request('category') === 'khusus' ? 'selected' : '' }}>⭐ Alat Khusus (Mahal/Premium)</option>
                 </select>
             </div>
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
@@ -62,9 +62,9 @@
                 {{-- Category Badge --}}
                 <div style="position:absolute;top:0.75rem;right:0.75rem;">
                     @if($eq->category === 'khusus')
-                        <span class="badge badge-indigo">Khusus</span>
+                        <span class="badge badge-indigo" title="Alat mahal/premium - memerlukan persetujuan Kepala Lab">⭐ Alat Khusus</span>
                     @else
-                        <span class="badge badge-blue">Umum</span>
+                        <span class="badge badge-blue" title="Alat standar/murah">🔵 Alat Umum</span>
                     @endif
                 </div>
 

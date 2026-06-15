@@ -114,11 +114,14 @@
                 left: 0;
                 top: 0;
                 z-index: 40;
-                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                            box-shadow 0.38s cubic-bezier(0.22, 1, 0.36, 1);
                 overflow: hidden;
+                will-change: transform;
             }
-            .sidebar-hidden { transform: translateX(-100%); }
+            .sidebar.sidebar-open {
+                box-shadow: 4px 0 32px rgba(0, 0, 0, 0.35);
+            }
             .sidebar-logo {
                 padding: 1.5rem;
                 border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -162,8 +165,9 @@
                 margin-left: 260px;
                 min-height: 100vh;
                 background: var(--bg);
-                transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                transition: margin-left 0.38s cubic-bezier(0.22, 1, 0.36, 1),
                             background-color 0.35s ease;
+                will-change: margin-left;
             }
             .top-bar {
                 background: var(--topbar);
@@ -383,11 +387,19 @@
                Overlay
             ═══════════════════════════════════════════════════ */
             .sidebar-overlay {
-                display: none;
                 position: fixed;
                 inset: 0;
-                background: rgba(0,0,0,0.4);
+                background: rgba(0,0,0,0.45);
                 z-index: 35;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                            visibility 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+                backdrop-filter: blur(2px);
+            }
+            .sidebar-overlay.active {
+                opacity: 1;
+                visibility: visible;
             }
 
             /* ═══════════════════════════════════════════════════
@@ -839,28 +851,35 @@
 
         <script>
             /* ────────────────────────────────────────────────────
-               Sidebar toggle (hover + click pin on desktop,
-               overlay tap on mobile)
+               Sidebar toggle (click only — desktop & mobile)
             ──────────────────────────────────────────────────── */
             const sidebar     = document.getElementById('sidebar');
             const overlay     = document.getElementById('sidebarOverlay');
             const hamburger   = document.getElementById('hamburgerBtn');
             const mainContent = document.getElementById('mainContent');
             let sidebarVisible = window.innerWidth > 1024;
-            let sidebarPinned  = sidebarVisible;
-            let hoverTimeout   = null;
 
+            // Set initial state without transition (no animation on load)
+            sidebar.style.transition = 'none';
+            mainContent.style.transition = 'none';
             if (!sidebarVisible) {
-                sidebar.style.transform    = 'translateX(-100%)';
+                sidebar.style.transform      = 'translateX(-100%)';
                 mainContent.style.marginLeft = '0';
             }
+            // Re-enable transitions after initial paint
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    sidebar.style.transition     = '';
+                    mainContent.style.transition = '';
+                });
+            });
 
             function showSidebar() {
-                clearTimeout(hoverTimeout);
                 sidebarVisible = true;
                 if (window.innerWidth > 1024) {
                     sidebar.style.transform      = 'translateX(0)';
                     mainContent.style.marginLeft = '260px';
+                    sidebar.classList.add('sidebar-open');
                 } else {
                     sidebar.classList.add('sidebar-open');
                     overlay.classList.add('active');
@@ -873,6 +892,7 @@
                 if (window.innerWidth > 1024) {
                     sidebar.style.transform      = 'translateX(-100%)';
                     mainContent.style.marginLeft = '0';
+                    sidebar.classList.remove('sidebar-open');
                 } else {
                     sidebar.classList.remove('sidebar-open');
                     overlay.classList.remove('active');
@@ -880,35 +900,13 @@
                 }
             }
 
+            // Buka/tutup hanya via klik tombol hamburger
             hamburger.addEventListener('click', () => {
-                if (sidebarVisible && sidebarPinned) {
-                    sidebarPinned = false;
-                    hideSidebar();
-                } else {
-                    sidebarPinned = true;
-                    showSidebar();
-                }
+                sidebarVisible ? hideSidebar() : showSidebar();
             });
 
-            hamburger.addEventListener('mouseenter', () => {
-                if (window.innerWidth > 1024 && !sidebarVisible) {
-                    sidebarPinned = false;
-                    showSidebar();
-                }
-            });
-
-            sidebar.addEventListener('mouseleave', () => {
-                if (window.innerWidth > 1024 && !sidebarPinned) {
-                    hoverTimeout = setTimeout(hideSidebar, 300);
-                }
-            });
-
-            sidebar.addEventListener('mouseenter', () => clearTimeout(hoverTimeout));
-
-            overlay.addEventListener('click', () => {
-                sidebarPinned = false;
-                hideSidebar();
-            });
+            // Tutup saat overlay (background gelap mobile) diklik
+            overlay.addEventListener('click', () => hideSidebar());
 
             window.addEventListener('resize', () => {
                 if (window.innerWidth > 1024) {
@@ -917,12 +915,12 @@
                     document.body.style.overflow = '';
                     sidebar.style.transform      = sidebarVisible ? 'translateX(0)' : 'translateX(-100%)';
                     mainContent.style.marginLeft = sidebarVisible ? '260px' : '0';
+                    if (sidebarVisible) sidebar.classList.add('sidebar-open');
                 } else {
                     sidebar.style.transform      = '';
                     mainContent.style.marginLeft = '0';
                     if (!sidebar.classList.contains('sidebar-open')) {
                         sidebarVisible = false;
-                        sidebarPinned  = false;
                     }
                 }
             });

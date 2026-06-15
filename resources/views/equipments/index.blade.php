@@ -41,9 +41,9 @@
                 {{-- Category Badge --}}
                 <div style="position:absolute;top:0.75rem;right:0.75rem;">
                     @if($eq->category === 'khusus')
-                        <span class="badge badge-indigo">Khusus</span>
+                        <span class="badge badge-indigo" title="Alat mahal/premium - memerlukan persetujuan Kepala Lab">⭐ Alat Khusus</span>
                     @else
-                        <span class="badge badge-blue">Umum</span>
+                        <span class="badge badge-blue" title="Alat standar/murah - dapat dipinjam langsung">🔵 Alat Umum</span>
                     @endif
                 </div>
 

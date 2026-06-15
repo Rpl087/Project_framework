@@ -10,16 +10,38 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     /**
-     * Daftar semua user dengan filter role.
-     * FITUR-2: Accessible by Laboran & Kepala Lab.
+     * Tentukan role yang boleh dikelola oleh role yang sedang login.
+     * - Laboran  => hanya boleh manage mahasiswa
+     * - Kepala Lab => hanya boleh manage laboran
+     */
+    private function getAllowedTargetRole(): string
+    {
+        return auth()->user()->role === 'laboran' ? 'mahasiswa' : 'laboran';
+    }
+
+    /**
+     * Pastikan user target sesuai dengan hak akses role yang login.
+     */
+    private function authorizeTargetUser(User $user): void
+    {
+        $allowed = $this->getAllowedTargetRole();
+        if ($user->role !== $allowed) {
+            abort(403, 'Anda tidak memiliki izin untuk mengelola user dengan role tersebut.');
+        }
+    }
+
+    /**
+     * Daftar user yang sesuai dengan hak akses role yang login.
+     * - Laboran  : hanya melihat daftar mahasiswa
+     * - Kepala Lab : hanya melihat daftar laboran
      */
     public function index(Request $request)
     {
-        $query = User::query()->orderBy('role')->orderBy('name');
+        $targetRole = $this->getAllowedTargetRole();
 
-        if ($request->filled('role')) {
-            $query->where('role', $request->role);
-        }
+        $query = User::query()
+            ->where('role', $targetRole)
+            ->orderBy('name');
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -33,34 +55,37 @@ class UserController extends Controller
             'borrowings as active_borrowings_count' => fn($q) => $q->whereIn('status', ['active', 'overdue']),
         ])->paginate(15)->withQueryString();
 
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users', 'targetRole'));
     }
 
     /**
-     * Form tambah user baru.
+     * Form tambah user baru (role yang bisa ditambah sesuai hak akses).
      */
     public function create()
     {
-        return view('users.create');
+        $targetRole = $this->getAllowedTargetRole();
+        return view('users.create', compact('targetRole'));
     }
 
     /**
-     * Simpan user baru.
+     * Simpan user baru (hanya role yang diizinkan).
      */
     public function store(Request $request)
     {
+        $targetRole = $this->getAllowedTargetRole();
+
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role'     => ['required', 'in:mahasiswa,laboran,kepala_lab'],
+            'role'     => ['required', Rule::in([$targetRole])],
         ]);
 
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role'     => $request->role,
+            'role'     => $targetRole,
         ]);
 
         return redirect()->route('users.index')
@@ -68,33 +93,32 @@ class UserController extends Controller
     }
 
     /**
-     * Form edit user.
+     * Form edit user (hanya jika user target sesuai hak akses).
      */
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $this->authorizeTargetUser($user);
+        $targetRole = $this->getAllowedTargetRole();
+        return view('users.edit', compact('user', 'targetRole'));
     }
 
     /**
-     * Update data user.
+     * Update data user (hanya jika user target sesuai hak akses).
      */
     public function update(Request $request, User $user)
     {
+        $this->authorizeTargetUser($user);
+        $targetRole = $this->getAllowedTargetRole();
+
         $request->validate([
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role'  => ['required', 'in:mahasiswa,laboran,kepala_lab'],
         ]);
-
-        // Tidak bisa mengubah role diri sendiri
-        if ($user->id === auth()->id() && $user->role !== $request->role) {
-            return back()->with('error', 'Anda tidak dapat mengubah role akun Anda sendiri.');
-        }
 
         $data = [
             'name'  => $request->name,
             'email' => $request->email,
-            'role'  => $request->role,
+            'role'  => $targetRole, // role tetap sesuai hak akses, tidak bisa diubah
         ];
 
         // Update password jika diisi
@@ -112,14 +136,11 @@ class UserController extends Controller
     }
 
     /**
-     * Hapus user.
+     * Hapus user (hanya jika user target sesuai hak akses).
      */
     public function destroy(User $user)
     {
-        // Tidak bisa menghapus diri sendiri
-        if ($user->id === auth()->id()) {
-            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
-        }
+        $this->authorizeTargetUser($user);
 
         // Tidak bisa menghapus user yang masih punya peminjaman aktif
         $activeCount = $user->borrowings()->whereIn('status', ['pending', 'approved_by_laboran', 'approved_by_kepala_lab', 'active', 'ready_for_pickup', 'overdue', 'issue_reported'])->count();

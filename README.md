@@ -49,7 +49,7 @@ Setiap transaksi dicatat dalam **audit log** (riwayat aktivitas) untuk keperluan
 | 🚫 Pembatalan | Mahasiswa dapat membatalkan pengajuan yang masih pending |
 | ⚠️ Laporan Masalah | Mahasiswa laporkan masalah alat, Laboran menangani/resolve |
 | 🔔 Notifikasi | Notifikasi otomatis ke mahasiswa saat status berubah |
-| 👤 Manajemen User | CRUD user oleh Laboran & Kepala Lab |
+| 👤 Manajemen User | Laboran kelola Mahasiswa; Kepala Lab kelola Laboran |
 | 📄 Export Laporan | Export data peminjaman ke PDF (dompdf) & CSV |
 | 📊 Dashboard | Dashboard spesifik per role dengan statistik |
 | 📜 Audit Log | Riwayat setiap aksi tersimpan di `borrowing_logs` |
@@ -99,7 +99,7 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 ## 👤 Role & Akses
 
 ### Mahasiswa
-- Melihat katalog alat yang tersedia
+- Melihat katalog alat yang tersedia (filter pencarian & kategori)
 - Mengajukan permintaan peminjaman
 - Membatalkan pengajuan yang masih pending
 - Melaporkan masalah pada alat yang sedang dipinjam
@@ -108,22 +108,24 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 - Menerima notifikasi otomatis saat status berubah
 
 ### Laboran
-- Melihat semua permintaan peminjaman
+- Melihat semua permintaan peminjaman (filter & pencarian)
 - Menyetujui / menolak permintaan (`pending`)
 - Melakukan serah terima alat (`ready_for_pickup`, `approved_by_kepala_lab`)
 - Memproses pengembalian alat (`active`, `overdue`)
 - Menangani laporan masalah dari mahasiswa (`issue_reported`)
 - Mengelola alat (tambah, edit, hapus, upload gambar)
-- Mengelola user (tambah, edit, hapus)
+- **Mengelola user Mahasiswa** (tambah, edit, hapus)
 - Export laporan peminjaman ke PDF & CSV
 - Dashboard dengan statistik lengkap
 
 ### Kepala Lab
 - Menyetujui / menolak peminjaman alat khusus (`approved_by_laboran`)
 - Melihat semua data peminjaman
-- Mengelola user (tambah, edit, hapus)
+- **Mengelola user Laboran** (tambah, edit, hapus)
 - Export laporan peminjaman ke PDF & CSV
 - Dashboard dengan ringkasan persetujuan
+
+> **Catatan Hierarki Manajemen User:** Laboran hanya dapat mengelola akun Mahasiswa; Kepala Lab hanya dapat mengelola akun Laboran. Tidak ada role yang dapat mengelola akun dengan level yang sama atau lebih tinggi.
 
 ---
 
@@ -135,8 +137,7 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 |---|---|
 | **PHP** | `^8.2` |
 | **Laravel** | `^11.31` |
-| **Laravel Breeze** | `^2.4` (Auth scaffolding) |
-| **Laravel DomPDF** | `barryvdh/laravel-dompdf` (Export PDF) |
+| **Laravel DomPDF** | `barryvdh/laravel-dompdf ^3.1` (Export PDF) |
 | **Laravel Tinker** | `^2.9` |
 | **Database** | SQLite (default), dapat diubah ke MySQL/PostgreSQL |
 | **Session Driver** | Database |
@@ -149,11 +150,14 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | Komponen | Versi / Detail |
 |---|---|
 | **Vite** | `^6.0.11` (build tool) |
+| **laravel-vite-plugin** | `^1.2.0` (integrasi Vite + Laravel) |
 | **Tailwind CSS** | `^3.1.0` (utility classes) |
-| **Alpine.js** | `^3.4.2` (reactive UI) |
+| **@tailwindcss/forms** | `^0.5.2` (plugin form styling) |
+| **Alpine.js** | `^3.x` (reactive UI — via CDN di layout) |
 | **Axios** | `^1.7.4` (HTTP client) |
 | **PostCSS** | `^8.4.31` |
 | **Autoprefixer** | `^10.4.2` |
+| **Concurrently** | `^9.0.1` (jalankan multi-process dev server) |
 
 ### Dev Tools
 
@@ -161,10 +165,10 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 |---|---|
 | **Laravel Pint** | Code style fixer (PSR-12) |
 | **Laravel Pail** | Log viewer di terminal |
-| **Laravel Sail** | Docker environment |
 | **PHPUnit** | `^11.0.1` — unit & feature testing |
 | **Faker PHP** | `^1.23` — data dummy untuk testing |
 | **Mockery** | `^1.6` — mock objects |
+| **Collision** | `^8.1` — better CLI error display |
 
 ---
 
@@ -177,6 +181,7 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `id` | integer | Primary key |
 | `name` | varchar | Nama lengkap |
 | `email` | varchar | Email (unique) |
+| `phone` | varchar(20) | Nomor telepon (nullable) |
 | `password` | varchar | Password (bcrypt) |
 | `role` | varchar | `mahasiswa` / `laboran` / `kepala_lab` |
 | `email_verified_at` | datetime | Nullable |
@@ -237,6 +242,14 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `read_at` | datetime | Waktu dibaca (nullable) |
 | `created_at` / `updated_at` | datetime | Timestamps |
 
+### Tabel Sistem Laravel
+
+| Tabel | Keterangan |
+|---|---|
+| `sessions` | Penyimpanan sesi pengguna (driver: database) |
+| `cache` | Cache aplikasi (driver: database) |
+| `jobs` / `job_batches` / `failed_jobs` | Queue system |
+
 ---
 
 ## 📁 Struktur Direktori
@@ -256,7 +269,7 @@ project-frame(lab IT)/
 │   │   │   ├── EquipmentController.php     # CRUD alat + katalog
 │   │   │   ├── NotificationController.php  # Daftar & mark-read notifikasi
 │   │   │   ├── ProfileController.php       # Edit profil & password
-│   │   │   ├── UserController.php          # CRUD user (Laboran & KepLab)
+│   │   │   ├── UserController.php          # CRUD user (Laboran → Mahasiswa; KepLab → Laboran)
 │   │   │   └── Controller.php
 │   │   ├── Middleware/
 │   │   │   ├── RoleMiddleware.php          # Guard akses berbasis role
@@ -265,18 +278,18 @@ project-frame(lab IT)/
 │   │       └── Auth/
 │   │           └── LoginRequest.php
 │   ├── Models/
-│   │   ├── Borrowing.php      # Model + status helpers
+│   │   ├── Borrowing.php      # Model + status helpers (label & color)
 │   │   ├── BorrowingLog.php   # Model audit log
 │   │   ├── Equipment.php      # Model + scope available()
 │   │   ├── Notification.php   # Model + static send() helper
-│   │   └── User.php           # Model + role helpers
+│   │   └── User.php           # Model + role helpers (isMahasiswa, isLaboran, isKepalaLab)
 │   ├── Providers/
 │   │   └── AppServiceProvider.php          # Register EquipmentImageComposer
 │   └── View/
 │       └── Composers/
 │           └── EquipmentImageComposer.php  # Inject $imageMap ke views alat
 ├── database/
-│   ├── migrations/             # 9 migration files
+│   ├── migrations/             # 10 migration files
 │   ├── seeders/
 │   │   ├── DatabaseSeeder.php
 │   │   ├── EquipmentSeeder.php # 15 alat lab IT
@@ -286,20 +299,23 @@ project-frame(lab IT)/
 │   └── views/
 │       ├── auth/               # Halaman login
 │       ├── borrowings/
-│       │   ├── create.blade.php    # Form pengajuan peminjaman
-│       │   ├── index.blade.php     # Daftar peminjaman
+│       │   ├── create.blade.php     # Form pengajuan peminjaman
+│       │   ├── index.blade.php      # Daftar peminjaman (filter & search)
 │       │   ├── report-pdf.blade.php # Template laporan PDF
-│       │   └── show.blade.php      # Detail + aksi peminjaman
+│       │   └── show.blade.php       # Detail + aksi peminjaman
 │       ├── dashboard/
 │       │   ├── mahasiswa.blade.php
 │       │   ├── laboran.blade.php
 │       │   └── kepala-lab.blade.php
 │       ├── equipments/
-│       │   ├── catalog.blade.php  # Katalog untuk mahasiswa
+│       │   ├── catalog.blade.php  # Katalog untuk mahasiswa (filter & search)
 │       │   ├── create.blade.php   # Form tambah alat
 │       │   ├── edit.blade.php     # Form edit alat
 │       │   └── index.blade.php    # Manajemen alat (laboran)
-│       ├── errors/              # Halaman error custom
+│       ├── errors/
+│       │   ├── 403.blade.php    # Halaman Forbidden
+│       │   ├── 404.blade.php    # Halaman Not Found
+│       │   └── 419.blade.php    # Halaman Session Expired
 │       ├── notifications/
 │       │   └── index.blade.php  # Daftar notifikasi user
 │       ├── profile/
@@ -313,11 +329,11 @@ project-frame(lab IT)/
 │           └── guest.blade.php  # Layout login
 ├── routes/
 │   ├── web.php      # Semua route aplikasi
-│   ├── auth.php     # Route autentikasi (Breeze)
+│   ├── auth.php     # Route autentikasi (Breeze-style)
 │   └── console.php  # Jadwal scheduler
 └── public/
     └── images/
-        └── equipments/  # Gambar alat (.png)
+        └── equipments/  # Gambar alat (.png, .jpg, .webp)
 ```
 
 ---
@@ -375,13 +391,15 @@ npm install
 
 **8. Jalankan development server**
 ```bash
-# Jalankan semua sekaligus (Laravel + Vite)
+# Jalankan semua sekaligus (Laravel + Vite + Queue + Log)
 composer run dev
 
 # ATAU jalankan terpisah:
 php artisan serve   # Backend → http://localhost:8000
 npm run dev         # Frontend (Vite hot-reload)
 ```
+
+> `composer run dev` akan menjalankan secara bersamaan: Laravel server, queue worker, log viewer (Pail), dan Vite dev server.
 
 **9. Akses aplikasi**
 
@@ -415,23 +433,23 @@ Setelah menjalankan `php artisan migrate --seed`, tersedia 3 akun berikut:
 
 15 alat laboratorium IT telah di-seed dengan data realistis:
 
-| No | Nama Alat | Kategori | Stok |
-|---|---|---|---|
-| 1 | Laptop ASUS ROG | Umum | 15 |
-| 2 | Raspberry Pi 5 | Umum | 20 |
-| 3 | Arduino Mega 2560 | Umum | 25 |
-| 4 | Cisco Router 2901 | Khusus | 8 |
-| 5 | Cisco Switch Catalyst 2960 | Khusus | 10 |
-| 6 | Server Dell PowerEdge | Khusus | 3 |
-| 7 | Monitor LG UltraWide 34" | Umum | 12 |
-| 8 | VR Headset Meta Quest 3 | Khusus | 5 |
-| 9 | 3D Printer Creality Ender | Khusus | 4 |
-| 10 | Kabel UTP Cat6 + RJ45 Kit | Umum | 30 |
-| 11 | GPU Workstation NVIDIA A4000 | Khusus | 2 |
-| 12 | Sensor Kit IoT | Umum | 20 |
-| 13 | Oscilloscope Digital Rigol | Khusus | 6 |
-| 14 | Webcam Logitech C920 | Umum | 15 |
-| 15 | External HDD 2TB | Umum | 10 (maintenance) |
+| No | Nama Alat | Kategori | Stok | Status |
+|---|---|---|---|---|
+| 1 | Laptop ASUS ROG | Umum | 15 | Good |
+| 2 | Raspberry Pi 5 | Umum | 20 | Good |
+| 3 | Arduino Mega 2560 | Umum | 25 | Good |
+| 4 | Cisco Router 2901 | Khusus | 8 | Good |
+| 5 | Cisco Switch Catalyst 2960 | Khusus | 10 | Good |
+| 6 | Server Dell PowerEdge | Khusus | 3 | Good |
+| 7 | Monitor LG UltraWide 34" | Umum | 12 | Good |
+| 8 | VR Headset Meta Quest 3 | Khusus | 5 | Good |
+| 9 | 3D Printer Creality Ender | Khusus | 4 | Good |
+| 10 | Kabel UTP Cat6 + RJ45 Kit | Umum | 30 | Good |
+| 11 | GPU Workstation NVIDIA A4000 | Khusus | 2 | Good |
+| 12 | Sensor Kit IoT | Umum | 20 | Good |
+| 13 | Oscilloscope Digital Rigol | Khusus | 6 | Good |
+| 14 | Webcam Logitech C920 | Umum | 15 | Good |
+| 15 | External HDD 2TB | Umum | 10 | Maintenance |
 
 ---
 
@@ -470,6 +488,10 @@ php artisan borrowings:mark-overdue --dry-run
 
 Command `borrowings:mark-overdue` dijadwalkan berjalan setiap hari pukul **00:01** via `routes/console.php`.
 
+Logika overdue:
+- Peminjaman `active` yang dibuat pada hari **sebelumnya** (belum dikembalikan)
+- Peminjaman `active` yang dibuat **hari ini** tapi jam `end_date` sudah terlewati
+
 Untuk mengaktifkan scheduler di server (Linux):
 ```bash
 # Tambahkan ke crontab
@@ -501,6 +523,9 @@ DB_PASSWORD=secret
 ### Jam Operasional Peminjaman
 
 Sistem hanya menerima peminjaman antara **08:00 – 20:00 WIB** (satu hari yang sama).
+- `start_date` harus antara `08:00` (inklusif) dan sebelum `20:00`
+- `end_date` harus setelah `start_date` dan maksimal `20:00`
+
 Konfigurasi validasi ada di `BorrowingController::store()`.
 
 ### Session
@@ -528,15 +553,20 @@ Prioritas tampilan: Upload (kolom `image`) → Legacy imageMap → Placeholder.
 | Middleware | Fungsi |
 |---|---|
 | `auth` | Wajib login untuk akses halaman |
+| `verified` | Wajib verifikasi email (Mahasiswa) |
 | `role:mahasiswa` | Membatasi akses khusus mahasiswa |
 | `role:laboran` | Membatasi akses khusus laboran |
 | `role:kepala_lab` | Membatasi akses khusus kepala lab |
-| `role:laboran\|kepala_lab` | Akses gabungan (contoh: fitur tolak) |
+| `role:laboran\|kepala_lab` | Akses gabungan (contoh: reject, export, kelola user) |
 | `EnforceSessionLifetime` | Logout otomatis saat sesi habis |
 
 ### Proteksi Race Condition
 
-Saat mahasiswa mengajukan peminjaman, sistem menggunakan **`DB::transaction()` + `lockForUpdate()`** untuk mencegah dua mahasiswa meminjam alat yang sama secara bersamaan ketika stok hanya tersisa 1 unit.
+Saat mahasiswa mengajukan peminjaman, sistem menggunakan **`DB::transaction()` + `lockForUpdate()`** untuk mencegah dua mahasiswa meminjam alat yang sama secara bersamaan ketika stok hanya tersisa 1 unit. Stok dikurangi saat status `pending` dan dikembalikan saat ditolak atau dikembalikan.
+
+### Proteksi Stok
+
+Saat penolakan (`reject`) atau pengembalian (`processReturn` / `resolveIssue`), `available_stock` dikembalikan dengan menggunakan `min(available_stock + 1, total_stock)` untuk mencegah stok melebihi total.
 
 ---
 

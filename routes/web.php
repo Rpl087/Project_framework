@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
 
     // ---- Mahasiswa Routes ----
-    Route::middleware('role:mahasiswa')->group(function () {
+    Route::middleware(['role:mahasiswa', 'verified'])->group(function () {
         Route::get('/catalog', [EquipmentController::class, 'catalog'])->name('catalog');
         Route::get('/borrowings/create', [BorrowingController::class, 'create'])->name('borrowings.create');
         Route::post('/borrowings', [BorrowingController::class, 'store'])->name('borrowings.store');

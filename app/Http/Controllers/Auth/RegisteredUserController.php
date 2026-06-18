@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class RegisteredUserController extends Controller
@@ -13,6 +15,7 @@ class RegisteredUserController extends Controller
     /**
      * Handle registrasi akun mahasiswa baru.
      * Role selalu 'mahasiswa' — tidak dapat diubah oleh user.
+     * Setelah register, user harus verifikasi email sebelum bisa akses fitur.
      */
     public function store(Request $request): RedirectResponse
     {
@@ -32,7 +35,7 @@ class RegisteredUserController extends Controller
             'password.confirmed'=> 'Konfirmasi password tidak cocok.',
         ]);
 
-        User::create([
+        $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'phone'    => $request->phone,
@@ -40,7 +43,12 @@ class RegisteredUserController extends Controller
             'role'     => 'mahasiswa', // selalu mahasiswa
         ]);
 
-        return redirect()->route('login')
-            ->with('status', 'Akun berhasil dibuat! Silakan login dengan kredensial Anda.');
+        // Login user kemudian kirim event Registered
+        // (event ini memicu pengiriman email verifikasi otomatis)
+        Auth::login($user);
+        event(new Registered($user));
+
+        return redirect()->route('verification.notice')
+            ->with('status', 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.');
     }
 }

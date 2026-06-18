@@ -311,7 +311,13 @@
             </div>
 
             <div class="form-group">
-                <label for="password" class="form-label">Password</label>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.375rem;">
+                    <label for="password" class="form-label" style="margin-bottom:0;">Password</label>
+                    <a href="{{ route('password.request') }}"
+                       style="font-size:0.75rem;color:#818cf8;text-decoration:none;font-weight:500;transition:color 0.2s;"
+                       onmouseover="this.style.color='#a5b4fc'" onmouseout="this.style.color='#818cf8'"
+                    >Lupa Password?</a>
+                </div>
                 <input id="password" type="password" name="password"
                     class="form-input" required autocomplete="current-password"
                     placeholder="••••••••">

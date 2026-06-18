@@ -82,10 +82,12 @@ class UserController extends Controller
         ]);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => $targetRole,
+            'name'              => $request->name,
+            'email'             => $request->email,
+            'password'          => Hash::make($request->password),
+            'role'              => $targetRole,
+            // User yang dibuat oleh admin langsung aktif (tidak perlu verifikasi email)
+            'email_verified_at' => now(),
         ]);
 
         return redirect()->route('users.index')

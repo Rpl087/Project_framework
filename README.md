@@ -269,33 +269,42 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 ### Diagram Alur Lengkap (State Machine)
 
 ```mermaid
-stateDiagram-v2
-    [*] --> pending : Mahasiswa ajukan
+flowchart LR
+    START(( )) -->|Mahasiswa ajukan| pending
 
-    pending --> ready_for_pickup    : Laboran setujui\n(alat UMUM)
-    pending --> approved_by_laboran : Laboran setujui\n(alat KHUSUS)
-    pending --> rejected            : Laboran / Kepala Lab tolak
-    pending --> rejected            : Mahasiswa batalkan
+    pending -->|Laboran setujui - alat UMUM| ready_for_pickup
+    pending -->|Laboran setujui - alat KHUSUS| approved_by_laboran
+    pending -->|Tolak / Batalkan| rejected
 
-    approved_by_laboran --> approved_by_kepala_lab : Kepala Lab setujui
-    approved_by_laboran --> rejected               : Kepala Lab tolak
+    approved_by_laboran -->|Kepala Lab setujui| approved_by_kepala_lab
+    approved_by_laboran -->|Kepala Lab tolak| rejected
 
-    approved_by_kepala_lab --> active  : Laboran serah terima
-    approved_by_kepala_lab --> rejected: Kepala Lab tolak
+    approved_by_kepala_lab -->|Laboran serah terima| active
+    ready_for_pickup -->|Laboran serah terima| active
 
-    ready_for_pickup --> active : Laboran serah terima
+    active -->|Laboran proses kembali| completed
+    active -->|Jam terlewat - Scheduler| overdue
+    active -->|Mahasiswa laporkan masalah| issue_reported
 
-    active --> completed      : Laboran proses kembali
-    active --> overdue        : Scheduler (jam terlewat)
-    active --> issue_reported : Mahasiswa laporkan masalah
+    overdue -->|Laboran proses kembali| completed
 
-    overdue --> completed : Laboran proses kembali (terlambat)
+    issue_reported -->|Lanjutkan peminjaman| active
+    issue_reported -->|Selesaikan dan kembalikan| completed
 
-    issue_reported --> active    : Laboran: masalah selesai, lanjut
-    issue_reported --> completed : Laboran: selesai & kembalikan alat
+    completed --> STOP(( ))
+    rejected  --> STOP
 
-    completed --> [*]
-    rejected  --> [*]
+    style START fill:#1e293b,stroke:#1e293b
+    style STOP  fill:#1e293b,stroke:#1e293b
+    style pending           fill:#fef3c7,stroke:#f59e0b,color:#92400e
+    style approved_by_laboran     fill:#dbeafe,stroke:#3b82f6,color:#1e40af
+    style approved_by_kepala_lab  fill:#ede9fe,stroke:#8b5cf6,color:#4c1d95
+    style ready_for_pickup  fill:#d1fae5,stroke:#10b981,color:#065f46
+    style active            fill:#d1fae5,stroke:#059669,color:#064e3b
+    style completed         fill:#f1f5f9,stroke:#64748b,color:#334155
+    style overdue           fill:#fee2e2,stroke:#ef4444,color:#991b1b
+    style issue_reported    fill:#ffedd5,stroke:#f97316,color:#7c2d12
+    style rejected          fill:#fce7f3,stroke:#ec4899,color:#831843
 ```
 
 ### Status Peminjaman

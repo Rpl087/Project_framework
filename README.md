@@ -68,72 +68,108 @@ Setiap transaksi dicatat dalam **audit log** (riwayat aktivitas) untuk keperluan
 
 ## 📊 Use Case Diagram
 
+### Overview — Aktor & Kelompok Fitur
+
 ```mermaid
-%%{init: {"theme": "default", "themeVariables": {"fontSize": "14px"}}}%%
-flowchart TD
-    subgraph UC["🎓 MAHASISWA"]
-        direction TB
-        M1(["Lihat Katalog Alat"])
-        M2(["Ajukan Peminjaman"])
-        M3(["Batalkan Pengajuan"])
-        M4(["Laporkan Masalah Alat"])
-        M5(["Lihat Riwayat Peminjaman"])
-        M6(["Lihat Detail Peminjaman"])
-        M7(["Terima Notifikasi"])
-        M8(["Edit Profil & Telepon"])
-    end
+flowchart LR
+    MA(["🎓 Mahasiswa"])
+    LA(["🔬 Laboran"])
+    KA(["🏛️ Kepala Lab"])
+    SY(["⚙️ Sistem"])
 
-    subgraph UL["🔬 LABORAN"]
-        direction TB
-        L1(["Setujui Peminjaman Alat Umum"])
-        L2(["Tolak Peminjaman"])
-        L3(["Serah Terima Alat"])
-        L4(["Proses Pengembalian"])
-        L5(["Selesaikan Laporan Masalah"])
-        L6(["Kelola Alat (CRUD + Gambar)"])
-        L7(["Kelola Akun Mahasiswa"])
-        L8(["Export Laporan PDF/CSV"])
-        L9(["Lihat Semua Peminjaman"])
-    end
+    MA --> F1 & F2
+    LA --> F1 & F3 & F4
+    KA --> F1 & F4 & F5
+    SY --> F6
 
-    subgraph UK["🏛️ KEPALA LAB"]
-        direction TB
-        K1(["Setujui Alat Khusus"])
-        K2(["Tolak Peminjaman"])
-        K3(["Kelola Akun Laboran"])
-        K4(["Export Laporan PDF/CSV"])
-        K5(["Lihat Semua Peminjaman"])
-    end
-
-    subgraph SYS["⚙️ SISTEM (Otomatis)"]
-        direction TB
-        S1(["Kirim Email Verifikasi"])
-        S2(["Kirim Email Reset Password"])
-        S3(["Tandai Overdue (Scheduler)"])
-        S4(["Kirim Notifikasi Status"])
-        S5(["Enforce Session Lifetime"])
-    end
-
-    AUTH["🔐 Autentikasi\n(Login / Register)"]
-
-    AUTH --> UC
-    AUTH --> UL
-    AUTH --> UK
-
-    M2 --> S4
-    L1 --> S4
-    L2 --> S4
-    L3 --> S4
-    L4 --> S4
-    L5 --> S4
-    K1 --> S4
-    K2 --> S4
-    S3 --> S4
-
-    M8 --> S1
-    AUTH --> S2
-    AUTH --> S5
+    F1["🔐 Autentikasi\n& Profil"]
+    F2["📋 Pengajuan\nPeminjaman"]
+    F3["📦 Pengelolaan\nPeminjaman"]
+    F4["🛠️ Administrasi\n& Laporan"]
+    F5["⭐ Persetujuan\nAlat Khusus"]
+    F6["🤖 Proses\nOtomatis"]
 ```
+
+### Detail Use Case per Aktor
+
+<table>
+<thead>
+<tr>
+  <th>🎓 Mahasiswa</th>
+  <th>🔬 Laboran</th>
+  <th>🏛️ Kepala Lab</th>
+  <th>⚙️ Sistem Otomatis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Register akun baru</td>
+  <td>Login & logout</td>
+  <td>Login & logout</td>
+  <td>Kirim email verifikasi</td>
+</tr>
+<tr>
+  <td>Login & logout</td>
+  <td>Edit profil & telepon</td>
+  <td>Edit profil & telepon</td>
+  <td>Kirim email reset password</td>
+</tr>
+<tr>
+  <td>Verifikasi email</td>
+  <td>Setujui peminjaman alat umum</td>
+  <td>Setujui peminjaman alat khusus</td>
+  <td>Kirim notifikasi in-app</td>
+</tr>
+<tr>
+  <td>Reset password</td>
+  <td>Tolak peminjaman</td>
+  <td>Tolak peminjaman</td>
+  <td>Tandai overdue (scheduler)</td>
+</tr>
+<tr>
+  <td>Edit profil & telepon</td>
+  <td>Serah terima alat ke peminjam</td>
+  <td>Lihat semua peminjaman</td>
+  <td>Enforce session timeout</td>
+</tr>
+<tr>
+  <td>Lihat katalog alat</td>
+  <td>Proses pengembalian alat</td>
+  <td>Kelola akun Laboran</td>
+  <td></td>
+</tr>
+<tr>
+  <td>Ajukan peminjaman</td>
+  <td>Tangani laporan masalah</td>
+  <td>Export laporan PDF/CSV</td>
+  <td></td>
+</tr>
+<tr>
+  <td>Batalkan pengajuan</td>
+  <td>Kelola alat (CRUD + gambar)</td>
+  <td>Dashboard & statistik</td>
+  <td></td>
+</tr>
+<tr>
+  <td>Laporkan masalah alat</td>
+  <td>Kelola akun Mahasiswa</td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>Lihat riwayat peminjaman</td>
+  <td>Export laporan PDF/CSV</td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>Lihat notifikasi</td>
+  <td>Dashboard & statistik</td>
+  <td></td>
+  <td></td>
+</tr>
+</tbody>
+</table>
 
 ---
 

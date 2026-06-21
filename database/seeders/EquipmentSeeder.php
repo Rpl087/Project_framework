@@ -15,7 +15,7 @@ class EquipmentSeeder extends Seeder
                 'description' => 'Laptop ASUS ROG Strix G16 dengan Intel Core i7, RAM 16GB, SSD 512GB, GPU RTX 4060 untuk pemrograman dan pengembangan software.',
                 'total_stock' => 15,
                 'available_stock' => 15,
-                'category' => 'umum',
+                'category' => 'khusus',
                 'status' => 'good',
             ],
             [
@@ -63,7 +63,7 @@ class EquipmentSeeder extends Seeder
                 'description' => 'Monitor LG UltraWide 34 inci resolusi 3440x1440 IPS untuk desain UI/UX dan pengembangan web.',
                 'total_stock' => 12,
                 'available_stock' => 12,
-                'category' => 'umum',
+                'category' => 'khusus',
                 'status' => 'good',
             ],
             [

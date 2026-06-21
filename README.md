@@ -614,21 +614,23 @@ Setelah menjalankan `php artisan migrate --seed`, tersedia 3 akun berikut:
 
 | No | Nama Alat | Kategori | Stok | Status |
 |---|---|---|---|---|
-| 1 | Laptop ASUS ROG | Umum | 15 | Good |
+| 1 | Laptop ASUS ROG | **Khusus** | 15 | Good |
 | 2 | Raspberry Pi 5 | Umum | 20 | Good |
 | 3 | Arduino Mega 2560 | Umum | 25 | Good |
-| 4 | Cisco Router 2901 | Khusus | 8 | Good |
-| 5 | Cisco Switch Catalyst 2960 | Khusus | 10 | Good |
-| 6 | Server Dell PowerEdge | Khusus | 3 | Good |
-| 7 | Monitor LG UltraWide 34" | Umum | 12 | Good |
-| 8 | VR Headset Meta Quest 3 | Khusus | 5 | Good |
-| 9 | 3D Printer Creality Ender | Khusus | 4 | Good |
+| 4 | Cisco Router 2901 | **Khusus** | 8 | Good |
+| 5 | Cisco Switch Catalyst 2960 | **Khusus** | 10 | Good |
+| 6 | Server Dell PowerEdge | **Khusus** | 3 | Good |
+| 7 | Monitor LG UltraWide 34" | **Khusus** | 12 | Good |
+| 8 | VR Headset Meta Quest 3 | **Khusus** | 5 | Good |
+| 9 | 3D Printer Creality Ender | **Khusus** | 4 | Good |
 | 10 | Kabel UTP Cat6 + RJ45 Kit | Umum | 30 | Good |
-| 11 | GPU Workstation NVIDIA A4000 | Khusus | 2 | Good |
+| 11 | GPU Workstation NVIDIA A4000 | **Khusus** | 2 | Good |
 | 12 | Sensor Kit IoT | Umum | 20 | Good |
-| 13 | Oscilloscope Digital Rigol | Khusus | 6 | Good |
+| 13 | Oscilloscope Digital Rigol | **Khusus** | 6 | Good |
 | 14 | Webcam Logitech C920 | Umum | 15 | Good |
 | 15 | External HDD 2TB | Umum | 10 | Maintenance |
+
+> **Alat Khusus** memerlukan persetujuan **dua level**: Laboran → Kepala Lab sebelum bisa diserahterimakan.
 
 ---
 

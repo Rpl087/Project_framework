@@ -34,7 +34,19 @@
                 <div>
                     <label class="form-label">Total Stok *</label>
                     <input type="number" name="total_stock" value="{{ old('total_stock', $equipment->total_stock) }}" class="form-input" min="0" required>
-                    <p style="font-size:0.7rem;color:#94a3b8;margin-top:0.25rem;">Stok tersedia saat ini: {{ $equipment->available_stock }}</p>
+                    @php
+                        $inUse = $equipment->borrowings()->whereIn('status', [
+                            'pending','approved_by_laboran','approved_by_kepala_lab',
+                            'ready_for_pickup','active','overdue','issue_reported',
+                        ])->count();
+                    @endphp
+                    <p style="font-size:0.7rem;color:#94a3b8;margin-top:0.25rem;">
+                        Tersedia: {{ $equipment->available_stock }}
+                        @if($inUse > 0)
+                            · <span style="color:#f59e0b;font-weight:600;">{{ $inUse }} unit sedang dipinjam/diproses</span>
+                            · Minimum total: <strong>{{ $inUse }}</strong>
+                        @endif
+                    </p>
                     @error('total_stock') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
                 <div>

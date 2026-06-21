@@ -18,10 +18,18 @@
                 <input type="text" name="name" value="{{ old('name', $user->name) }}" class="form-input" required>
                 @error('name') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
-            <div style="margin-bottom:1.5rem;">
+            <div style="margin-bottom:1.25rem;">
                 <label class="form-label">Email *</label>
                 <input type="email" name="email" value="{{ old('email', $user->email) }}" class="form-input" required>
                 @error('email') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+                @if(!$user->email_verified_at)
+                <p style="font-size:0.72rem;color:#f59e0b;margin-top:0.25rem;">⚠️ Email belum diverifikasi.</p>
+                @endif
+            </div>
+            <div style="margin-bottom:1.25rem;">
+                <label class="form-label">Nomor Telepon</label>
+                <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}" class="form-input" placeholder="Contoh: 081234567890" maxlength="20">
+                @error('phone') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
             <div style="margin-bottom:1rem;">
                 <label class="form-label">Role</label>

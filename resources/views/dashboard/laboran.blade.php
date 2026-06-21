@@ -106,8 +106,9 @@
                             <p style="font-size:0.75rem;color:#94a3b8;">{{ $ab->user->name }} &bull; Kembali: {{ $ab->end_date }}</p>
                         </div>
                         @php
-                            // Overdue jika: dipinjam hari lain (tidak dikembalikan), ATAU jam sekarang sudah lewat end_time
-                            $isOverdue = !$ab->created_at->isToday()
+                            // Cek overdue berbasis updated_at (waktu alat di-handover/aktif),
+                            // konsisten dengan logika MarkOverdueBorrowings command.
+                            $isOverdue = !$ab->updated_at->isToday()
                                 || now()->format('H:i') > $ab->end_date;
                         @endphp
                         @if($isOverdue)

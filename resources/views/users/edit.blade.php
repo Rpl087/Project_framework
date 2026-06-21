@@ -25,6 +25,11 @@
                 <input type="email" name="email" value="{{ old('email', $user->email) }}" class="form-input" required>
                 @error('email') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
+            <div style="margin-bottom:1.25rem;">
+                <label class="form-label">Nomor Telepon</label>
+                <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}" class="form-input" placeholder="Contoh: 081234567890" maxlength="20">
+                @error('phone') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+            </div>
 
             {{-- Role tidak bisa diubah, ditampilkan sebagai info --}}
             <div style="margin-bottom:1.25rem;">

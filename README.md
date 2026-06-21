@@ -8,6 +8,8 @@
 
 - [Tentang Proyek](#-tentang-proyek)
 - [Fitur Utama](#-fitur-utama)
+- [Use Case Diagram](#-use-case-diagram)
+- [ERD (Entity Relationship Diagram)](#-erd-entity-relationship-diagram)
 - [Alur Peminjaman](#-alur-peminjaman)
 - [Role & Akses](#-role--akses)
 - [Tech Stack](#-tech-stack)
@@ -18,6 +20,7 @@
 - [Alat yang Tersedia (Seeder)](#-alat-yang-tersedia-seeder)
 - [Artisan Commands](#-artisan-commands)
 - [Konfigurasi Penting](#-konfigurasi-penting)
+- [Middleware & Keamanan](#-middleware--keamanan)
 
 ---
 
@@ -28,7 +31,7 @@
 - **Alat Umum** → cukup disetujui oleh **Laboran**
 - **Alat Khusus** → wajib disetujui **Laboran** *dan* **Kepala Lab**
 
-Setiap transaksi dicatat dalam **audit log** (riwayat aktivitas) untuk keperluan tracking dan akuntabilitas.
+Setiap transaksi dicatat dalam **audit log** (riwayat aktivitas) untuk keperluan tracking dan akuntabilitas. Mahasiswa mendapatkan **notifikasi real-time** di setiap perubahan status peminjaman.
 
 ---
 
@@ -36,28 +39,175 @@ Setiap transaksi dicatat dalam **audit log** (riwayat aktivitas) untuk keperluan
 
 | Fitur | Keterangan |
 |---|---|
-| 🔐 Autentikasi | Login, logout, "ingat saya" (3 jam / 1 hari) |
+| 🔐 Autentikasi | Login, register, logout, "ingat saya" (3 jam / 1 hari) |
+| 📧 Verifikasi Email | Mahasiswa wajib verifikasi email sebelum meminjam |
+| 🔑 Reset Password | Reset password melalui email |
 | 👥 Multi-Role | Mahasiswa, Laboran, Kepala Lab |
-| 📦 Manajemen Alat | CRUD alat, kategori, status, stok |
-| 🖼️ Gambar Alat | Upload & tampilan gambar alat (via upload form + `EquipmentImageComposer`) |
-| 📋 Katalog Alat | Halaman katalog bagi Mahasiswa untuk melihat alat tersedia |
+| 📦 Manajemen Alat | CRUD alat, kategori, status, stok (dengan validasi stok aktif) |
+| 🖼️ Gambar Alat | Upload & tampilan gambar alat |
+| 📋 Katalog Alat | Halaman katalog Mahasiswa dengan filter & pencarian |
 | 📝 Pengajuan Peminjaman | Form peminjaman dengan validasi waktu (08:00–20:00) |
 | ✅ Approval Multi-Level | Laboran + Kepala Lab (untuk alat khusus) |
 | 🤝 Serah Terima | Laboran mengkonfirmasi penyerahan alat ke peminjam |
 | 🔄 Pengembalian | Proses pengembalian dengan catatan kondisi alat |
 | ❌ Penolakan | Laboran / Kepala Lab dapat menolak dengan alasan |
 | 🚫 Pembatalan | Mahasiswa dapat membatalkan pengajuan yang masih pending |
-| ⚠️ Laporan Masalah | Mahasiswa laporkan masalah alat, Laboran menangani/resolve |
-| 🔔 Notifikasi | Notifikasi otomatis ke mahasiswa saat status berubah |
+| ⚠️ Laporan Masalah | Mahasiswa laporkan masalah alat, Laboran menangani |
+| 🔔 Notifikasi | Notifikasi otomatis di setiap perubahan status |
 | 👤 Manajemen User | Laboran kelola Mahasiswa; Kepala Lab kelola Laboran |
 | 📄 Export Laporan | Export data peminjaman ke PDF (dompdf) & CSV |
 | 📊 Dashboard | Dashboard spesifik per role dengan statistik |
 | 📜 Audit Log | Riwayat setiap aksi tersimpan di `borrowing_logs` |
 | ⏰ Overdue Otomatis | Scheduler harian menandai peminjaman yang terlambat |
-| 🛡️ Race Condition Guard | Locking DB saat pengajuan untuk mencegah double-booking |
+| 🛡️ Race Condition Guard | DB locking saat pengajuan untuk mencegah double-booking |
 | 🔒 Session Management | Middleware custom untuk enforce session lifetime dinamis |
-| 🌗 Dark Mode | Toggle mode gelap/terang dengan transisi animasi halus |
-| 👤 Profil | User dapat mengedit nama, email, dan password |
+| 🌗 Dark Mode | Toggle mode gelap/terang |
+| 👤 Profil | User dapat mengedit nama, email, telepon, dan password |
+
+---
+
+## 📊 Use Case Diagram
+
+```mermaid
+%%{init: {"theme": "default", "themeVariables": {"fontSize": "14px"}}}%%
+flowchart TD
+    subgraph UC["🎓 MAHASISWA"]
+        direction TB
+        M1(["Lihat Katalog Alat"])
+        M2(["Ajukan Peminjaman"])
+        M3(["Batalkan Pengajuan"])
+        M4(["Laporkan Masalah Alat"])
+        M5(["Lihat Riwayat Peminjaman"])
+        M6(["Lihat Detail Peminjaman"])
+        M7(["Terima Notifikasi"])
+        M8(["Edit Profil & Telepon"])
+    end
+
+    subgraph UL["🔬 LABORAN"]
+        direction TB
+        L1(["Setujui Peminjaman Alat Umum"])
+        L2(["Tolak Peminjaman"])
+        L3(["Serah Terima Alat"])
+        L4(["Proses Pengembalian"])
+        L5(["Selesaikan Laporan Masalah"])
+        L6(["Kelola Alat (CRUD + Gambar)"])
+        L7(["Kelola Akun Mahasiswa"])
+        L8(["Export Laporan PDF/CSV"])
+        L9(["Lihat Semua Peminjaman"])
+    end
+
+    subgraph UK["🏛️ KEPALA LAB"]
+        direction TB
+        K1(["Setujui Alat Khusus"])
+        K2(["Tolak Peminjaman"])
+        K3(["Kelola Akun Laboran"])
+        K4(["Export Laporan PDF/CSV"])
+        K5(["Lihat Semua Peminjaman"])
+    end
+
+    subgraph SYS["⚙️ SISTEM (Otomatis)"]
+        direction TB
+        S1(["Kirim Email Verifikasi"])
+        S2(["Kirim Email Reset Password"])
+        S3(["Tandai Overdue (Scheduler)"])
+        S4(["Kirim Notifikasi Status"])
+        S5(["Enforce Session Lifetime"])
+    end
+
+    AUTH["🔐 Autentikasi\n(Login / Register)"]
+
+    AUTH --> UC
+    AUTH --> UL
+    AUTH --> UK
+
+    M2 --> S4
+    L1 --> S4
+    L2 --> S4
+    L3 --> S4
+    L4 --> S4
+    L5 --> S4
+    K1 --> S4
+    K2 --> S4
+    S3 --> S4
+
+    M8 --> S1
+    AUTH --> S2
+    AUTH --> S5
+```
+
+---
+
+## 🗃️ ERD (Entity Relationship Diagram)
+
+```mermaid
+erDiagram
+    USERS {
+        int id PK
+        string name
+        string email
+        string phone "nullable"
+        string password
+        string role "mahasiswa|laboran|kepala_lab"
+        datetime email_verified_at "nullable"
+        string remember_token "nullable"
+        datetime created_at
+        datetime updated_at
+    }
+
+    EQUIPMENTS {
+        int id PK
+        string name
+        text description "nullable"
+        int total_stock
+        int available_stock
+        string category "umum|khusus"
+        string status "good|maintenance"
+        string image "nullable"
+        datetime created_at
+        datetime updated_at
+    }
+
+    BORROWINGS {
+        int id PK
+        int user_id FK
+        int equipment_id FK
+        time start_date "HH:MM"
+        time end_date "HH:MM"
+        text purpose
+        string status "pending|approved_by_laboran|approved_by_kepala_lab|ready_for_pickup|active|completed|rejected|overdue|issue_reported"
+        text return_condition "nullable"
+        text reject_reason "nullable"
+        datetime created_at
+        datetime updated_at
+    }
+
+    BORROWING_LOGS {
+        int id PK
+        int borrowing_id FK
+        int user_id FK
+        text action_description
+        datetime created_at
+        datetime updated_at
+    }
+
+    NOTIFICATIONS {
+        int id PK
+        int user_id FK
+        string title
+        text message
+        string type "info|success|warning|danger"
+        string link "nullable"
+        datetime read_at "nullable"
+        datetime created_at
+        datetime updated_at
+    }
+
+    USERS ||--o{ BORROWINGS       : "mengajukan"
+    USERS ||--o{ BORROWING_LOGS   : "melakukan aksi"
+    USERS ||--o{ NOTIFICATIONS    : "menerima"
+    EQUIPMENTS ||--o{ BORROWINGS  : "dipinjam via"
+    BORROWINGS ||--o{ BORROWING_LOGS : "dicatat dalam"
+```
 
 ---
 
@@ -80,6 +230,38 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
          → Laboran Proses Kembali → [completed]
 ```
 
+### Diagram Alur Lengkap (State Machine)
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending : Mahasiswa ajukan
+
+    pending --> ready_for_pickup    : Laboran setujui\n(alat UMUM)
+    pending --> approved_by_laboran : Laboran setujui\n(alat KHUSUS)
+    pending --> rejected            : Laboran / Kepala Lab tolak
+    pending --> rejected            : Mahasiswa batalkan
+
+    approved_by_laboran --> approved_by_kepala_lab : Kepala Lab setujui
+    approved_by_laboran --> rejected               : Kepala Lab tolak
+
+    approved_by_kepala_lab --> active  : Laboran serah terima
+    approved_by_kepala_lab --> rejected: Kepala Lab tolak
+
+    ready_for_pickup --> active : Laboran serah terima
+
+    active --> completed      : Laboran proses kembali
+    active --> overdue        : Scheduler (jam terlewat)
+    active --> issue_reported : Mahasiswa laporkan masalah
+
+    overdue --> completed : Laboran proses kembali (terlambat)
+
+    issue_reported --> active    : Laboran: masalah selesai, lanjut
+    issue_reported --> completed : Laboran: selesai & kembalikan alat
+
+    completed --> [*]
+    rejected  --> [*]
+```
+
 ### Status Peminjaman
 
 | Status | Label | Keterangan |
@@ -90,22 +272,23 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `ready_for_pickup` | Siap Diambil | Alat umum sudah disetujui Laboran |
 | `active` | Sedang Dipinjam | Alat sudah diserahkan ke peminjam |
 | `completed` | Selesai | Alat sudah dikembalikan |
-| `rejected` | Ditolak | Ditolak oleh Laboran / Kepala Lab |
+| `rejected` | Ditolak / Dibatalkan | Ditolak oleh admin atau dibatalkan mahasiswa |
 | `overdue` | Terlambat | Melewati waktu pengembalian (otomatis via scheduler) |
-| `issue_reported` | Ada Masalah | Status untuk pelaporan masalah |
+| `issue_reported` | Ada Masalah | Status untuk pelaporan masalah alat |
 
 ---
 
 ## 👤 Role & Akses
 
 ### Mahasiswa
+- Mendaftar akun & verifikasi email
 - Melihat katalog alat yang tersedia (filter pencarian & kategori)
 - Mengajukan permintaan peminjaman
 - Membatalkan pengajuan yang masih pending
 - Melaporkan masalah pada alat yang sedang dipinjam
 - Melihat riwayat peminjaman sendiri
-- Melihat detail & status peminjaman
 - Menerima notifikasi otomatis saat status berubah
+- Mengedit profil (nama, email, telepon, password)
 
 ### Laboran
 - Melihat semua permintaan peminjaman (filter & pencarian)
@@ -114,14 +297,14 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 - Memproses pengembalian alat (`active`, `overdue`)
 - Menangani laporan masalah dari mahasiswa (`issue_reported`)
 - Mengelola alat (tambah, edit, hapus, upload gambar)
-- **Mengelola user Mahasiswa** (tambah, edit, hapus)
+- **Mengelola akun Mahasiswa** (tambah, edit, hapus)
 - Export laporan peminjaman ke PDF & CSV
 - Dashboard dengan statistik lengkap
 
 ### Kepala Lab
 - Menyetujui / menolak peminjaman alat khusus (`approved_by_laboran`)
 - Melihat semua data peminjaman
-- **Mengelola user Laboran** (tambah, edit, hapus)
+- **Mengelola akun Laboran** (tambah, edit, hapus)
 - Export laporan peminjaman ke PDF & CSV
 - Dashboard dengan ringkasan persetujuan
 
@@ -155,9 +338,6 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | **@tailwindcss/forms** | `^0.5.2` (plugin form styling) |
 | **Alpine.js** | `^3.x` (reactive UI — via CDN di layout) |
 | **Axios** | `^1.7.4` (HTTP client) |
-| **PostCSS** | `^8.4.31` |
-| **Autoprefixer** | `^10.4.2` |
-| **Concurrently** | `^9.0.1` (jalankan multi-process dev server) |
 
 ### Dev Tools
 
@@ -166,9 +346,6 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | **Laravel Pint** | Code style fixer (PSR-12) |
 | **Laravel Pail** | Log viewer di terminal |
 | **PHPUnit** | `^11.0.1` — unit & feature testing |
-| **Faker PHP** | `^1.23` — data dummy untuk testing |
-| **Mockery** | `^1.6` — mock objects |
-| **Collision** | `^8.1` — better CLI error display |
 
 ---
 
@@ -184,7 +361,7 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `phone` | varchar(20) | Nomor telepon (nullable) |
 | `password` | varchar | Password (bcrypt) |
 | `role` | varchar | `mahasiswa` / `laboran` / `kepala_lab` |
-| `email_verified_at` | datetime | Nullable |
+| `email_verified_at` | datetime | Nullable — wajib diisi untuk mahasiswa |
 | `remember_token` | varchar | Nullable |
 | `created_at` / `updated_at` | datetime | Timestamps |
 
@@ -212,9 +389,9 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `start_date` | time | Waktu mulai pinjam (HH:MM) |
 | `end_date` | time | Waktu pengembalian (HH:MM) |
 | `purpose` | text | Tujuan peminjaman |
-| `status` | enum | Status peminjaman (lihat tabel status di atas) |
+| `status` | varchar | Status peminjaman (9 status) |
 | `return_condition` | text | Kondisi alat saat dikembalikan (nullable) |
-| `reject_reason` | text | Alasan penolakan (nullable) |
+| `reject_reason` | text | Alasan penolakan atau "Dibatalkan oleh peminjam." (nullable) |
 | `created_at` / `updated_at` | datetime | Timestamps |
 
 > **Catatan:** `start_date` dan `end_date` menyimpan **waktu dalam sehari** (format `HH:MM`), bukan tanggal penuh. Sistem peminjaman berlaku untuk hari yang sama, dalam jam operasional **08:00 – 20:00 WIB**.
@@ -237,7 +414,7 @@ Mahasiswa → [pending] → Laboran Setujui → [approved_by_laboran]
 | `user_id` | FK → users | Penerima notifikasi |
 | `title` | varchar | Judul notifikasi |
 | `message` | text | Isi pesan notifikasi |
-| `type` | varchar | Tipe: `success` / `info` / `danger` |
+| `type` | varchar | `info` / `success` / `warning` / `danger` |
 | `link` | varchar | URL terkait (nullable) |
 | `read_at` | datetime | Waktu dibaca (nullable) |
 | `created_at` / `updated_at` | datetime | Timestamps |
@@ -259,18 +436,20 @@ project-frame(lab IT)/
 ├── app/
 │   ├── Console/
 │   │   └── Commands/
-│   │       └── MarkOverdueBorrowings.php   # Command scheduler overdue
+│   │       └── MarkOverdueBorrowings.php   # Command scheduler overdue + notifikasi
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── Auth/
-│   │   │   │   └── AuthenticatedSessionController.php
-│   │   │   ├── BorrowingController.php     # Logika peminjaman lengkap
+│   │   │   │   ├── AuthenticatedSessionController.php  # Login + session lifetime
+│   │   │   │   ├── EmailVerificationController.php     # Verifikasi email
+│   │   │   │   ├── NewPasswordController.php           # Reset password
+│   │   │   │   └── RegisteredUserController.php        # Registrasi mahasiswa
+│   │   │   ├── BorrowingController.php     # Logika peminjaman + notifikasi lengkap
 │   │   │   ├── DashboardController.php     # Dashboard per-role
-│   │   │   ├── EquipmentController.php     # CRUD alat + katalog
+│   │   │   ├── EquipmentController.php     # CRUD alat + katalog + validasi stok
 │   │   │   ├── NotificationController.php  # Daftar & mark-read notifikasi
-│   │   │   ├── ProfileController.php       # Edit profil & password
-│   │   │   ├── UserController.php          # CRUD user (Laboran → Mahasiswa; KepLab → Laboran)
-│   │   │   └── Controller.php
+│   │   │   ├── ProfileController.php       # Edit profil (nama, email, phone, password)
+│   │   │   └── UserController.php          # CRUD user (Laboran→Mahasiswa; KepLab→Laboran)
 │   │   ├── Middleware/
 │   │   │   ├── RoleMiddleware.php          # Guard akses berbasis role
 │   │   │   └── EnforceSessionLifetime.php  # Dynamic session TTL
@@ -278,39 +457,39 @@ project-frame(lab IT)/
 │   │       └── Auth/
 │   │           └── LoginRequest.php
 │   ├── Models/
-│   │   ├── Borrowing.php      # Model + status helpers (label & color)
+│   │   ├── Borrowing.php      # Model + status_label + status_color helpers
 │   │   ├── BorrowingLog.php   # Model audit log
-│   │   ├── Equipment.php      # Model + scope available()
+│   │   ├── Equipment.php      # Model + scopeAvailable()
 │   │   ├── Notification.php   # Model + static send() helper
-│   │   └── User.php           # Model + role helpers (isMahasiswa, isLaboran, isKepalaLab)
+│   │   └── User.php           # Model + isMahasiswa/isLaboran/isKepalaLab helpers
 │   ├── Providers/
 │   │   └── AppServiceProvider.php          # Register EquipmentImageComposer
 │   └── View/
 │       └── Composers/
-│           └── EquipmentImageComposer.php  # Inject $imageMap ke views alat
+│           └── EquipmentImageComposer.php  # Inject $imageMap + getImageUrl() static
 ├── database/
 │   ├── migrations/             # 10 migration files
 │   ├── seeders/
 │   │   ├── DatabaseSeeder.php
 │   │   ├── EquipmentSeeder.php # 15 alat lab IT
-│   │   └── UserSeeder.php      # 3 akun default
+│   │   └── UserSeeder.php      # 3 akun default (dengan phone)
 │   └── database.db             # SQLite database file
 ├── resources/
 │   └── views/
-│       ├── auth/               # Halaman login
+│       ├── auth/               # Login (+ modal register), verify email, reset password
 │       ├── borrowings/
 │       │   ├── create.blade.php     # Form pengajuan peminjaman
-│       │   ├── index.blade.php      # Daftar peminjaman (filter & search)
+│       │   ├── index.blade.php      # Daftar peminjaman (filter, search, export)
 │       │   ├── report-pdf.blade.php # Template laporan PDF
-│       │   └── show.blade.php       # Detail + aksi peminjaman
+│       │   └── show.blade.php       # Detail + aksi + telepon peminjam
 │       ├── dashboard/
 │       │   ├── mahasiswa.blade.php
 │       │   ├── laboran.blade.php
 │       │   └── kepala-lab.blade.php
 │       ├── equipments/
-│       │   ├── catalog.blade.php  # Katalog untuk mahasiswa (filter & search)
+│       │   ├── catalog.blade.php  # Katalog mahasiswa (filter & kategori)
 │       │   ├── create.blade.php   # Form tambah alat
-│       │   ├── edit.blade.php     # Form edit alat
+│       │   ├── edit.blade.php     # Form edit alat (+ info stok aktif)
 │       │   └── index.blade.php    # Manajemen alat (laboran)
 │       ├── errors/
 │       │   ├── 403.blade.php    # Halaman Forbidden
@@ -319,17 +498,17 @@ project-frame(lab IT)/
 │       ├── notifications/
 │       │   └── index.blade.php  # Daftar notifikasi user
 │       ├── profile/
-│       │   └── edit.blade.php   # Edit profil & password
+│       │   └── edit.blade.php   # Edit profil & password (dengan phone)
 │       ├── users/
-│       │   ├── create.blade.php # Form tambah user
-│       │   ├── edit.blade.php   # Form edit user
-│       │   └── index.blade.php  # Daftar user
+│       │   ├── create.blade.php # Form tambah user (dengan phone)
+│       │   ├── edit.blade.php   # Form edit user (dengan phone)
+│       │   └── index.blade.php  # Daftar user (tabel + kolom telepon)
 │       └── layouts/
-│           ├── app.blade.php    # Layout utama (sidebar + navbar)
+│           ├── app.blade.php    # Layout utama (sidebar + navbar + dark mode)
 │           └── guest.blade.php  # Layout login
 ├── routes/
-│   ├── web.php      # Semua route aplikasi
-│   ├── auth.php     # Route autentikasi (Breeze-style)
+│   ├── web.php      # Semua route aplikasi (export sebelum {borrowing})
+│   ├── auth.php     # Route autentikasi
 │   └── console.php  # Jadwal scheduler
 └── public/
     └── images/
@@ -412,7 +591,7 @@ Buka browser dan kunjungi: **http://localhost:8000**
 Jika menggunakan **Laragon**, letakkan folder project di `C:\laragon\www\`, lalu:
 
 1. Pastikan Laragon sudah berjalan (Apache/Nginx + PHP)
-2. Akses via: `http://project-frame(lab IT).test` atau `http://localhost/project-frame(lab IT)/public`
+2. Akses via: `http://project-frame(lab IT).test`
 3. Jalankan `npm run dev` untuk assets Vite
 
 ---
@@ -421,11 +600,11 @@ Jika menggunakan **Laragon**, letakkan folder project di `C:\laragon\www\`, lalu
 
 Setelah menjalankan `php artisan migrate --seed`, tersedia 3 akun berikut:
 
-| Role | Nama | Email | Password |
-|---|---|---|---|
-| 🎓 Mahasiswa | Ahmad Mahasiswa | `mahasiswa@lab.test` | `password` |
-| 🔬 Laboran | Budi Laboran | `laboran@lab.test` | `password` |
-| 🏛️ Kepala Lab | Dr. Citra Kepala Lab | `kepalalab@lab.test` | `password` |
+| Role | Nama | Email | Telepon | Password |
+|---|---|---|---|---|
+| 🎓 Mahasiswa | Ahmad Mahasiswa | `mahasiswa@lab.test` | 081234567890 | `password` |
+| 🔬 Laboran | Budi Laboran | `laboran@lab.test` | 081298765432 | `password` |
+| 🏛️ Kepala Lab | Dr. Citra Kepala Lab | `kepalalab@lab.test` | 081311223344 | `password` |
 
 ---
 
@@ -470,14 +649,14 @@ php artisan migrate:status
 # Lihat daftar route
 php artisan route:list
 
-# Bersihkan cache
+# Bersihkan cache (config + view + app)
 php artisan optimize:clear
 ```
 
 ### Command Kustom
 
 ```bash
-# Tandai peminjaman aktif yang terlambat sebagai 'overdue'
+# Tandai peminjaman aktif yang terlambat sebagai 'overdue' + kirim notifikasi
 php artisan borrowings:mark-overdue
 
 # Mode preview (tidak ada perubahan ke database)
@@ -488,9 +667,9 @@ php artisan borrowings:mark-overdue --dry-run
 
 Command `borrowings:mark-overdue` dijadwalkan berjalan setiap hari pukul **00:01** via `routes/console.php`.
 
-Logika overdue:
-- Peminjaman `active` yang dibuat pada hari **sebelumnya** (belum dikembalikan)
-- Peminjaman `active` yang dibuat **hari ini** tapi jam `end_date` sudah terlewati
+Logika overdue (menggunakan `updated_at` sebagai waktu handover):
+- Peminjaman `active` yang di-handover pada hari **sebelumnya** (belum dikembalikan)
+- Peminjaman `active` yang di-handover **hari ini** tapi jam `end_date` sudah terlewati
 
 Untuk mengaktifkan scheduler di server (Linux):
 ```bash
@@ -539,12 +718,11 @@ Session driver: `database` (tabel `sessions`).
 
 ### Gambar Alat
 
-Gambar alat disimpan di `public/images/equipments/` dan dapat ditambahkan melalui **dua cara**:
+Gambar alat disimpan di `public/images/equipments/` dengan prioritas tampilan:
 
-1. **Upload via form** — Saat menambah/mengedit alat, Laboran bisa upload gambar (JPEG, PNG, GIF, WebP, max 2MB). Gambar disimpan di kolom `image` pada tabel `equipments`.
-2. **Legacy imageMap** — Pemetaan nama alat → file gambar di-hardcode pada `EquipmentImageComposer` (`app/View/Composers/`), digunakan untuk data seeder bawaan.
-
-Prioritas tampilan: Upload (kolom `image`) → Legacy imageMap → Placeholder.
+1. **Upload via form** — Laboran upload gambar (JPEG, PNG, GIF, WebP, max 2MB). Tersimpan di kolom `image` DB.
+2. **Legacy imageMap** — Pemetaan nama alat → file gambar di `EquipmentImageComposer` (untuk data seeder).
+3. **Placeholder** — SVG placeholder ditampilkan jika tidak ada gambar.
 
 ---
 
@@ -557,16 +735,32 @@ Prioritas tampilan: Upload (kolom `image`) → Legacy imageMap → Placeholder.
 | `role:mahasiswa` | Membatasi akses khusus mahasiswa |
 | `role:laboran` | Membatasi akses khusus laboran |
 | `role:kepala_lab` | Membatasi akses khusus kepala lab |
-| `role:laboran\|kepala_lab` | Akses gabungan (contoh: reject, export, kelola user) |
+| `role:laboran\|kepala_lab` | Akses gabungan (reject, export, kelola user) |
 | `EnforceSessionLifetime` | Logout otomatis saat sesi habis |
 
 ### Proteksi Race Condition
 
-Saat mahasiswa mengajukan peminjaman, sistem menggunakan **`DB::transaction()` + `lockForUpdate()`** untuk mencegah dua mahasiswa meminjam alat yang sama secara bersamaan ketika stok hanya tersisa 1 unit. Stok dikurangi saat status `pending` dan dikembalikan saat ditolak atau dikembalikan.
+Saat mahasiswa mengajukan peminjaman, sistem menggunakan **`DB::transaction()` + `lockForUpdate()`** untuk mencegah dua mahasiswa meminjam alat yang sama secara bersamaan. Stok dikurangi saat status `pending` dan dikembalikan saat ditolak atau dikembalikan.
 
 ### Proteksi Stok
 
-Saat penolakan (`reject`) atau pengembalian (`processReturn` / `resolveIssue`), `available_stock` dikembalikan dengan menggunakan `min(available_stock + 1, total_stock)` untuk mencegah stok melebihi total.
+- Saat penolakan / pengembalian: `available_stock` dikembalikan dengan `min(available + 1, total)`.
+- Saat edit alat: validasi `total_stock >= jumlah_unit_aktif_dipinjam` mencegah inkonsistensi data.
+
+### Notifikasi Otomatis
+
+Notifikasi dikirim ke mahasiswa pada setiap event:
+
+| Event | Notifikasi |
+|---|---|
+| Disetujui Laboran (umum) | ✅ Siap diambil |
+| Disetujui Laboran (khusus) | 🔄 Menunggu Kepala Lab |
+| Disetujui Kepala Lab | ✅ Siap diambil |
+| Ditolak | ❌ Dengan alasan penolakan |
+| Alat Diserahkan (Handover) | 🎉 Alat sudah di tangan |
+| Peminjaman Selesai | ✅ / ⚠️ (tepat waktu / terlambat) |
+| Masalah Diselesaikan | ✅ Lanjut / Selesai |
+| Peminjaman Overdue | ⚠️ Segera kembalikan |
 
 ---
 

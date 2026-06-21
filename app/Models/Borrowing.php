@@ -46,33 +46,44 @@ class Borrowing extends Model
 
     public function getStatusLabelAttribute(): string
     {
+        // Jika status rejected tapi dibatalkan oleh peminjam sendiri,
+        // tampilkan "Dibatalkan" bukan "Ditolak" untuk kejelasan UX
+        if ($this->status === 'rejected' && $this->reject_reason === 'Dibatalkan oleh peminjam.') {
+            return 'Dibatalkan';
+        }
+
         return match ($this->status) {
-            'pending' => 'Menunggu Persetujuan',
-            'approved_by_laboran' => 'Disetujui Laboran',
-            'approved_by_kepala_lab' => 'Disetujui Kepala Lab',
-            'ready_for_pickup' => 'Siap Diambil',
-            'active' => 'Sedang Dipinjam',
-            'completed' => 'Selesai',
-            'rejected' => 'Ditolak',
-            'overdue' => 'Terlambat',
-            'issue_reported' => 'Ada Masalah',
-            default => ucfirst($this->status),
+            'pending'                 => 'Menunggu Persetujuan',
+            'approved_by_laboran'     => 'Disetujui Laboran',
+            'approved_by_kepala_lab'  => 'Disetujui Kepala Lab',
+            'ready_for_pickup'        => 'Siap Diambil',
+            'active'                  => 'Sedang Dipinjam',
+            'completed'               => 'Selesai',
+            'rejected'                => 'Ditolak',
+            'overdue'                 => 'Terlambat',
+            'issue_reported'          => 'Ada Masalah',
+            default                   => ucfirst($this->status),
         };
     }
 
     public function getStatusColorAttribute(): string
     {
+        // Warna abu-abu untuk peminjaman yang dibatalkan sendiri
+        if ($this->status === 'rejected' && $this->reject_reason === 'Dibatalkan oleh peminjam.') {
+            return 'gray';
+        }
+
         return match ($this->status) {
-            'pending' => 'amber',
-            'approved_by_laboran' => 'blue',
-            'approved_by_kepala_lab' => 'indigo',
-            'ready_for_pickup' => 'cyan',
-            'active' => 'emerald',
-            'completed' => 'green',
-            'rejected' => 'red',
-            'overdue' => 'orange',
-            'issue_reported' => 'rose',
-            default => 'gray',
+            'pending'                 => 'amber',
+            'approved_by_laboran'     => 'blue',
+            'approved_by_kepala_lab'  => 'indigo',
+            'ready_for_pickup'        => 'cyan',
+            'active'                  => 'emerald',
+            'completed'               => 'green',
+            'rejected'                => 'red',
+            'overdue'                 => 'orange',
+            'issue_reported'          => 'rose',
+            default                   => 'gray',
         };
     }
 }

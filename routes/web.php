@@ -61,13 +61,21 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         // ---- Shared Reject (Laboran & Kepala Lab) ----
         Route::post('/borrowings/{borrowing}/reject', [BorrowingController::class, 'reject'])->name('borrowings.reject');
-        // ---- FITUR-4: Export Laporan ----
-        Route::get('/borrowings/export/pdf', [BorrowingController::class, 'exportPdf'])->name('borrowings.export-pdf');
-        Route::get('/borrowings/export/csv', [BorrowingController::class, 'exportCsv'])->name('borrowings.export-csv');
+        // CATATAN: Route export PDF/CSV dipindahkan ke bawah (sebelum route borrowings.show)
+        // agar urutan route benar dan tidak tertangkap oleh {borrowing} parameter.
     });
 
     // ---- All Authenticated Users ----
     Route::get('/borrowings', [BorrowingController::class, 'index'])->name('borrowings.index');
+
+    // PERBAIKAN: Route export harus dideklarasikan SEBELUM route {borrowing}
+    // agar '/borrowings/export/pdf' tidak tertangkap sebagai route show dengan $borrowing='export'
+    Route::middleware('role:laboran|kepala_lab')->group(function () {
+        // ---- FITUR-4: Export Laporan (duplikat group agar urutan route benar) ----
+        Route::get('/borrowings/export/pdf', [BorrowingController::class, 'exportPdf'])->name('borrowings.export-pdf');
+        Route::get('/borrowings/export/csv', [BorrowingController::class, 'exportCsv'])->name('borrowings.export-csv');
+    });
+
     Route::get('/borrowings/{borrowing}', [BorrowingController::class, 'show'])->name('borrowings.show');
 });
 

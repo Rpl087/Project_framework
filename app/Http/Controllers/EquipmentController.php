@@ -75,6 +75,18 @@ class EquipmentController extends Controller
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
+        // Hitung jumlah unit yang sedang aktif dipinjam (tidak boleh dikurangi di bawah ini)
+        $activeBorrowingsCount = $equipment->borrowings()->whereIn('status', [
+            'pending', 'approved_by_laboran', 'approved_by_kepala_lab',
+            'ready_for_pickup', 'active', 'overdue', 'issue_reported',
+        ])->count();
+
+        if ($validated['total_stock'] < $activeBorrowingsCount) {
+            return back()
+                ->withInput()
+                ->withErrors(['total_stock' => "Total stok tidak boleh kurang dari jumlah unit yang sedang dipinjam/diproses ({$activeBorrowingsCount} unit)."]);
+        }
+
         // Adjust available stock if total_stock changed
         $stockDiff = $validated['total_stock'] - $equipment->total_stock;
         $validated['available_stock'] = max(0, $equipment->available_stock + $stockDiff);

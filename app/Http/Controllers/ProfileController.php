@@ -26,12 +26,29 @@ class ProfileController extends Controller
         $request->validate([
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]+$/'],
+        ], [
+            'phone.regex' => 'Format nomor telepon tidak valid.',
         ]);
 
-        $user->update([
+        $data = [
             'name'  => $request->name,
             'email' => $request->email,
-        ]);
+            'phone' => $request->phone,
+        ];
+
+        // Jika email berubah, reset verifikasi agar user harus verifikasi ulang
+        if ($request->email !== $user->email) {
+            $data['email_verified_at'] = null;
+        }
+
+        $user->update($data);
+
+        // Jika email berubah, user perlu verifikasi ulang → redirect ke notice
+        if (isset($data['email_verified_at'])) {
+            return redirect()->route('verification.notice')
+                ->with('status', 'Email diperbarui. Silakan verifikasi alamat email baru Anda.');
+        }
 
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
@@ -42,9 +59,9 @@ class ProfileController extends Controller
     public function updatePassword(Request $request)
     {
         $request->validate([
-            'current_password'          => ['required', 'string'],
-            'password'                  => ['required', 'string', 'min:8', 'confirmed'],
-            'password_confirmation'     => ['required', 'string'],
+            'current_password'      => ['required', 'string'],
+            'password'              => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required', 'string'],
         ]);
 
         $user = auth()->user();
@@ -55,6 +72,12 @@ class ProfileController extends Controller
 
         $user->update(['password' => Hash::make($request->password)]);
 
-        return back()->with('success', 'Password berhasil diubah. Silakan login kembali.');
+        // Logout setelah ganti password untuk keamanan
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')
+            ->with('status', 'Password berhasil diubah. Silakan login kembali dengan password baru.');
     }
 }

@@ -15,7 +15,12 @@ Route::middleware('guest')->group(function () {
         ->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    // Register
+    // Register (form ada sebagai modal di login page)
+    // GET /register → redirect ke login agar tidak 404
+    Route::get('register', function () {
+        return redirect()->route('login');
+    })->name('register.page');
+
     Route::post('register', [RegisteredUserController::class, 'store'])
         ->name('register');
 

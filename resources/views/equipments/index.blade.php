@@ -19,13 +19,13 @@
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;">
         @forelse($equipments as $index => $eq)
-        @php $imgFile = $imageMap[$eq->name] ?? null; @endphp
+        @php $imgUrl = \App\View\Composers\EquipmentImageComposer::getImageUrl($eq, $imageMap); @endphp
         <div class="stat-card animate-in animate-delay-{{ min($index + 1, 4) }}" style="padding:0;overflow:hidden;">
 
             {{-- Product Image --}}
             <div style="position:relative;height:180px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);overflow:hidden;">
-                @if($imgFile && file_exists(public_path('images/equipments/' . $imgFile)))
-                    <img src="{{ asset('images/equipments/' . $imgFile) }}"
+                @if($imgUrl)
+                    <img src="{{ $imgUrl }}"
                          alt="{{ $eq->name }}"
                          style="width:100%;height:100%;object-fit:contain;padding:1rem;transition:transform 0.3s ease;"
                          onmouseover="this.style.transform='scale(1.05)'"

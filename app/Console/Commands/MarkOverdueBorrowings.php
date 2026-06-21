@@ -36,17 +36,22 @@ class MarkOverdueBorrowings extends Command
         $currentTime = now()->format('H:i');
 
         // Peminjaman aktif yang overdue:
-        // - Dibuat sebelum hari ini (tidak dikembalikan kemarin atau lebih awal)
-        // - ATAU dibuat hari ini tapi sudah lewat jam pengembalian
+        // Menggunakan updated_at sebagai proxy "kapan alat diserahterimakan" (handover),
+        // karena saat status berubah menjadi 'active', updated_at diperbarui.
+        // Ini lebih akurat daripada created_at (waktu pengajuan) yang bisa dari hari sebelumnya.
+        //
+        // Kondisi overdue:
+        // - updated_at (waktu aktif) sebelum hari ini → pasti overdue (tidak dikembalikan kemarin)
+        // - ATAU updated_at hari ini && jam sekarang sudah lewat end_date
         $overdueBorrowings = Borrowing::with(['equipment', 'user'])
             ->where('status', 'active')
             ->where(function ($query) use ($today, $currentTime) {
                 $query
-                    // Kasus 1: dibuat sebelum hari ini — pasti overdue
-                    ->whereDate('created_at', '<', $today)
-                    // Kasus 2: dibuat hari ini tapi jam pengembalian sudah lewat
+                    // Kasus 1: menjadi aktif sebelum hari ini — pasti overdue
+                    ->whereDate('updated_at', '<', $today)
+                    // Kasus 2: menjadi aktif hari ini tapi jam pengembalian sudah lewat
                     ->orWhere(function ($q) use ($today, $currentTime) {
-                        $q->whereDate('created_at', $today)
+                        $q->whereDate('updated_at', $today)
                           ->where('end_date', '<', $currentTime);
                     });
             })
@@ -80,6 +85,15 @@ class MarkOverdueBorrowings extends Command
                     'user_id'            => $borrowing->user_id,
                     'action_description' => 'Peminjaman otomatis ditandai terlambat (overdue). Batas pengembalian: ' . $borrowing->end_date . ' pada ' . $borrowing->created_at->format('d M Y') . '.',
                 ]);
+
+                // Notifikasi ke mahasiswa: peminjaman melewati batas waktu
+                \App\Models\Notification::send(
+                    $borrowing->user_id,
+                    'Peminjaman Terlambat! ⚠️',
+                    "Peminjaman {$borrowing->equipment->name} Anda telah melewati batas waktu pengembalian ({$borrowing->end_date}). Segera kembalikan ke Laboran.",
+                    'warning',
+                    route('borrowings.show', $borrowing->id)
+                );
 
                 $count++;
             }

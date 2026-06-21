@@ -30,6 +30,13 @@
                     <span style="font-size:0.75rem;color:#94a3b8;">Email</span>
                     <p style="color:#475569;">{{ $borrowing->user->email }}</p>
                 </div>
+                {{-- Nomor telepon hanya tampil untuk Laboran & Kepala Lab --}}
+                @if(!auth()->user()->isMahasiswa() && $borrowing->user->phone)
+                <div>
+                    <span style="font-size:0.75rem;color:#94a3b8;">Telepon</span>
+                    <a href="tel:{{ $borrowing->user->phone }}" style="color:#4f46e5;font-weight:600;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">{{ $borrowing->user->phone }}</a>
+                </div>
+                @endif
                 <div>
                     <span style="font-size:0.75rem;color:#94a3b8;">Diajukan</span>
                     <p style="color:#475569;">{{ $borrowing->created_at->format('d M Y, H:i') }}</p>
@@ -69,12 +76,21 @@
         <p style="color:#334155;line-height:1.6;">{{ $borrowing->purpose }}</p>
     </div>
 
-    <!-- Reject Reason -->
+    {{-- Reject Reason: hanya tampil saat ditolak oleh admin --}}
     @if($borrowing->status === 'rejected' && $borrowing->reject_reason)
-    <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:0.75rem;padding:1.25rem;margin-bottom:1.5rem;" class="animate-in animate-delay-2">
-        <h3 style="font-size:0.8rem;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Alasan Penolakan</h3>
-        <p style="color:#991b1b;">{{ $borrowing->reject_reason }}</p>
-    </div>
+        @if($borrowing->reject_reason === 'Dibatalkan oleh peminjam.')
+        {{-- Dibatalkan sendiri: tampilkan panel abu-abu/netral --}}
+        <div style="background:#f1f5f9;border:1px solid #cbd5e1;border-radius:0.75rem;padding:1.25rem;margin-bottom:1.5rem;" class="animate-in animate-delay-2">
+            <h3 style="font-size:0.8rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Dibatalkan oleh Peminjam</h3>
+            <p style="color:#64748b;">Pengajuan peminjaman ini dibatalkan oleh Anda sendiri.</p>
+        </div>
+        @else
+        {{-- Ditolak oleh admin: tampilkan panel merah --}}
+        <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:0.75rem;padding:1.25rem;margin-bottom:1.5rem;" class="animate-in animate-delay-2">
+            <h3 style="font-size:0.8rem;font-weight:700;color:#991b1b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;">Alasan Penolakan</h3>
+            <p style="color:#991b1b;">{{ $borrowing->reject_reason }}</p>
+        </div>
+        @endif
     @endif
 
     <!-- Return Condition -->

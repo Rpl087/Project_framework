@@ -40,6 +40,7 @@
                     <th>#</th>
                     <th>Nama</th>
                     <th>Email</th>
+                    <th>Telepon</th>
                     <th>Role</th>
                     <th>Peminjaman</th>
                     <th>Bergabung</th>
@@ -59,6 +60,13 @@
                             </div>
                         </td>
                         <td style="color:var(--txt-2);">{{ $u->email }}</td>
+                        <td style="color:var(--txt-2);font-size:0.85rem;">
+                            @if($u->phone)
+                                <a href="tel:{{ $u->phone }}" style="color:#4f46e5;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">{{ $u->phone }}</a>
+                            @else
+                                <span style="color:var(--txt-3);">—</span>
+                            @endif
+                        </td>
                         <td>
                             @if($u->role === 'mahasiswa')
                                 <span class="badge badge-blue">🎓 Mahasiswa</span>
@@ -90,7 +98,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--txt-3);">Tidak ada {{ $targetRole }} ditemukan.</td></tr>
+                    <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--txt-3);">Tidak ada {{ $targetRole }} ditemukan.</td></tr>
                 @endforelse
             </tbody>
         </table>

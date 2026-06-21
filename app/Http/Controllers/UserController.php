@@ -77,13 +77,17 @@ class UserController extends Controller
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone'    => ['nullable', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]+$/'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role'     => ['required', Rule::in([$targetRole])],
+        ], [
+            'phone.regex' => 'Format nomor telepon tidak valid.',
         ]);
 
         $user = User::create([
             'name'              => $request->name,
             'email'             => $request->email,
+            'phone'             => $request->phone,
             'password'          => Hash::make($request->password),
             'role'              => $targetRole,
             // User yang dibuat oleh admin langsung aktif (tidak perlu verifikasi email)
@@ -115,11 +119,15 @@ class UserController extends Controller
         $request->validate([
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]+$/'],
+        ], [
+            'phone.regex' => 'Format nomor telepon tidak valid.',
         ]);
 
         $data = [
             'name'  => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'role'  => $targetRole, // role tetap sesuai hak akses, tidak bisa diubah
         ];
 

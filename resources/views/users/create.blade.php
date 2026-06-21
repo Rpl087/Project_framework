@@ -34,6 +34,11 @@
                 <input type="email" name="email" value="{{ old('email') }}" class="form-input" required placeholder="email@domain.com">
                 @error('email') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
+            <div style="margin-bottom:1.25rem;">
+                <label class="form-label">Nomor Telepon</label>
+                <input type="tel" name="phone" value="{{ old('phone') }}" class="form-input" placeholder="Contoh: 081234567890" maxlength="20">
+                @error('phone') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
                 <div>
                     <label class="form-label">Password * (min. 8 karakter)</label>

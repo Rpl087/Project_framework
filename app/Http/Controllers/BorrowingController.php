@@ -296,6 +296,15 @@ class BorrowingController extends Controller
             'action_description' => 'Alat diserahkan kepada peminjam. Status: aktif.',
         ]);
 
+        // Notifikasi ke mahasiswa: alat sudah diserahterimakan
+        Notification::send(
+            $borrowing->user_id,
+            'Alat Sudah Diserahkan 🎉',
+            "Alat {$borrowing->equipment->name} telah diserahkan kepada Anda. Jaga dengan baik dan kembalikan sebelum {$borrowing->end_date}.",
+            'success',
+            route('borrowings.show', $borrowing->id)
+        );
+
         return back()->with('success', 'Alat berhasil diserahkan.');
     }
 
@@ -333,6 +342,18 @@ class BorrowingController extends Controller
                 'user_id' => auth()->id(),
                 'action_description' => 'Alat dikembalikan' . $note . '. Kondisi: ' . $request->return_condition,
             ]);
+
+            // Notifikasi ke mahasiswa: peminjaman selesai
+            $msg = $wasOverdue
+                ? "Peminjaman {$borrowing->equipment->name} Anda telah selesai (terlambat). Kondisi: {$request->return_condition}."
+                : "Peminjaman {$borrowing->equipment->name} Anda telah selesai. Terima kasih telah mengembalikan tepat waktu!";
+            Notification::send(
+                $borrowing->user_id,
+                $wasOverdue ? 'Peminjaman Selesai (Terlambat) ⚠️' : 'Peminjaman Selesai ✅',
+                $msg,
+                $wasOverdue ? 'warning' : 'success',
+                route('borrowings.show', $borrowing->id)
+            );
         });
 
         return back()->with('success', 'Pengembalian berhasil diproses.');
@@ -445,6 +466,25 @@ class BorrowingController extends Controller
                 'user_id'            => auth()->id(),
                 'action_description' => $action,
             ]);
+
+            // Notifikasi ke mahasiswa: masalah diselesaikan
+            if ($request->resolve_action === 'complete') {
+                Notification::send(
+                    $borrowing->user_id,
+                    'Masalah Selesai & Peminjaman Ditutup ✅',
+                    "Laporan masalah pada {$borrowing->equipment->name} telah diselesaikan dan peminjaman ditutup. Catatan: {$request->resolve_description}",
+                    'success',
+                    route('borrowings.show', $borrowing->id)
+                );
+            } else {
+                Notification::send(
+                    $borrowing->user_id,
+                    'Masalah Ditangani, Peminjaman Dilanjutkan ✅',
+                    "Laporan masalah pada {$borrowing->equipment->name} telah ditangani. Peminjaman Anda dilanjutkan. Catatan: {$request->resolve_description}",
+                    'info',
+                    route('borrowings.show', $borrowing->id)
+                );
+            }
         });
 
         return back()->with('success', 'Laporan masalah berhasil ditangani.');

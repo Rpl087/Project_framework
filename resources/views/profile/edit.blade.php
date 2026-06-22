@@ -1,11 +1,14 @@
-@extends('layouts.app')
+@extends(auth()->user()->isMahasiswa() ? 'layouts.mahasiswa' : 'layouts.app')
 @section('title', 'Edit Profil')
+@if(auth()->user()->isMahasiswa())
+@section('no_hero', true)
+@endif
 
 @section('content')
 <div style="max-width:640px;">
     <div class="animate-in" style="margin-bottom:1.5rem;">
-        <h1 style="font-size:1.5rem;font-weight:800;color:var(--txt-1);">Edit Profil</h1>
-        <p style="color:var(--txt-2);font-size:0.875rem;margin-top:0.25rem;">Kelola informasi akun dan keamanan Anda.</p>
+        <h1 style="font-size:1.5rem;font-weight:800;color:{{ auth()->user()->isMahasiswa() ? 'var(--u-txt1)' : 'var(--txt-1)' }};">Edit Profil</h1>
+        <p style="color:{{ auth()->user()->isMahasiswa() ? 'var(--u-txt2)' : 'var(--txt-2)' }};font-size:0.875rem;margin-top:0.25rem;">Kelola informasi akun dan keamanan Anda.</p>
     </div>
 
     {{-- Info Profil --}}

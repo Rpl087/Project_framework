@@ -58,10 +58,14 @@
             text-decoration: none;
         }
         .u-nav-brand-icon {
-            width: 36px; height: 36px; border-radius: 10px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px;
+            border-radius: 12px;
+            overflow: hidden;
             flex-shrink: 0;
+            border: 2px solid rgba(99,102,241,0.25);
+            box-shadow: 0 2px 8px rgba(99,102,241,0.2);
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
         }
         .u-nav-brand-text { font-size: 1rem; font-weight: 800; color: var(--u-txt1); }
         .u-nav-brand-sub  { font-size: 0.62rem; color: var(--u-txt3); font-weight: 500; }
@@ -497,9 +501,7 @@
             {{-- Brand --}}
             <a href="{{ route('dashboard') }}" class="u-nav-brand">
                 <div class="u-nav-brand-icon">
-                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-                    </svg>
+                    <img src="{{ asset('images/logo.png') }}" alt="LabManager" style="width:100%;height:100%;object-fit:cover;display:block;">
                 </div>
                 <div>
                     <div class="u-nav-brand-text">LabManager</div>
@@ -625,13 +627,13 @@
         </div>
     </nav>
 
-    {{-- â•â•â• HERO BANNER â•â•â• --}}
+    {{-- ═══ HERO BANNER ═══ --}}
     @hasSection('no_hero')
     @else
     <div class="u-hero">
         <div class="u-hero-inner">
             <div class="u-hero-greeting">Selamat datang</div>
-            <h1 class="u-hero-title">{{ auth()->user()->name }} ðŸ‘‹</h1>
+            <h1 class="u-hero-title">{{ auth()->user()->name }}</h1>
             <p class="u-hero-sub">@yield('hero_sub', 'Apa yang ingin Anda pinjam hari ini?')</p>
 
             @hasSection('hero_stats')
@@ -721,7 +723,7 @@
         });
     </script>
 
-    @stack('scripts')
+
 
     {{-- Reuse Global Confirm Modal dari app.blade.php --}}
     <div id="globalConfirmModal" aria-modal="true" role="dialog" style="display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;padding:1rem;">
@@ -774,6 +776,8 @@
         window.submitWithConfirm=function(formEl,opts){opts.onConfirm=()=>formEl.submit();window.showConfirm(opts);};
     })();
     </script>
+
+    @stack('scripts')
 </body>
 </html>
 

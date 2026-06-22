@@ -681,7 +681,9 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('images/logo.png') }}" alt="LabManager Logo" style="width:40px;height:40px;border-radius:10px;flex-shrink:0;">
+                    <div style="width:42px;height:42px;border-radius:12px;overflow:hidden;flex-shrink:0;border:2px solid rgba(99,102,241,0.3);box-shadow:0 2px 10px rgba(99,102,241,0.25);background:#fff;">
+                        <img src="{{ asset('images/logo.png') }}" alt="LabManager Logo" style="width:100%;height:100%;object-fit:cover;display:block;">
+                    </div>
                     <div>
                         <h1 style="color:#f1f5f9;font-size:1.05rem;font-weight:700;line-height:1.2;">LabManager</h1>
                         <p style="color:#64748b;font-size:0.7rem;font-weight:500;">Manajemen Lab</p>

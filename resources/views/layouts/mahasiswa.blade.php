@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Sistem Peminjaman Alat Laboratorium â€” Mahasiswa">
-    <title>{{ config('app.name', 'LabManager') }} â€” @yield('title', 'Beranda')</title>
+    <meta name="description" content="Sistem Peminjaman Alat Laboratorium - Mahasiswa">
+    <title>{{ config('app.name', 'LabManager') }} - @yield('title', 'Beranda')</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16.png') }}">

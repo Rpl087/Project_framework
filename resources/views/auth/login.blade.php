@@ -148,6 +148,18 @@
             display: flex; align-items: flex-start; gap: 0.5rem;
         }
 
+        /* ── Password Toggle ── */
+        .pw-wrap { position: relative; }
+        .pw-wrap .form-input { padding-right: 2.75rem; }
+        .pw-toggle {
+            position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: #475569; padding: 0.25rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.2s;
+        }
+        .pw-toggle:hover { color: #818cf8; }
+
         /* ── Demo box ── */
         .demo-box {
             margin-top: 1.5rem; text-align: center;
@@ -273,10 +285,8 @@
 
     {{-- Logo --}}
     <div class="logo-block">
-        <div class="logo-icon">
-            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
-            </svg>
+        <div class="logo-icon" style="background:none;box-shadow:none;">
+            <img src="{{ asset('images/logo.png') }}" alt="LabManager Logo" style="width:48px;height:48px;border-radius:12px;">
         </div>
         <h1>LabManager</h1>
         <p>Sistem Manajemen Peminjaman Lab</p>
@@ -318,9 +328,15 @@
                        onmouseover="this.style.color='#a5b4fc'" onmouseout="this.style.color='#818cf8'"
                     >Lupa Password?</a>
                 </div>
-                <input id="password" type="password" name="password"
-                    class="form-input" required autocomplete="current-password"
-                    placeholder="••••••••">
+                <div class="pw-wrap">
+                    <input id="password" type="password" name="password"
+                        class="form-input" required autocomplete="current-password"
+                        placeholder="••••••••">
+                    <button type="button" class="pw-toggle" onclick="togglePassword('password', this)" tabindex="-1" aria-label="Tampilkan password">
+                        <svg id="eye-password" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <svg id="eye-off-password" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                    </button>
+                </div>
                 @error('password')
                     <p class="form-error">
                         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -435,16 +451,28 @@
             <div class="grid-2">
                 <div class="form-group">
                     <label for="reg_password" class="form-label">Password * (min. 8)</label>
-                    <input id="reg_password" type="password" name="password"
-                        class="form-input" required minlength="8" placeholder="••••••••">
+                    <div class="pw-wrap">
+                        <input id="reg_password" type="password" name="password"
+                            class="form-input" required minlength="8" placeholder="••••••••">
+                        <button type="button" class="pw-toggle" onclick="togglePassword('reg_password', this)" tabindex="-1" aria-label="Tampilkan password">
+                            <svg id="eye-reg_password" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg id="eye-off-reg_password" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                        </button>
+                    </div>
                     @error('password')
                         <p class="form-error" style="font-size:0.68rem;">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="form-group">
                     <label for="reg_password_confirmation" class="form-label">Konfirmasi *</label>
-                    <input id="reg_password_confirmation" type="password" name="password_confirmation"
-                        class="form-input" required placeholder="••••••••">
+                    <div class="pw-wrap">
+                        <input id="reg_password_confirmation" type="password" name="password_confirmation"
+                            class="form-input" required placeholder="••••••••">
+                        <button type="button" class="pw-toggle" onclick="togglePassword('reg_password_confirmation', this)" tabindex="-1" aria-label="Tampilkan konfirmasi password">
+                            <svg id="eye-reg_password_confirmation" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            <svg id="eye-off-reg_password_confirmation" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -500,6 +528,24 @@
         if (v.length > 8)  f += '-' + v.slice(8, 13);
         e.target.value = f;
     });
+
+    // Toggle tampil/sembunyikan password
+    function togglePassword(fieldId, btn) {
+        const input = document.getElementById(fieldId);
+        const eyeOn  = document.getElementById('eye-' + fieldId);
+        const eyeOff = document.getElementById('eye-off-' + fieldId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            eyeOn.style.display  = 'none';
+            eyeOff.style.display = 'block';
+            btn.setAttribute('aria-label', 'Sembunyikan password');
+        } else {
+            input.type = 'password';
+            eyeOn.style.display  = 'block';
+            eyeOff.style.display = 'none';
+            btn.setAttribute('aria-label', 'Tampilkan password');
+        }
+    }
 </script>
 
 </body>

@@ -53,14 +53,14 @@ class Borrowing extends Model
         }
 
         return match ($this->status) {
-            'pending'                 => 'Menunggu Persetujuan',
-            'approved_by_laboran'     => 'Disetujui Laboran',
-            'approved_by_kepala_lab'  => 'Disetujui Kepala Lab',
+            'pending'                 => 'Menunggu Persetujuan Laboran',
+            'approved_by_laboran'     => 'Menunggu Persetujuan Kepala Lab',
+            'approved_by_kepala_lab'  => 'Siap Diambil',
             'ready_for_pickup'        => 'Siap Diambil',
             'active'                  => 'Sedang Dipinjam',
             'completed'               => 'Selesai',
             'rejected'                => 'Ditolak',
-            'overdue'                 => 'Terlambat',
+            'overdue'                 => 'Terlambat Dikembalikan',
             'issue_reported'          => 'Ada Masalah',
             default                   => ucfirst($this->status),
         };

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(auth()->user()->isMahasiswa() ? 'layouts.mahasiswa' : 'layouts.app')
 @section('title', 'Ajukan Peminjaman')
 
 @section('content')
@@ -39,21 +39,36 @@
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:1.25rem;">
                 <div>
                     <label class="form-label">Waktu Mulai Pinjam *</label>
-                    <input type="time" name="start_date" value="{{ old('start_date') }}" class="form-input" required min="08:00" max="19:55" step="300">
-                    <p style="font-size:0.72rem;color:#94a3b8;margin-top:0.3rem;">Jam operasional: 08:00 &ndash; sebelum 20:00</p>
+                    <input type="time" name="start_date" value="{{ old('start_date') }}" class="form-input"
+                        required min="08:00" max="19:55" step="300" id="startTime">
+                    <div style="font-size:0.72rem;color:#64748b;margin-top:0.3rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.4rem;padding:0.4rem 0.6rem;">
+                        🕐 Jam operasional: <strong>08:00 – 19:55</strong><br>
+                        ⚠️ Waktu harus <strong>kelipatan 5 menit</strong> (08:00, 08:05, 08:30, …)<br>
+                        <span id="minTimeHint" style="color:#6366f1;font-weight:600;"></span>
+                    </div>
                     @error('start_date') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
                 <div>
                     <label class="form-label">Waktu Pengembalian *</label>
-                    <input type="time" name="end_date" value="{{ old('end_date') }}" class="form-input" required min="08:05" max="20:00" step="300">
-                    <p style="font-size:0.72rem;color:#94a3b8;margin-top:0.3rem;">Maksimal pukul 20:00</p>
+                    <input type="time" name="end_date" value="{{ old('end_date') }}" class="form-input"
+                        required min="08:05" max="20:00" step="300" id="endTime">
+                    <div style="font-size:0.72rem;color:#64748b;margin-top:0.3rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.4rem;padding:0.4rem 0.6rem;">
+                        ⏰ Maksimal pukul <strong>20:00</strong><br>
+                        ⚠️ Waktu harus <strong>kelipatan 5 menit</strong> (09:00, 12:30, 14:15, …)
+                    </div>
                     @error('end_date') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
             </div>
 
             <div style="margin-bottom:1.5rem;">
                 <label class="form-label">Tujuan Peminjaman *</label>
-                <textarea name="purpose" class="form-input" rows="4" required placeholder="Jelaskan tujuan peminjaman alat ini (min. 10 karakter)..." minlength="10">{{ old('purpose') }}</textarea>
+                <textarea name="purpose" class="form-input" rows="4" required
+                    placeholder="Jelaskan tujuan peminjaman alat ini (min. 10 karakter)..."
+                    minlength="10" maxlength="1000" id="purposeText"
+                    oninput="updatePurposeCounter()">{{ old('purpose') }}</textarea>
+                <div style="display:flex;justify-content:flex-end;margin-top:0.25rem;">
+                    <span id="purposeCounter" style="font-size:0.72rem;color:#94a3b8;">0/1000</span>
+                </div>
                 @error('purpose') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
 
@@ -88,6 +103,7 @@
 
 @push('scripts')
 <script>
+    // ── Kategori Info ──
     document.getElementById('equipmentSelect').addEventListener('change', function() {
         const selected = this.options[this.selectedIndex];
         const info = document.getElementById('categoryInfo');
@@ -111,10 +127,67 @@
         }
     });
 
-    // Trigger on load if pre-selected
     if (document.getElementById('equipmentSelect').value) {
         document.getElementById('equipmentSelect').dispatchEvent(new Event('change'));
     }
+
+    // ── Fix Waktu Realtime (kelipatan 5 menit berikutnya) ──
+    function roundUpTo5(h, m) {
+        const remainder = m % 5;
+        if (remainder === 0) return { h, m };
+        const newM = m + (5 - remainder);
+        if (newM >= 60) return { h: h + 1, m: 0 };
+        return { h, m: newM };
+    }
+
+    function padZ(n) { return String(n).padStart(2, '0'); }
+
+    function setMinTime() {
+        const now = new Date();
+        const { h, m } = roundUpTo5(now.getHours(), now.getMinutes());
+        const minTime = padZ(h) + ':' + padZ(m);
+
+        const startInput = document.getElementById('startTime');
+        const hint = document.getElementById('minTimeHint');
+
+        // Hanya batasi dari jam 08:00
+        const effectiveMin = minTime > '08:00' ? minTime : '08:00';
+        startInput.min = effectiveMin;
+
+        if (minTime >= '08:00' && minTime < '20:00') {
+            hint.textContent = '⏰ Minimal mulai: ' + effectiveMin + ' WIB (waktu sekarang)';
+        } else {
+            hint.textContent = '';
+        }
+    }
+
+    // Update min waktu mulai setiap 30 detik
+    setMinTime();
+    setInterval(setMinTime, 30000);
+
+    // Saat start_date berubah, update min end_date
+    document.getElementById('startTime').addEventListener('change', function() {
+        const val = this.value;
+        const endInput = document.getElementById('endTime');
+        if (val) {
+            const [h, m] = val.split(':').map(Number);
+            const next = roundUpTo5(h, m + 5);
+            endInput.min = padZ(next.h) + ':' + padZ(next.m);
+        }
+    });
+
+    // ── Counter Tujuan Peminjaman ──
+    function updatePurposeCounter() {
+        const ta = document.getElementById('purposeText');
+        const counter = document.getElementById('purposeCounter');
+        if (!ta || !counter) return;
+        const len = ta.value.length;
+        counter.textContent = len + '/1000';
+        counter.style.color = len >= 950 ? '#ef4444' : '#94a3b8';
+    }
+
+    // Init counter on load
+    updatePurposeCounter();
 </script>
 @endpush
 @endsection

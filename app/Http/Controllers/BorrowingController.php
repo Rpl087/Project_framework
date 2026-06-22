@@ -64,11 +64,18 @@ class BorrowingController extends Controller
                 'required',
                 'date_format:H:i',
                 function ($attribute, $value, $fail) {
-                    // FIX SEDANG-3: Gunakan >= bukan > agar 20:00 tidak bisa dipilih
-                    // sebagai waktu mulai (tidak mungkin menentukan end_date yang valid
-                    // karena end_date harus after:start_date dan max 20:00).
                     if ($value < '08:00' || $value >= '20:00') {
                         $fail('Waktu mulai pinjam harus antara pukul 08:00 hingga sebelum 20:00.');
+                    }
+                    // Validasi kelipatan 5 menit
+                    [$h, $m] = explode(':', $value);
+                    if ((int)$m % 5 !== 0) {
+                        $fail('Waktu mulai harus dalam kelipatan 5 menit (contoh: 08:00, 08:30, 13:15).');
+                    }
+                    // Validasi tidak boleh di bawah waktu realtime (timezone WIB)
+                    $nowWib = now()->setTimezone('Asia/Jakarta')->format('H:i');
+                    if ($value < $nowWib) {
+                        $fail('Waktu mulai tidak boleh lebih awal dari waktu sekarang (' . $nowWib . ' WIB).');
                     }
                 },
             ],
@@ -80,9 +87,14 @@ class BorrowingController extends Controller
                     if ($value > '20:00') {
                         $fail('Waktu pengembalian tidak boleh melebihi pukul 20:00.');
                     }
+                    // Validasi kelipatan 5 menit
+                    [$h, $m] = explode(':', $value);
+                    if ((int)$m % 5 !== 0) {
+                        $fail('Waktu kembali harus dalam kelipatan 5 menit (contoh: 09:00, 12:30, 14:15).');
+                    }
                 },
             ],
-            'purpose'      => 'required|string|min:10',
+            'purpose'      => 'required|string|min:10|max:1000',
         ]);
 
         try {
@@ -98,26 +110,22 @@ class BorrowingController extends Controller
                     throw new \Exception('Alat sedang dalam maintenance.');
                 }
 
-                // FIX RINGAN-1: Stok dikurangi saat pending — bukan bug, ini desain.
-                // Tujuan: mencegah double-booking (dua mahasiswa meminjam alat yang sama).
-                // Stok dikembalikan jika: (a) permintaan ditolak via reject(), atau
-                //                         (b) pengembalian diproses via processReturn().
                 $equipment->decrement('available_stock');
 
                 // Create borrowing record
                 $borrowing = Borrowing::create([
-                    'user_id' => auth()->id(),
+                    'user_id'      => auth()->id(),
                     'equipment_id' => $equipment->id,
-                    'start_date' => $validated['start_date'],
-                    'end_date' => $validated['end_date'],
-                    'purpose' => $validated['purpose'],
-                    'status' => 'pending',
+                    'start_date'   => $validated['start_date'],
+                    'end_date'     => $validated['end_date'],
+                    'purpose'      => $validated['purpose'],
+                    'status'       => 'pending',
                 ]);
 
                 // Create audit log
                 BorrowingLog::create([
-                    'borrowing_id' => $borrowing->id,
-                    'user_id' => auth()->id(),
+                    'borrowing_id'       => $borrowing->id,
+                    'user_id'            => auth()->id(),
                     'action_description' => 'Mengajukan peminjaman alat: ' . $equipment->name,
                 ]);
 
@@ -205,24 +213,25 @@ class BorrowingController extends Controller
             return back()->with('error', 'Peminjaman ini tidak dalam status menunggu persetujuan Kepala Lab.');
         }
 
-        $borrowing->update(['status' => 'approved_by_kepala_lab']);
+        // Langsung set ready_for_pickup agar laboran bisa langsung serah terima
+        $borrowing->update(['status' => 'ready_for_pickup']);
 
         BorrowingLog::create([
-            'borrowing_id'      => $borrowing->id,
-            'user_id'           => auth()->id(),
-            'action_description'=> 'Kepala Lab menyetujui peminjaman. Menunggu serah terima oleh Laboran.',
+            'borrowing_id'       => $borrowing->id,
+            'user_id'            => auth()->id(),
+            'action_description' => 'Kepala Lab menyetujui peminjaman. Status: Siap diambil oleh peminjam.',
         ]);
 
-        // FITUR-5: Notifikasi ke mahasiswa
+        // Notifikasi ke mahasiswa
         Notification::send(
             $borrowing->user_id,
             'Peminjaman Disetujui Kepala Lab ✅',
-            "Peminjaman {$borrowing->equipment->name} Anda telah disetujui penuh. Silakan ambil alat ke Laboran.",
+            "Peminjaman {$borrowing->equipment->name} Anda telah disetujui penuh dan siap diambil. Silakan ambil alat ke Laboran.",
             'success',
             route('borrowings.show', $borrowing->id)
         );
 
-        return back()->with('success', 'Peminjaman disetujui. Laboran dapat melakukan serah terima.');
+        return back()->with('success', 'Peminjaman disetujui. Status diubah ke Siap Diambil — Laboran dapat melakukan serah terima.');
     }
 
     /**
@@ -231,7 +240,7 @@ class BorrowingController extends Controller
     public function reject(Request $request, Borrowing $borrowing)
     {
         $request->validate([
-            'reject_reason' => 'required|string|min:5',
+            'reject_reason' => 'required|string|min:5|max:255',
         ]);
 
         // BUG-1 FIX: Validasi role di backend — hanya Laboran yang bisa tolak 'pending',
@@ -314,39 +323,51 @@ class BorrowingController extends Controller
     public function processReturn(Request $request, Borrowing $borrowing)
     {
         $request->validate([
-            'return_condition' => 'required|string|min:5',
+            'condition_type'   => 'required|in:baik,rusak',
+            'condition_detail' => 'nullable|string|max:500',
         ]);
 
-        // DESAIN-3 FIX: Izinkan peminjaman 'overdue' untuk diproses pengembaliannya
         if (!in_array($borrowing->status, ['active', 'overdue'])) {
             return back()->with('error', 'Peminjaman ini tidak dalam status aktif atau terlambat.');
         }
 
-        DB::transaction(function () use ($borrowing, $request) {
-            // BUG-2 FIX: Gunakan min() agar available_stock tidak melebihi total_stock
+        // Susun kondisi pengembalian dari dropdown + detail
+        $conditionLabel = $request->condition_type === 'baik' ? 'Baik' : 'Rusak';
+        $returnCondition = $conditionLabel;
+        if ($request->filled('condition_detail')) {
+            $returnCondition .= ' — ' . $request->condition_detail;
+        }
+
+        DB::transaction(function () use ($borrowing, $request, $returnCondition) {
             $equipment = $borrowing->equipment;
             $equipment->update([
                 'available_stock' => min($equipment->available_stock + 1, $equipment->total_stock),
             ]);
 
+            // Jika kondisi rusak, set alat ke maintenance
+            if ($request->condition_type === 'rusak') {
+                $equipment->update(['status' => 'maintenance']);
+            }
+
             $wasOverdue = $borrowing->status === 'overdue';
 
             $borrowing->update([
-                'status' => 'completed',
-                'return_condition' => $request->return_condition,
+                'status'           => 'completed',
+                'return_condition' => $returnCondition,
             ]);
 
             $note = $wasOverdue ? ' [Pengembalian terlambat]' : '';
             BorrowingLog::create([
-                'borrowing_id' => $borrowing->id,
-                'user_id' => auth()->id(),
-                'action_description' => 'Alat dikembalikan' . $note . '. Kondisi: ' . $request->return_condition,
+                'borrowing_id'       => $borrowing->id,
+                'user_id'            => auth()->id(),
+                'action_description' => 'Alat dikembalikan' . $note . '. Kondisi: ' . $returnCondition
+                    . ($request->condition_type === 'rusak' ? ' — Alat otomatis masuk status Maintenance.' : ''),
             ]);
 
-            // Notifikasi ke mahasiswa: peminjaman selesai
+            // Notifikasi ke mahasiswa
             $msg = $wasOverdue
-                ? "Peminjaman {$borrowing->equipment->name} Anda telah selesai (terlambat). Kondisi: {$request->return_condition}."
-                : "Peminjaman {$borrowing->equipment->name} Anda telah selesai. Terima kasih telah mengembalikan tepat waktu!";
+                ? "Peminjaman {$borrowing->equipment->name} Anda telah selesai (terlambat). Kondisi: {$returnCondition}."
+                : "Peminjaman {$borrowing->equipment->name} Anda telah selesai. Kondisi: {$returnCondition}. Terima kasih!";
             Notification::send(
                 $borrowing->user_id,
                 $wasOverdue ? 'Peminjaman Selesai (Terlambat) ⚠️' : 'Peminjaman Selesai ✅',

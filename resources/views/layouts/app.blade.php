@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
@@ -6,7 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="description" content="Sistem Manajemen &amp; Peminjaman Infrastruktur Laboratorium">
 
-        {{-- Early theme init — prevents flash of wrong theme --}}
+        {{-- Early theme init â€” prevents flash of wrong theme --}}
         <script>
             (function() {
                 var t = localStorage.getItem('theme') ||
@@ -28,9 +28,15 @@
         <style>
             * { font-family: 'Inter', sans-serif; }
 
-            /* ═══════════════════════════════════════════════════
-               CSS Custom Properties — Light Mode (default)
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Smooth Global Transitions
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+            html { scroll-behavior: smooth; }
+            body { -webkit-font-smoothing: antialiased; }
+
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               CSS Custom Properties â€” Light Mode (default)
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             :root {
                 --bg:          #f1f5f9;
                 --surface:     rgba(255,255,255,0.85);
@@ -59,9 +65,9 @@
                 --alert-er-b:  #fca5a5;
             }
 
-            /* ═══════════════════════════════════════════════════
-               CSS Custom Properties — Dark Mode
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               CSS Custom Properties â€” Dark Mode
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             [data-theme="dark"] {
                 --bg:          #0f172a;
                 --surface:     rgba(30,41,59,0.95);
@@ -90,11 +96,11 @@
                 --alert-er-b:  rgba(248,113,113,0.25);
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Theme-switch transition helper
                (only active for 500ms during toggle, avoids
                killing normal hover/animation transitions)
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .theme-transition,
             .theme-transition * {
                 transition: background-color 0.35s ease,
@@ -103,9 +109,9 @@
                             box-shadow 0.35s ease !important;
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Sidebar
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .sidebar {
                 background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
                 width: 260px;
@@ -158,9 +164,9 @@
                 padding: 1.25rem 1rem 0.5rem;
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Main Layout
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .main-content {
                 margin-left: 260px;
                 min-height: 100vh;
@@ -183,9 +189,9 @@
                 transition: background-color 0.35s ease, border-color 0.35s ease;
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Cards
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .stat-card {
                 background: var(--surface);
                 backdrop-filter: blur(12px);
@@ -207,9 +213,9 @@
                 transition: background-color 0.35s ease, border-color 0.35s ease;
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Badge
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .badge {
                 display: inline-flex;
                 align-items: center;
@@ -229,9 +235,9 @@
             .badge-rose    { background: #ffe4e6; color: #9f1239; }
             .badge-gray    { background: #f1f5f9; color: #475569; }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Buttons
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .btn {
                 display: inline-flex;
                 align-items: center;
@@ -273,9 +279,9 @@
             }
             .btn-sm { padding: 0.375rem 0.875rem; font-size: 0.8rem; }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Theme Toggle Button
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .theme-toggle {
                 display: flex;
                 align-items: center;
@@ -309,9 +315,9 @@
             [data-theme="dark"] .theme-toggle .icon-sun  { transform: scale(0)  rotate(90deg);  opacity: 0; }
             [data-theme="dark"] .theme-toggle .icon-moon { transform: scale(1)  rotate(0deg);   opacity: 1; }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Form
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .form-input {
                 width: 100%;
                 padding: 0.625rem 0.875rem;
@@ -335,9 +341,9 @@
                 margin-bottom: 0.375rem;
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Table
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .data-table {
                 width: 100%;
                 border-collapse: separate;
@@ -365,9 +371,9 @@
             .data-table tbody tr { transition: background 0.15s ease; }
             .data-table tbody tr:hover { background: var(--row-hover); }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Page Transitions
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             @keyframes fadeInUp {
                 from { opacity: 0; transform: translateY(16px); }
                 to   { opacity: 1; transform: translateY(0);    }
@@ -383,9 +389,9 @@
             .animate-delay-4 { animation-delay: 0.28s; opacity: 0; }
             body.page-exiting main { animation: pageExit 0.22s ease-in forwards; }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Overlay
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .sidebar-overlay {
                 position: fixed;
                 inset: 0;
@@ -402,9 +408,9 @@
                 visibility: visible;
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Hamburger Button
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .hamburger-btn {
                 display: flex;
                 align-items: center;
@@ -439,18 +445,18 @@
             }
             .hamburger-btn:hover .hamburger-bars span { background: var(--ham-hover); }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Table Responsive
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .table-responsive {
                 width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Alert
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             .alert {
                 padding: 0.875rem 1.25rem;
                 border-radius: 0.75rem;
@@ -465,24 +471,24 @@
             .alert-success { background: var(--alert-ok-bg); color: var(--alert-ok-c); border: 1px solid var(--alert-ok-b); }
             .alert-error   { background: var(--alert-er-bg); color: var(--alert-er-c); border: 1px solid var(--alert-er-b); }
 
-            /* ═══════════════════════════════════════════════════
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
                Scrollbar
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             ::-webkit-scrollbar       { width: 6px; }
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
             ::-webkit-scrollbar-thumb:hover { background: var(--txt-3); }
 
-            /* ═══════════════════════════════════════════════════
-               Dark Mode — Global body/main bg
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Dark Mode â€” Global body/main bg
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             [data-theme="dark"] body { background: var(--bg); }
             [data-theme="dark"] main { background: var(--bg); }
 
-            /* ═══════════════════════════════════════════════════
-               Dark Mode — Inline style overrides for content pages
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Dark Mode â€” Inline style overrides for content pages
                (Scoped to .main-content so sidebar is unaffected)
-            ═══════════════════════════════════════════════════ */
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             [data-theme="dark"] .main-content [style*="color:#0f172a"] { color: var(--txt-1) !important; }
             [data-theme="dark"] .main-content [style*="color:#1e293b"] { color: var(--txt-1) !important; }
             [data-theme="dark"] .main-content [style*="color:#334155"] { color: var(--txt-4) !important; }
@@ -537,9 +543,9 @@
             [data-theme="dark"] .main-content [style*="border:1px solid #bfdbfe"] { border-color: rgba(147,197,253,0.3) !important; }
             [data-theme="dark"] .main-content [style*="border:1px solid #fed7aa"] { border-color: rgba(251,146,60,0.3) !important; }
 
-            /* ═══════════════════════════════════════════════════
-               Responsive — Tablet (≤1024px)
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Responsive â€” Tablet (â‰¤1024px)
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             @media (max-width: 1024px) {
                 .sidebar { transform: translateX(-100%); }
                 .sidebar.sidebar-open { transform: translateX(0); }
@@ -547,9 +553,9 @@
                 .sidebar-overlay.active { display: block; }
             }
 
-            /* ═══════════════════════════════════════════════════
-               Responsive — Mobile (≤768px)
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Responsive â€” Mobile (â‰¤768px)
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             @media (max-width: 768px) {
                 .top-bar { padding: 0.625rem 1rem; }
                 .top-bar h2 { font-size: 0.95rem !important; }
@@ -560,9 +566,9 @@
                 .btn { padding: 0.45rem 1rem; font-size: 0.8rem; }
             }
 
-            /* ═══════════════════════════════════════════════════
-               Responsive — Small Mobile (≤480px)
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Responsive â€” Small Mobile (â‰¤480px)
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             @media (max-width: 480px) {
                 .top-bar { padding: 0.5rem 0.75rem; }
                 .top-bar h2 { font-size: 0.875rem !important; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -574,17 +580,17 @@
                 .top-bar-date { display: none; }
             }
 
-            /* ═══════════════════════════════════════════════════
-               Responsive — Medium (≤640px)
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Responsive â€” Medium (â‰¤640px)
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             @media (max-width: 640px) {
                 main { padding: 1rem !important; }
                 .top-bar-date { display: none; }
             }
 
-            /* ═══════════════════════════════════════════════════
-               Deadline Alert Bar — Peringatan batas waktu pinjam
-            ═══════════════════════════════════════════════════ */
+            /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+               Deadline Alert Bar â€” Peringatan batas waktu pinjam
+            â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             #deadline-alert-bar {
                 display: none;
                 position: sticky;
@@ -641,6 +647,29 @@
         </style>
     </head>
     <body class="antialiased">
+
+        {{-- LOADING BAR + SMOOTH NAVIGATION SYSTEM --}}
+        <div id="lp-bar" style="position:fixed;top:0;left:0;z-index:999999;height:3px;width:0%;background:linear-gradient(90deg,#6366f1,#8b5cf6,#a78bfa);box-shadow:0 0 10px rgba(99,102,241,0.6),0 0 20px rgba(99,102,241,0.3);transition:width 0.25s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease;opacity:0;pointer-events:none;border-radius:0 2px 2px 0;"></div>
+        <div id="page-overlay" style="position:fixed;inset:0;z-index:99998;background:var(--bg,#f1f5f9);opacity:0;pointer-events:none;transition:opacity 0.18s ease;"></div>
+
+        {{-- â”€â”€ LOADING PROGRESS BAR â”€â”€ --}}
+        <div id="lp-bar" style="
+            position:fixed;top:0;left:0;z-index:999999;
+            height:3px;width:0%;
+            background:linear-gradient(90deg,#6366f1,#8b5cf6,#a78bfa);
+            box-shadow:0 0 10px rgba(99,102,241,0.6),0 0 20px rgba(99,102,241,0.3);
+            transition:width 0.25s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease;
+            opacity:0;pointer-events:none;border-radius:0 2px 2px 0;
+        "></div>
+
+        {{-- â”€â”€ PAGE TRANSITION OVERLAY â”€â”€ --}}
+        <div id="page-overlay" style="
+            position:fixed;inset:0;z-index:99998;
+            background:var(--bg,#f1f5f9);
+            opacity:0;pointer-events:none;
+            transition:opacity 0.18s ease;
+        "></div>
+
         <!-- Sidebar Overlay (mobile) -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -838,11 +867,11 @@
                     </div>
                 @endif
 
-                {{-- ─────────────────────────────────────────────────────────
+                {{-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                      Deadline Alert Bar
                      Ditampilkan secara dinamis oleh JavaScript di bawah.
                      Mengingatkan user tentang batas waktu pengembalian alat.
-                ───────────────────────────────────────────────────────── --}}
+                â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
                 <div id="deadline-alert-bar"></div>
 
                 @yield('content')
@@ -850,9 +879,9 @@
         </div>
 
         <script>
-            /* ────────────────────────────────────────────────────
-               Sidebar toggle (click only — desktop & mobile)
-            ──────────────────────────────────────────────────── */
+            /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+               Sidebar toggle (click only â€” desktop & mobile)
+            â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             const sidebar     = document.getElementById('sidebar');
             const overlay     = document.getElementById('sidebarOverlay');
             const hamburger   = document.getElementById('hamburgerBtn');
@@ -935,9 +964,9 @@
                 }
             });
 
-            /* ────────────────────────────────────────────────────
+            /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                Dark / Light Mode Toggle
-            ──────────────────────────────────────────────────── */
+            â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             const themeToggle = document.getElementById('themeToggle');
             const htmlEl      = document.documentElement;
 
@@ -960,10 +989,10 @@
                 applyTheme(current === 'dark' ? 'light' : 'dark', true);
             });
 
-            /* ────────────────────────────────────────────────────
+            /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                Smooth Page Transitions
-               Intercept link clicks → fade-out → navigate
-            ──────────────────────────────────────────────────── */
+               Intercept link clicks â†’ fade-out â†’ navigate
+            â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             document.querySelectorAll('a[href]').forEach(link => {
                 const href = link.getAttribute('href');
                 if (!href ||
@@ -985,11 +1014,11 @@
         </script>
 
         @auth
-        {{-- ──────────────────────────────────────────────────────────
+        {{-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
              Deadline Alert Engine
              Menampilkan peringatan real-time saat mendekati batas
              waktu pengembalian alat (jam operasional 08:00 - 20:00).
-        ────────────────────────────────────────────────────────── --}}
+        â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
         @php
             // FIX ANEH-2: Hapus filter whereDate('created_at', today) agar
             // peminjaman aktif dari HARI SEBELUMNYA juga masuk ke data alert.
@@ -1010,7 +1039,7 @@
         @endphp
         <script>
         (function () {
-            /* ── Konfigurasi ─────────────────────────────── */
+            /* â”€â”€ Konfigurasi â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             const LAB_CLOSE      = '20:00'; // Batas tutup lab
             const WARN_MINUTES   = 60;      // Mulai peringatan X menit sebelum
             const DANGER_MINUTES = 15;      // Level bahaya X menit sebelum
@@ -1018,7 +1047,7 @@
 
             const activeBorrowings = @json($deadlineAlertData);
 
-            /* ── Helper ──────────────────────────────────── */
+            /* â”€â”€ Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             function toMins(hhmm) {
                 const [h, m] = hhmm.substring(0,5).split(':').map(Number);
                 return h * 60 + m;
@@ -1028,7 +1057,7 @@
                 return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
             }
 
-            /* ── Bangun daftar alert ────────────────────────── */
+            /* â”€â”€ Bangun daftar alert â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             function buildAlerts() {
                 const nowMin   = toMins(nowHHMM());
                 const closeMin = toMins(LAB_CLOSE);
@@ -1041,7 +1070,7 @@
                     alerts.push({
                         id:    'lab-close',
                         level: isDanger ? 'danger' : 'warning',
-                        icon:  isDanger ? '🚨' : '⏰',
+                        icon:  isDanger ? 'ðŸš¨' : 'â°',
                         html:  isDanger
                             ? 'Lab <strong>tutup dalam ' + minsToClose + ' menit</strong> (pukul 20:00). Segera kembalikan semua alat!'
                             : 'Lab tutup dalam <strong>' + minsToClose + ' menit</strong> (pukul 20:00). Pastikan alat kembali tepat waktu.',
@@ -1055,7 +1084,7 @@
                     // Kasus darurat: dipinjam kemarin/sebelumnya dan belum dikembalikan
                     if (!b.created_today) {
                         alerts.push({
-                            id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                            id: 'borrow-' + b.id, level: 'danger', icon: 'ðŸ”´',
                             html: '<strong>' + b.name + '</strong>: Peminjaman dari <strong>hari sebelumnya</strong> belum dikembalikan! <a href="' + b.url + '" style="text-decoration:underline;font-weight:700;color:inherit;">Segera kembalikan &rarr;</a>',
                         });
                         return; // skip time-based check untuk borrowing lama
@@ -1067,17 +1096,17 @@
 
                     if (minsLeft <= 0) {
                         alerts.push({
-                            id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                            id: 'borrow-' + b.id, level: 'danger', icon: 'ðŸ”´',
                             html: '<strong>' + b.name + '</strong>: Batas waktu pengembalian pukul ' + b.end_date + ' <strong>telah lewat!</strong> <a href="' + b.url + '" style="text-decoration:underline;font-weight:700;color:inherit;">Lihat detail &rarr;</a>',
                         });
                     } else if (minsLeft <= DANGER_MINUTES) {
                         alerts.push({
-                            id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                            id: 'borrow-' + b.id, level: 'danger', icon: 'ðŸ”´',
                             html: '<strong>' + b.name + '</strong>: Harus dikembalikan dalam <strong>' + minsLeft + ' menit</strong> (pukul ' + b.end_date + ')! <a href="' + b.url + '" style="text-decoration:underline;color:inherit;">Detail &rarr;</a>',
                         });
                     } else if (minsLeft <= WARN_MINUTES) {
                         alerts.push({
-                            id: 'borrow-' + b.id, level: 'warning', icon: '⚠️',
+                            id: 'borrow-' + b.id, level: 'warning', icon: 'âš ï¸',
                             html: '<strong>' + b.name + '</strong>: Batas pengembalian dalam <strong>' + minsLeft + ' menit</strong> (pukul ' + b.end_date + '). <a href="' + b.url + '" style="text-decoration:underline;color:inherit;">Lihat &rarr;</a>',
                         });
                     }
@@ -1086,7 +1115,7 @@
                 return alerts;
             }
 
-            /* ── Render ke DOM ─────────────────────────────── */
+            /* â”€â”€ Render ke DOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             var dismissed = new Set();
 
             function render() {
@@ -1132,7 +1161,7 @@
                 });
             }
 
-            /* ── Jalankan ──────────────────────────────────── */
+            /* â”€â”€ Jalankan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
             render();
             setInterval(function () {
                 // Alert level danger selalu muncul kembali meski sudah di-dismiss
@@ -1146,5 +1175,390 @@
         @endauth
 
         @stack('scripts')
+
+        {{-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+             GLOBAL CONFIRM MODAL â€” Menggantikan native browser confirm()
+             Gunakan: showConfirm({ title, message, icon, type, onConfirm })
+             type: 'danger' | 'warning' | 'success' | 'info' (default)
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• --}}
+        <div id="globalConfirmModal" aria-modal="true" role="dialog" style="
+            display:none;
+            position:fixed;inset:0;z-index:99999;
+            align-items:center;justify-content:center;
+            padding:1rem;
+        ">
+            {{-- Backdrop --}}
+            <div id="gcmBackdrop" style="
+                position:absolute;inset:0;
+                background:rgba(2,6,23,0.65);
+                backdrop-filter:blur(6px);
+                -webkit-backdrop-filter:blur(6px);
+                animation:gcmFadeIn 0.2s ease forwards;
+            "></div>
+
+            {{-- Modal Card --}}
+            <div id="gcmCard" style="
+                position:relative;z-index:1;
+                background:var(--surface-g);
+                backdrop-filter:blur(20px);
+                border:1px solid var(--border-s);
+                border-radius:1.25rem;
+                width:100%;max-width:420px;
+                box-shadow:0 32px 80px rgba(0,0,0,0.45);
+                animation:gcmSlideIn 0.3s cubic-bezier(0.22,1,0.36,1) forwards;
+                overflow:hidden;
+            ">
+                {{-- Top accent bar (color injected by JS) --}}
+                <div id="gcmAccentBar" style="height:4px;width:100%;background:linear-gradient(90deg,#4f46e5,#6366f1);"></div>
+
+                <div style="padding:1.75rem 1.75rem 1.5rem;">
+                    {{-- Icon + Title --}}
+                    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+                        <div id="gcmIconWrap" style="
+                            width:48px;height:48px;border-radius:12px;flex-shrink:0;
+                            display:flex;align-items:center;justify-content:center;
+                            background:linear-gradient(135deg,#e0e7ff,#c7d2fe);
+                        ">
+                            <span id="gcmIcon" style="font-size:1.4rem;line-height:1;">âš¡</span>
+                        </div>
+                        <div>
+                            <h3 id="gcmTitle" style="font-size:1.05rem;font-weight:800;color:var(--txt-1);margin:0;line-height:1.3;">Konfirmasi Aksi</h3>
+                            <p id="gcmSubtitle" style="font-size:0.72rem;color:var(--txt-3);margin:0.15rem 0 0;"></p>
+                        </div>
+                    </div>
+
+                    {{-- Message --}}
+                    <p id="gcmMessage" style="
+                        font-size:0.9rem;color:var(--txt-2);line-height:1.6;
+                        background:var(--th-bg);
+                        border:1px solid var(--border-s);
+                        border-radius:0.6rem;
+                        padding:0.75rem 1rem;
+                        margin-bottom:1.5rem;
+                    ">Apakah Anda yakin?</p>
+
+                    {{-- Action Buttons --}}
+                    <div style="display:flex;gap:0.625rem;justify-content:flex-end;">
+                        <button id="gcmCancelBtn" style="
+                            display:inline-flex;align-items:center;gap:0.4rem;
+                            padding:0.6rem 1.25rem;border-radius:0.5rem;
+                            background:transparent;border:1px solid var(--border-s);
+                            color:var(--txt-2);font-size:0.875rem;font-weight:600;
+                            cursor:pointer;transition:all 0.18s ease;
+                        " onmouseover="this.style.background='var(--row-hover)';this.style.borderColor='var(--txt-3)'"
+                           onmouseout="this.style.background='transparent';this.style.borderColor='var(--border-s)'">
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Batal
+                        </button>
+                        <button id="gcmConfirmBtn" style="
+                            display:inline-flex;align-items:center;gap:0.4rem;
+                            padding:0.6rem 1.4rem;border-radius:0.5rem;
+                            background:linear-gradient(135deg,#4f46e5,#6366f1);
+                            border:none;color:#fff;font-size:0.875rem;font-weight:700;
+                            cursor:pointer;transition:all 0.18s ease;
+                            box-shadow:0 4px 12px rgba(79,70,229,0.3);
+                        ">
+                            <svg id="gcmConfirmIcon" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span id="gcmConfirmLabel">Ya, Lanjutkan</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            @keyframes gcmFadeIn {
+                from { opacity:0; }
+                to   { opacity:1; }
+            }
+            @keyframes gcmSlideIn {
+                from { opacity:0; transform:scale(0.88) translateY(20px); }
+                to   { opacity:1; transform:scale(1)    translateY(0);    }
+            }
+            @keyframes gcmSlideOut {
+                from { opacity:1; transform:scale(1)    translateY(0); }
+                to   { opacity:0; transform:scale(0.92) translateY(10px); }
+            }
+            #globalConfirmModal.gcm-closing #gcmCard      { animation:gcmSlideOut 0.2s ease forwards; }
+            #globalConfirmModal.gcm-closing #gcmBackdrop  { animation:gcmFadeIn  0.2s ease reverse forwards; }
+            #gcmConfirmBtn:hover { transform:translateY(-1px); filter:brightness(1.08); }
+            #gcmConfirmBtn:active { transform:translateY(0); filter:brightness(0.95); }
+        </style>
+
+        <script>
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+           Global Confirm Modal System
+           â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+           API:
+             showConfirm({
+               title   : 'Setujui Peminjaman',          // heading
+               subtitle: 'Alat: Laptop ASUS ROG',       // small text under title (optional)
+               message : 'Yakin ingin menyetujui...?',  // body text
+               icon    : 'âœ…',                           // emoji icon
+               type    : 'success',                     // 'success'|'danger'|'warning'|'info'
+               confirmLabel : 'Ya, Setujui',            // confirm button label
+               onConfirm    : () => form.submit()       // callback on confirm
+             })
+
+           Untuk form submit convenience:
+             submitWithConfirm(formEl, options)
+        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+        (function() {
+            const modal      = document.getElementById('globalConfirmModal');
+            const backdrop   = document.getElementById('gcmBackdrop');
+            const card       = document.getElementById('gcmCard');
+            const title      = document.getElementById('gcmTitle');
+            const subtitle   = document.getElementById('gcmSubtitle');
+            const message    = document.getElementById('gcmMessage');
+            const iconWrap   = document.getElementById('gcmIconWrap');
+            const icon       = document.getElementById('gcmIcon');
+            const accentBar  = document.getElementById('gcmAccentBar');
+            const confirmBtn = document.getElementById('gcmConfirmBtn');
+            const cancelBtn  = document.getElementById('gcmCancelBtn');
+            const confirmLbl = document.getElementById('gcmConfirmLabel');
+            const confirmIco = document.getElementById('gcmConfirmIcon');
+
+            const themes = {
+                success: {
+                    bar  : 'linear-gradient(90deg,#059669,#10b981)',
+                    icon : 'linear-gradient(135deg,#d1fae5,#a7f3d0)',
+                    btn  : 'linear-gradient(135deg,#059669,#10b981)',
+                    shadow: 'rgba(16,185,129,0.35)',
+                    svg  : '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>',
+                },
+                danger: {
+                    bar  : 'linear-gradient(90deg,#dc2626,#ef4444)',
+                    icon : 'linear-gradient(135deg,#fee2e2,#fca5a5)',
+                    btn  : 'linear-gradient(135deg,#dc2626,#ef4444)',
+                    shadow: 'rgba(239,68,68,0.35)',
+                    svg  : '<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>',
+                },
+                warning: {
+                    bar  : 'linear-gradient(90deg,#d97706,#f59e0b)',
+                    icon : 'linear-gradient(135deg,#fef3c7,#fde68a)',
+                    btn  : 'linear-gradient(135deg,#d97706,#f59e0b)',
+                    shadow: 'rgba(245,158,11,0.35)',
+                    svg  : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>',
+                },
+                info: {
+                    bar  : 'linear-gradient(90deg,#4f46e5,#6366f1)',
+                    icon : 'linear-gradient(135deg,#e0e7ff,#c7d2fe)',
+                    btn  : 'linear-gradient(135deg,#4f46e5,#6366f1)',
+                    shadow: 'rgba(79,70,229,0.35)',
+                    svg  : '<path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+                },
+            };
+
+            let _callback = null;
+
+            function closeModal() {
+                modal.classList.add('gcm-closing');
+                setTimeout(() => {
+                    modal.style.display  = 'none';
+                    modal.classList.remove('gcm-closing');
+                    document.body.style.overflow = '';
+                    _callback = null;
+                }, 200);
+            }
+
+            window.showConfirm = function(opts) {
+                const t = themes[opts.type] || themes.info;
+
+                // Apply theme
+                accentBar.style.background   = t.bar;
+                iconWrap.style.background    = t.icon;
+                confirmBtn.style.background  = t.btn;
+                confirmBtn.style.boxShadow   = '0 4px 12px ' + t.shadow;
+                confirmIco.innerHTML         = t.svg;
+
+                // Set content
+                title.textContent   = opts.title   || 'Konfirmasi';
+                subtitle.textContent= opts.subtitle || '';
+                subtitle.style.display = opts.subtitle ? 'block' : 'none';
+                message.textContent = opts.message  || 'Apakah Anda yakin?';
+                icon.textContent    = opts.icon     || 'âš¡';
+                confirmLbl.textContent = opts.confirmLabel || 'Ya, Lanjutkan';
+
+                _callback = opts.onConfirm || null;
+
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+
+                // Focus confirm button after animation
+                setTimeout(() => confirmBtn.focus(), 310);
+            };
+
+            // Confirm button
+            confirmBtn.addEventListener('click', () => {
+                closeModal();
+                if (typeof _callback === 'function') {
+                    // Small delay so modal closes before action
+                    setTimeout(_callback, 60);
+                }
+            });
+
+            // Cancel
+            cancelBtn.addEventListener('click', closeModal);
+
+            // Backdrop click
+            backdrop.addEventListener('click', closeModal);
+
+            // Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+                if (e.key === 'Enter'  && modal.style.display === 'flex') confirmBtn.click();
+            });
+
+            /* â”€â”€ Convenience wrapper for form submit â”€â”€ */
+            window.submitWithConfirm = function(formEl, opts) {
+                opts.onConfirm = () => formEl.submit();
+                window.showConfirm(opts);
+            };
+
+            /* â”€â”€ Auto-intercept semua onclick="return confirm(...)" â”€â”€
+               Digantikan oleh custom modal saat halaman load.
+               Cara kerja: cari semua elemen dengan data-confirm="..." attribute.
+               Gunakan attribute data-confirm, data-confirm-title, data-confirm-type
+               data-confirm-icon, data-confirm-label pada button/a/form.
+            â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('[data-confirm]').forEach(function(el) {
+                    const tag = el.tagName.toLowerCase();
+
+                    if (tag === 'form') {
+                        el.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            window.showConfirm({
+                                title        : el.dataset.confirmTitle   || 'Konfirmasi Aksi',
+                                subtitle     : el.dataset.confirmSubtitle|| '',
+                                message      : el.dataset.confirm,
+                                icon         : el.dataset.confirmIcon    || 'âš¡',
+                                type         : el.dataset.confirmType    || 'info',
+                                confirmLabel : el.dataset.confirmLabel   || 'Ya, Lanjutkan',
+                                onConfirm    : () => el.submit(),
+                            });
+                        });
+                    } else {
+                        // button or a
+                        const form = el.closest('form') || el.form;
+                        el.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.showConfirm({
+                                title        : el.dataset.confirmTitle   || 'Konfirmasi Aksi',
+                                subtitle     : el.dataset.confirmSubtitle|| '',
+                                message      : el.dataset.confirm,
+                                icon         : el.dataset.confirmIcon    || 'âš¡',
+                                type         : el.dataset.confirmType    || 'info',
+                                confirmLabel : el.dataset.confirmLabel   || 'Ya, Lanjutkan',
+                                onConfirm    : () => {
+                                    if (form) form.submit();
+                                    else if (el.href) window.location.href = el.href;
+                                },
+                            });
+                        });
+                    }
+                });
+            });
+        })();
+        </script>
+        <script>
+        /* ── LP: Loading Progress bar ── */
+        window.LP=(function(){
+            var b=document.getElementById('lp-bar');
+            var o=document.getElementById('page-overlay');
+            var tid=null,fake=null,cur=0;
+            function sw(p,i){if(!b)return;if(i){b.style.transition='none';}b.style.width=p+'%';if(i){void b.offsetWidth;b.style.transition='';}}
+            function start(){
+                clearTimeout(tid);clearInterval(fake);cur=0;sw(0,true);
+                if(b){b.style.opacity='1';}
+                if(o){o.style.opacity='0.25';o.style.pointerEvents='all';}
+                fake=setInterval(function(){
+                    if(cur<30)cur+=3;else if(cur<60)cur+=1.5;else if(cur<80)cur+=0.7;else if(cur<90)cur+=0.2;else{clearInterval(fake);return;}
+                    sw(cur);
+                },120);
+            }
+            function done(){
+                clearInterval(fake);sw(100);
+                if(o){o.style.opacity='0';setTimeout(function(){o.style.pointerEvents='none';},200);}
+                tid=setTimeout(function(){if(b){b.style.opacity='0';setTimeout(function(){sw(0,true);cur=0;},350);}},220);
+            }
+            function fail(){
+                clearInterval(fake);
+                if(b){b.style.background='linear-gradient(90deg,#ef4444,#f87171)';b.style.boxShadow='0 0 10px rgba(239,68,68,0.5)';}
+                sw(100);
+                tid=setTimeout(function(){if(b){b.style.opacity='0';setTimeout(function(){sw(0,true);b.style.background='linear-gradient(90deg,#6366f1,#8b5cf6,#a78bfa)';b.style.boxShadow='0 0 10px rgba(99,102,241,0.6)';cur=0;},400);}},600);
+            }
+            return{start:start,done:done,fail:fail};
+        })();
+
+        document.addEventListener('click',function(e){
+            var a=e.target.closest('a[href]');if(!a)return;
+            var h=a.getAttribute('href');
+            if(!h||h.startsWith('#')||h.startsWith('mailto:')||h.startsWith('tel:')||h.startsWith('javascript:')||a.target==='_blank'||e.ctrlKey||e.metaKey||e.shiftKey)return;
+            try{var u=new URL(h,window.location.href);if(u.origin!==window.location.origin)return;if(u.pathname===window.location.pathname&&u.hash)return;}catch(er){return;}
+            LP.start();
+        },true);
+
+        document.addEventListener('submit',function(e){if(!e.defaultPrevented)LP.start();},true);
+
+        if(document.readyState==='complete'){LP.done();}
+        else{window.addEventListener('pageshow',LP.done);window.addEventListener('load',LP.done);}
+
+        document.addEventListener('DOMContentLoaded',function(){
+            var s=document.createElement('style');
+            s.textContent=
+                '.rpl-host{position:relative;overflow:hidden}'+
+                '.rpl{position:absolute;border-radius:50%;transform:scale(0);animation:rplAnim 0.55s linear;pointer-events:none;background:rgba(255,255,255,0.28)}'+
+                '@keyframes rplAnim{to{transform:scale(4);opacity:0}}'+
+                '.btn:active,.u-btn:active{transform:scale(0.96)!important;transition:transform 0.08s ease!important}'+
+                '.stat-card,.glass-card,.u-card{transition:transform 0.2s cubic-bezier(0.22,1,0.36,1),box-shadow 0.2s ease,background-color 0.25s ease,border-color 0.25s ease!important}'+
+                '.form-input,.u-form-input{transition:border-color 0.18s ease,box-shadow 0.18s ease,background-color 0.18s ease!important}'+
+                '.badge,.u-badge{transition:transform 0.15s ease,background-color 0.2s ease!important}'+
+                '.badge:hover,.u-badge:hover{transform:scale(1.08)}'+
+                '.alert,.u-alert{animation:alertSlide 0.32s cubic-bezier(0.22,1,0.36,1) both!important}'+
+                '@keyframes alertSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}'+
+                '.sidebar-link{transition:all 0.18s cubic-bezier(0.22,1,0.36,1)!important}'+
+                '.sidebar{transition:transform 0.32s cubic-bezier(0.22,1,0.36,1),box-shadow 0.32s ease!important}'+
+                '.data-table tbody tr,.u-table tbody tr{transition:background-color 0.1s ease!important}'+
+                '.u-nav-link{transition:all 0.18s ease!important}'+
+                '.top-bar{transition:background-color 0.25s ease,border-color 0.25s ease!important}'+
+                '#stb{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(79,70,229,0.35);opacity:0;transform:translateY(12px) scale(0.85);transition:opacity 0.25s ease,transform 0.25s cubic-bezier(0.22,1,0.36,1),box-shadow 0.2s ease;pointer-events:none}'+
+                '#stb.vis{opacity:1!important;transform:translateY(0) scale(1)!important;pointer-events:all!important}'+
+                '#stb:hover{transform:translateY(-3px) scale(1.1)!important;box-shadow:0 10px 28px rgba(79,70,229,0.5)!important}';
+            document.head.appendChild(s);
+
+            function addRipple(el){
+                if(el.dataset.rpl)return;el.dataset.rpl='1';el.classList.add('rpl-host');
+                el.addEventListener('mousedown',function(e){
+                    var r=el.getBoundingClientRect(),d=Math.max(r.width,r.height);
+                    var rp=document.createElement('span');rp.className='rpl';
+                    rp.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';
+                    el.appendChild(rp);rp.addEventListener('animationend',function(){rp.remove();});
+                });
+            }
+            document.querySelectorAll('.btn,.u-btn,button[type="submit"]').forEach(addRipple);
+            if(window.MutationObserver){
+                new MutationObserver(function(muts){muts.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType!==1)return;if(n.matches&&n.matches('.btn,.u-btn,button[type="submit"]'))addRipple(n);n.querySelectorAll&&n.querySelectorAll('.btn,.u-btn,button[type="submit"]').forEach(addRipple);});});}).observe(document.body,{childList:true,subtree:true});
+            }
+
+            var sb=document.createElement('button');sb.id='stb';
+            sb.innerHTML='<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>';
+            sb.setAttribute('aria-label','Scroll to top');sb.setAttribute('title','Kembali ke atas');
+            document.body.appendChild(sb);
+            var mc=document.getElementById('mainContent')||document.documentElement;
+            function chk(){var t=(mc===document.documentElement)?window.scrollY:mc.scrollTop;t>280?sb.classList.add('vis'):sb.classList.remove('vis');}
+            mc.addEventListener('scroll',chk,{passive:true});window.addEventListener('scroll',chk,{passive:true});
+            sb.addEventListener('click',function(){(mc===document.documentElement?window:mc).scrollTo({top:0,behavior:'smooth'});});
+        });
+        </script>
+
+
     </body>
 </html>
+
+

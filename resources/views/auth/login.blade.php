@@ -419,15 +419,11 @@
 
             <div class="form-group">
                 <label for="reg_phone" class="form-label">Nomor Telepon *</label>
-                <div class="phone-wrap">
-                    <div class="phone-prefix">🇮🇩 +62</div>
-                    <input id="reg_phone" type="tel" name="phone" value="{{ old('phone') }}"
-                        class="form-input" required
-                        placeholder="8xx-xxxx-xxxx"
-                        maxlength="20" inputmode="tel"
-                        style="flex:1;">
-                </div>
-                <p class="hint">Contoh: 081234567890 atau 8123-4567-890</p>
+                <input id="reg_phone" type="tel" name="phone" value="{{ old('phone') }}"
+                    class="form-input" required
+                    placeholder="Contoh: 081234567890"
+                    maxlength="20" inputmode="tel">
+                <p class="hint">Masukkan nomor HP aktif (08xx atau 628xx)</p>
                 @error('phone')
                     <p class="form-error">
                         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -494,14 +490,14 @@
         openRegisterModal();
     @endif
 
-    // Auto-format nomor telepon
+    // Auto-format nomor telepon (opsional formatting)
     document.getElementById('reg_phone').addEventListener('input', function(e) {
         let v = e.target.value.replace(/\D/g, '');
-        if (v.startsWith('0')) v = v.slice(1);
+        // Biarkan user input bebas (08xx atau 628xx)
         let f = '';
-        if (v.length > 0) f  = v.slice(0, 3);
-        if (v.length > 3) f += '-' + v.slice(3, 7);
-        if (v.length > 7) f += '-' + v.slice(7, 12);
+        if (v.length > 0)  f = v.slice(0, 4);
+        if (v.length > 4)  f += '-' + v.slice(4, 8);
+        if (v.length > 8)  f += '-' + v.slice(8, 13);
         e.target.value = f;
     });
 </script>

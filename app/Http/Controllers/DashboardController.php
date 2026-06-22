@@ -51,16 +51,20 @@ class DashboardController extends Controller
     private function laboranDashboard()
     {
         // Status yang artinya "siap diserahterimakan" oleh Laboran:
-        // - ready_for_pickup   : alat umum (sudah disetujui Laboran)
+        // - ready_for_pickup       : alat umum (sudah disetujui Laboran)
         // - approved_by_kepala_lab : alat khusus (sudah disetujui Kepala Lab)
         $handoverStatuses = ['ready_for_pickup', 'approved_by_kepala_lab'];
 
+        $overdueCount = Borrowing::where('status', 'overdue')->count();
+
         $stats = [
-            'total_equipment'      => Equipment::count(),
-            'maintenance_equipment'=> Equipment::where('status', 'maintenance')->count(),
-            'pending_requests'     => Borrowing::where('status', 'pending')->count(),
-            'active_borrowings'    => Borrowing::where('status', 'active')->count(),
-            'ready_for_pickup'     => Borrowing::whereIn('status', $handoverStatuses)->count(),
+            'total_equipment'       => Equipment::count(),
+            'maintenance_equipment' => Equipment::where('status', 'maintenance')->count(),
+            'pending_requests'      => Borrowing::where('status', 'pending')->count(),
+            'active_borrowings'     => Borrowing::whereIn('status', ['active', 'overdue'])->count(),
+            'ready_for_pickup'      => Borrowing::whereIn('status', $handoverStatuses)->count(),
+            'overdue_borrowings'    => $overdueCount,
+            'issue_reported'        => Borrowing::where('status', 'issue_reported')->count(),
         ];
 
         $pendingRequests = Borrowing::with(['user', 'equipment'])
@@ -69,8 +73,9 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        // Sertakan status overdue di daftar aktif
         $activeBorrowings = Borrowing::with(['user', 'equipment'])
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'overdue'])
             ->latest()
             ->take(10)
             ->get();
@@ -82,11 +87,26 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        // Peminjaman dengan laporan masalah
+        $issueReportedBorrowings = Borrowing::with(['user', 'equipment'])
+            ->where('status', 'issue_reported')
+            ->latest()
+            ->take(10)
+            ->get();
+
+        // Alat yang sedang maintenance
+        $maintenanceEquipments = Equipment::where('status', 'maintenance')
+            ->latest()
+            ->take(10)
+            ->get();
+
         return view('dashboard.laboran', compact(
             'stats',
             'pendingRequests',
             'activeBorrowings',
-            'readyForHandover'
+            'readyForHandover',
+            'issueReportedBorrowings',
+            'maintenanceEquipments'
         ));
     }
 

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(auth()->user()->isMahasiswa() ? 'layouts.mahasiswa' : 'layouts.app')
 @section('title', 'Daftar Peminjaman')
 
 @section('content')
@@ -34,18 +34,18 @@
             </div>
             <div style="min-width:200px;">
                 <label class="form-label">Status</label>
-                <select name="status" class="form-input">
-                    <option value="">Semua Status</option>
-                    <option value="pending"                {{ request('status') === 'pending'                ? 'selected' : '' }}>Menunggu Persetujuan</option>
-                    <option value="approved_by_laboran"    {{ request('status') === 'approved_by_laboran'    ? 'selected' : '' }}>Disetujui Laboran</option>
-                    <option value="approved_by_kepala_lab" {{ request('status') === 'approved_by_kepala_lab' ? 'selected' : '' }}>Disetujui Kepala Lab</option>
-                    <option value="ready_for_pickup"       {{ request('status') === 'ready_for_pickup'       ? 'selected' : '' }}>Siap Diambil</option>
-                    <option value="active"                 {{ request('status') === 'active'                 ? 'selected' : '' }}>Aktif</option>
-                    <option value="overdue"                {{ request('status') === 'overdue'                ? 'selected' : '' }}>Terlambat</option>
-                    <option value="issue_reported"         {{ request('status') === 'issue_reported'         ? 'selected' : '' }}>Ada Masalah</option>
-                    <option value="completed"              {{ request('status') === 'completed'              ? 'selected' : '' }}>Selesai</option>
-                    <option value="rejected"               {{ request('status') === 'rejected'               ? 'selected' : '' }}>Ditolak</option>
-                </select>
+                    <select name="status" class="form-input">
+                        <option value="">Semua Status</option>
+                        <option value="pending"                {{ request('status') === 'pending'                ? 'selected' : '' }}>Menunggu Persetujuan Laboran</option>
+                        <option value="approved_by_laboran"    {{ request('status') === 'approved_by_laboran'    ? 'selected' : '' }}>Menunggu Persetujuan Kepala Lab</option>
+                        <option value="approved_by_kepala_lab" {{ request('status') === 'approved_by_kepala_lab' ? 'selected' : '' }}>Siap Diambil (Kepala Lab)</option>
+                        <option value="ready_for_pickup"       {{ request('status') === 'ready_for_pickup'       ? 'selected' : '' }}>Siap Diambil</option>
+                        <option value="active"                 {{ request('status') === 'active'                 ? 'selected' : '' }}>Aktif Dipinjam</option>
+                        <option value="overdue"                {{ request('status') === 'overdue'                ? 'selected' : '' }}>Terlambat Dikembalikan</option>
+                        <option value="issue_reported"         {{ request('status') === 'issue_reported'         ? 'selected' : '' }}>Ada Masalah</option>
+                        <option value="completed"              {{ request('status') === 'completed'              ? 'selected' : '' }}>Selesai</option>
+                        <option value="rejected"               {{ request('status') === 'rejected'               ? 'selected' : '' }}>Ditolak/Dibatalkan</option>
+                    </select>
             </div>
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button type="submit" class="btn btn-primary btn-sm">Filter</button>

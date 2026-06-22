@@ -681,7 +681,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <div class="flex items-center gap-3">
-                    <div style="width:42px;height:42px;border-radius:12px;overflow:hidden;flex-shrink:0;border:2px solid rgba(99,102,241,0.3);box-shadow:0 2px 10px rgba(99,102,241,0.25);background:#fff;">
+                    <div style="width:42px;height:42px;border-radius:12px;overflow:hidden;flex-shrink:0;box-shadow:0 2px 10px rgba(99,102,241,0.25);background:#fff;">
                         <img src="{{ asset('images/logo.png') }}" alt="LabManager Logo" style="width:100%;height:100%;object-fit:cover;display:block;">
                     </div>
                     <div>
@@ -1176,7 +1176,6 @@
         </script>
         @endauth
 
-        @stack('scripts')
 
         {{-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
              GLOBAL CONFIRM MODAL â€” Menggantikan native browser confirm()
@@ -1438,10 +1437,11 @@
                                 title        : el.dataset.confirmTitle   || 'Konfirmasi Aksi',
                                 subtitle     : el.dataset.confirmSubtitle|| '',
                                 message      : el.dataset.confirm,
-                                icon         : el.dataset.confirmIcon    || 'âš¡',
+                                icon         : el.dataset.confirmIcon    || '⚡',
                                 type         : el.dataset.confirmType    || 'info',
                                 confirmLabel : el.dataset.confirmLabel   || 'Ya, Lanjutkan',
-                                onConfirm    : () => el.submit(),
+                                // Gunakan HTMLFormElement.prototype.submit untuk bypass event listener
+                                onConfirm    : () => HTMLFormElement.prototype.submit.call(el),
                             });
                         });
                     } else {
@@ -1560,6 +1560,7 @@
         </script>
 
 
+        @stack('scripts')
     </body>
 </html>
 

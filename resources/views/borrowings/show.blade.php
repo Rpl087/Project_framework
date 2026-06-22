@@ -117,16 +117,7 @@
             @if(auth()->user()->isLaboran() && $borrowing->status === 'pending')
                 <form method="POST" action="{{ route('borrowings.approve-laboran', $borrowing) }}" id="formApproveLaboran">
                     @csrf
-                    <button type="button" class="btn btn-success"
-                        onclick="showConfirm({
-                            title: 'Setujui Peminjaman',
-                            subtitle: 'Alat: {{ addslashes($borrowing->equipment->name) }}',
-                            message: 'Peminjam: {{ addslashes($borrowing->user->name) }}\n\nSetujui permintaan ini? Status akan diteruskan ke Kepala Lab jika alat khusus, atau langsung Siap Diambil jika alat umum.',
-                            icon: '✅',
-                            type: 'success',
-                            confirmLabel: 'Ya, Setujui',
-                            onConfirm: () => document.getElementById(\'formApproveLaboran\').submit()
-                        })">
+                    <button type="button" class="btn btn-success" onclick="submitApproveLaboran()">
                         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                         </svg>
@@ -139,16 +130,7 @@
             @if(auth()->user()->isKepalaLab() && $borrowing->status === 'approved_by_laboran')
                 <form method="POST" action="{{ route('borrowings.approve-kepala-lab', $borrowing) }}" id="formApproveKL">
                     @csrf
-                    <button type="button" class="btn btn-success"
-                        onclick="showConfirm({
-                            title: 'Setujui & Siap Diambil',
-                            subtitle: 'Alat: {{ addslashes($borrowing->equipment->name) }}',
-                            message: 'Peminjam: {{ addslashes($borrowing->user->name) }}\n\nMenyetujui permintaan alat khusus ini akan langsung mengubah status menjadi Siap Diambil. Laboran dapat melakukan serah terima.',
-                            icon: '🏛️',
-                            type: 'success',
-                            confirmLabel: 'Ya, Setujui',
-                            onConfirm: () => document.getElementById(\'formApproveKL\').submit()
-                        })">
+                    <button type="button" class="btn btn-success" onclick="submitApproveKepalaLab()">
                         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                         </svg>
@@ -161,16 +143,7 @@
             @if(auth()->user()->isLaboran() && in_array($borrowing->status, ['ready_for_pickup', 'approved_by_kepala_lab']))
                 <form method="POST" action="{{ route('borrowings.handover', $borrowing) }}" id="formHandover">
                     @csrf
-                    <button type="button" class="btn btn-primary"
-                        onclick="showConfirm({
-                            title: 'Serah Terima Alat',
-                            subtitle: 'Alat: {{ addslashes($borrowing->equipment->name) }}',
-                            message: 'Serahkan alat kepada {{ addslashes($borrowing->user->name) }}? Status peminjaman akan berubah menjadi Aktif Dipinjam.',
-                            icon: '📦',
-                            type: 'info',
-                            confirmLabel: 'Serahkan Alat',
-                            onConfirm: () => document.getElementById(\'formHandover\').submit()
-                        })">
+                    <button type="button" class="btn btn-primary" onclick="submitHandover()">
                         <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                         </svg>
@@ -308,18 +281,15 @@
         <div class="glass-card animate-in animate-delay-3" style="padding:1.5rem;margin-bottom:1.5rem;background:#fff7ed;border:1px solid #fed7aa;">
             <h3 style="font-size:0.8rem;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem;">⚠️ Batalkan Pengajuan</h3>
             <p style="font-size:0.85rem;color:#9a3412;margin-bottom:1rem;">Pengajuan masih menunggu persetujuan. Anda dapat membatalkannya jika sudah tidak diperlukan.</p>
-            <form method="POST" action="{{ route('borrowings.cancel', $borrowing) }}" id="formCancel">
+            <form method="POST" action="{{ route('borrowings.cancel', $borrowing) }}"
+                data-confirm="Yakin ingin membatalkan pengajuan peminjaman ini? Stok alat akan dikembalikan."
+                data-confirm-title="Batalkan Pengajuan"
+                data-confirm-subtitle="Alat: {{ $borrowing->equipment->name }}"
+                data-confirm-icon="🚫"
+                data-confirm-type="danger"
+                data-confirm-label="Ya, Batalkan">
                 @csrf
-                <button type="button" class="btn btn-danger btn-sm"
-                    onclick="showConfirm({
-                        title: 'Batalkan Pengajuan',
-                        subtitle: 'Alat: {{ addslashes($borrowing->equipment->name) }}',
-                        message: 'Yakin ingin membatalkan pengajuan peminjaman ini? Stok alat akan dikembalikan.',
-                        icon: '🚫',
-                        type: 'danger',
-                        confirmLabel: 'Ya, Batalkan',
-                        onConfirm: () => document.getElementById(\'formCancel\').submit()
-                    })">
+                <button type="submit" class="btn btn-danger btn-sm">
                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -490,6 +460,45 @@
             type   : 'warning',
             confirmLabel: 'Ya, Laporkan',
             onConfirm: () => document.getElementById('formReportIssue').submit()
+        });
+    }
+
+    // Setujui — Laboran
+    function submitApproveLaboran() {
+        showConfirm({
+            title  : 'Setujui Peminjaman',
+            subtitle: 'Alat: {{ $borrowing->equipment->name }}',
+            message: 'Setujui permintaan peminjaman dari {{ $borrowing->user->name }}?\n\nStatus akan diteruskan ke Kepala Lab jika alat khusus, atau langsung Siap Diambil jika alat umum.',
+            icon   : '✅',
+            type   : 'success',
+            confirmLabel: 'Ya, Setujui',
+            onConfirm: () => document.getElementById('formApproveLaboran').submit()
+        });
+    }
+
+    // Setujui — Kepala Lab
+    function submitApproveKepalaLab() {
+        showConfirm({
+            title  : 'Setujui & Siap Diambil',
+            subtitle: 'Alat: {{ $borrowing->equipment->name }}',
+            message: 'Setujui permintaan alat khusus dari {{ $borrowing->user->name }}?\n\nStatus akan langsung menjadi Siap Diambil — Laboran dapat melakukan serah terima.',
+            icon   : '🏛️',
+            type   : 'success',
+            confirmLabel: 'Ya, Setujui',
+            onConfirm: () => document.getElementById('formApproveKL').submit()
+        });
+    }
+
+    // Serah Terima — Laboran
+    function submitHandover() {
+        showConfirm({
+            title  : 'Serah Terima Alat',
+            subtitle: 'Alat: {{ $borrowing->equipment->name }}',
+            message: 'Serahkan alat kepada {{ $borrowing->user->name }}?\n\nStatus peminjaman akan berubah menjadi Aktif Dipinjam.',
+            icon   : '📦',
+            type   : 'info',
+            confirmLabel: 'Serahkan Alat',
+            onConfirm: () => document.getElementById('formHandover').submit()
         });
     }
 </script>

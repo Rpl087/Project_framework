@@ -568,6 +568,8 @@
                 .data-table thead th,
                 .data-table tbody td { padding: 0.625rem 0.75rem; font-size: 0.8rem; white-space: nowrap; }
                 .btn { padding: 0.45rem 1rem; font-size: 0.8rem; }
+                .form-grid-2col { grid-template-columns: 1fr !important; }
+                .equipment-grid { grid-template-columns: 1fr !important; }
             }
 
             /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -575,13 +577,15 @@
             â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
             @media (max-width: 480px) {
                 .top-bar { padding: 0.5rem 0.75rem; }
-                .top-bar h2 { font-size: 0.875rem !important; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+                .top-bar h2 { font-size: 0.875rem !important; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
                 main { padding: 0.75rem !important; }
-                .stat-card { padding: 1rem; }
+                .stat-card { padding: 1rem; border-radius: 0.75rem; }
                 .btn { padding: 0.4rem 0.75rem; font-size: 0.75rem; }
                 .btn-sm { padding: 0.3rem 0.625rem; font-size: 0.7rem; }
                 .badge { font-size: 0.65rem; padding: 0.2rem 0.5rem; }
                 .top-bar-date { display: none; }
+                .glass-card { border-radius: 0.75rem; }
+                .form-input { font-size: 0.8rem; padding: 0.5rem 0.75rem; }
             }
 
             /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -590,6 +594,8 @@
             @media (max-width: 640px) {
                 main { padding: 1rem !important; }
                 .top-bar-date { display: none; }
+                .top-bar h2 { font-size: 0.9rem !important; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+                .form-grid-2col { grid-template-columns: 1fr !important; }
             }
 
             /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -652,9 +658,6 @@
     </head>
     <body class="antialiased">
 
-        {{-- LOADING BAR + SMOOTH NAVIGATION SYSTEM --}}
-        <div id="lp-bar" style="position:fixed;top:0;left:0;z-index:999999;height:3px;width:0%;background:linear-gradient(90deg,#6366f1,#8b5cf6,#a78bfa);box-shadow:0 0 10px rgba(99,102,241,0.6),0 0 20px rgba(99,102,241,0.3);transition:width 0.25s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease;opacity:0;pointer-events:none;border-radius:0 2px 2px 0;"></div>
-        <div id="page-overlay" style="position:fixed;inset:0;z-index:99998;background:var(--bg,#f1f5f9);opacity:0;pointer-events:none;transition:opacity 0.18s ease;"></div>
 
         {{-- â”€â”€ LOADING PROGRESS BAR â”€â”€ --}}
         <div id="lp-bar" style="
@@ -1502,14 +1505,18 @@
             var a=e.target.closest('a[href]');if(!a)return;
             var h=a.getAttribute('href');
             if(!h||h.startsWith('#')||h.startsWith('mailto:')||h.startsWith('tel:')||h.startsWith('javascript:')||a.target==='_blank'||e.ctrlKey||e.metaKey||e.shiftKey)return;
+            /* Skip loading bar for download/export links (PDF, CSV, etc.) */
+            if(a.hasAttribute('data-no-loading')||a.hasAttribute('download'))return;
             try{var u=new URL(h,window.location.href);if(u.origin!==window.location.origin)return;if(u.pathname===window.location.pathname&&u.hash)return;}catch(er){return;}
             LP.start();
         },true);
 
         document.addEventListener('submit',function(e){if(!e.defaultPrevented)LP.start();},true);
 
+        /* Always call LP.done on page show (handles bfcache & download cancel) */
+        window.addEventListener('pageshow',function(){LP.done();});
         if(document.readyState==='complete'){LP.done();}
-        else{window.addEventListener('pageshow',LP.done);window.addEventListener('load',LP.done);}
+        else{window.addEventListener('load',LP.done);}
 
         document.addEventListener('DOMContentLoaded',function(){
             var s=document.createElement('style');

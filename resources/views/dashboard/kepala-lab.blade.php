@@ -150,10 +150,10 @@
                     </svg>
                     Terlambat Dikembalikan
                 </a>
-                <a href="{{ route('borrowings.export-pdf', request()->query()) }}" class="btn btn-outline" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b;">
+                <a href="{{ route('borrowings.export-pdf', request()->query()) }}" class="btn btn-outline" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b;" data-no-loading>
                     📄 Export PDF
                 </a>
-                <a href="{{ route('borrowings.export-csv', request()->query()) }}" class="btn btn-outline" style="background:#d1fae5;border-color:#a7f3d0;color:#065f46;">
+                <a href="{{ route('borrowings.export-csv', request()->query()) }}" class="btn btn-outline" style="background:#d1fae5;border-color:#a7f3d0;color:#065f46;" data-no-loading>
                     📊 Export CSV
                 </a>
             </div>

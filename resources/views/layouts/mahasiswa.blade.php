@@ -441,12 +441,16 @@
             var a=e.target.closest('a[href]');if(!a)return;
             var h=a.getAttribute('href');
             if(!h||h.startsWith('#')||h.startsWith('mailto:')||h.startsWith('tel:')||h.startsWith('javascript:')||a.target==='_blank'||e.ctrlKey||e.metaKey||e.shiftKey)return;
+            /* Skip loading bar for download/export links (PDF, CSV, etc.) */
+            if(a.hasAttribute('data-no-loading')||a.hasAttribute('download'))return;
             try{var u=new URL(h,window.location.href);if(u.origin!==window.location.origin)return;if(u.pathname===window.location.pathname&&u.hash)return;}catch(er){return;}
             LP.start();
         },true);
         document.addEventListener('submit',function(e){if(!e.defaultPrevented)LP.start();},true);
+        /* Always call LP.done on page show (handles bfcache & download cancel) */
+        window.addEventListener('pageshow',function(){LP.done();});
         if(document.readyState==='complete'){LP.done();}
-        else{window.addEventListener('pageshow',LP.done);window.addEventListener('load',LP.done);}
+        else{window.addEventListener('load',LP.done);}
 
         document.addEventListener('DOMContentLoaded',function(){
             var s=document.createElement('style');

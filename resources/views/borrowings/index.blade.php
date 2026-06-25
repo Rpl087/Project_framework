@@ -50,8 +50,8 @@
             <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                 <button type="submit" class="btn btn-primary btn-sm">Filter</button>
                 <a href="{{ route('borrowings.index') }}" class="btn btn-outline btn-sm">Reset</a>
-                <a href="{{ route('borrowings.export-pdf', request()->query()) }}" class="btn btn-outline btn-sm" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b;">📄 PDF</a>
-                <a href="{{ route('borrowings.export-csv', request()->query()) }}" class="btn btn-outline btn-sm" style="background:#d1fae5;border-color:#a7f3d0;color:#065f46;">📊 CSV</a>
+                <a href="{{ route('borrowings.export-pdf', request()->query()) }}" class="btn btn-outline btn-sm" style="background:#fee2e2;border-color:#fca5a5;color:#991b1b;" data-no-loading>📄 PDF</a>
+                <a href="{{ route('borrowings.export-csv', request()->query()) }}" class="btn btn-outline btn-sm" style="background:#d1fae5;border-color:#a7f3d0;color:#065f46;" data-no-loading>📊 CSV</a>
             </div>
         </form>
     </div>

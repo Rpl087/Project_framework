@@ -23,7 +23,12 @@ class NotificationController extends Controller
         $ids = $notifications->pluck('id');
         auth()->user()->notifications()->whereIn('id', $ids)->whereNull('read_at')->update(['read_at' => now()]);
 
-        return view('notifications.index', compact('notifications'));
+        // Gunakan view berbeda untuk admin (laboran/kepala_lab) vs mahasiswa
+        $view = auth()->user()->isMahasiswa()
+            ? 'notifications.index'
+            : 'notifications.admin';
+
+        return view($view, compact('notifications'));
     }
 
     /**

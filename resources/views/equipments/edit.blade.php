@@ -30,7 +30,7 @@
                 @error('description') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
             </div>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem;" class="form-grid-2col">
                 <div>
                     <label class="form-label">Total Stok *</label>
                     <input type="number" name="total_stock" value="{{ old('total_stock', $equipment->total_stock) }}" class="form-input" min="0" required>
@@ -56,6 +56,7 @@
                         <option value="khusus" {{ old('category', $equipment->category) === 'khusus' ? 'selected' : '' }}>⭐ Alat Khusus (Mahal/Premium)</option>
                     </select>
                     <p style="font-size:0.7rem;color:var(--txt-3);margin-top:0.25rem;">Alat khusus memerlukan persetujuan Kepala Lab.</p>
+                    <p style="font-size:0.7rem;color:#d97706;margin-top:0.15rem;">💡 Note: harga di atas 10 juta (alat khusus)</p>
                     @error('category') <p style="color:#ef4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p> @enderror
                 </div>
             </div>

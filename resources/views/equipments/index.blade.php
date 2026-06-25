@@ -7,6 +7,10 @@
         <div>
             <h1 style="font-size:1.5rem;font-weight:800;color:#0f172a;">Kelola Alat Laboratorium 🔧</h1>
             <p style="color:#64748b;font-size:0.9rem;margin-top:0.25rem;">Tambah, edit, dan kelola stok alat lab.</p>
+            <p style="font-size:0.78rem;color:#d97706;margin-top:0.35rem;display:inline-flex;align-items:center;gap:0.35rem;background:#fffbeb;padding:0.3rem 0.75rem;border-radius:0.375rem;border:1px solid #fde68a;">
+                <span style="font-size:0.85rem;">💡</span>
+                <span><strong>Note:</strong> harga di atas 10 juta (alat khusus)</span>
+            </p>
         </div>
         <a href="{{ route('equipments.create') }}" class="btn btn-primary">
             <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -17,7 +21,7 @@
     </div>
 
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;">
+    <div class="equipment-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;">
         @forelse($equipments as $index => $eq)
         @php $imgUrl = \App\View\Composers\EquipmentImageComposer::getImageUrl($eq, $imageMap); @endphp
         <div class="stat-card animate-in animate-delay-{{ min($index + 1, 4) }}" style="padding:0;overflow:hidden;">

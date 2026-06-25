@@ -88,8 +88,12 @@
                                 <a href="{{ route('users.edit', $u) }}" class="btn btn-outline btn-sm">Edit</a>
                                 <form method="POST" action="{{ route('users.destroy', $u) }}" style="display:inline;">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Hapus {{ addslashes($u->name) }}?')"
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                        data-confirm="Yakin ingin menghapus user {{ addslashes($u->name) }}?"
+                                        data-confirm-title="Hapus User"
+                                        data-confirm-type="danger"
+                                        data-confirm-icon="🗑️"
+                                        data-confirm-label="Ya, Hapus"
                                         {{ $u->active_borrowings_count > 0 ? 'disabled title=\'User masih punya peminjaman aktif\'' : '' }}>
                                         Hapus
                                     </button>

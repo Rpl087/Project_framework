@@ -778,6 +778,43 @@
         backdrop.addEventListener('click',closeModal);
         document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&modal.style.display==='flex')closeModal();if(e.key==='Enter'&&modal.style.display==='flex')confirmBtn.click();});
         window.submitWithConfirm=function(formEl,opts){opts.onConfirm=()=>formEl.submit();window.showConfirm(opts);};
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-confirm]').forEach(function(el) {
+                const tag = el.tagName.toLowerCase();
+                if (tag === 'form') {
+                    el.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        window.showConfirm({
+                            title        : el.dataset.confirmTitle   || 'Konfirmasi Aksi',
+                            subtitle     : el.dataset.confirmSubtitle|| '',
+                            message      : el.dataset.confirm,
+                            icon         : el.dataset.confirmIcon    || '⚡',
+                            type         : el.dataset.confirmType    || 'info',
+                            confirmLabel : el.dataset.confirmLabel   || 'Ya, Lanjutkan',
+                            onConfirm    : () => HTMLFormElement.prototype.submit.call(el),
+                        });
+                    });
+                } else {
+                    const form = el.closest('form') || el.form;
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.showConfirm({
+                            title        : el.dataset.confirmTitle   || 'Konfirmasi Aksi',
+                            subtitle     : el.dataset.confirmSubtitle|| '',
+                            message      : el.dataset.confirm,
+                            icon         : el.dataset.confirmIcon    || '⚡',
+                            type         : el.dataset.confirmType    || 'info',
+                            confirmLabel : el.dataset.confirmLabel   || 'Ya, Lanjutkan',
+                            onConfirm    : () => {
+                                if (form) form.submit();
+                                else if (el.href) window.location.href = el.href;
+                            },
+                        });
+                    });
+                }
+            });
+        });
     })();
     </script>
 

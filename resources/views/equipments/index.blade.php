@@ -77,10 +77,17 @@
                     </div>
                     <div style="display:flex;gap:0.4rem;">
                         <a href="{{ route('equipments.edit', $eq) }}" class="btn btn-outline btn-sm">Edit</a>
-                        <form method="POST" action="{{ route('equipments.destroy', $eq) }}" onsubmit="return confirm('Yakin ingin menghapus alat ini?')">
+                        <form method="POST" action="{{ route('equipments.destroy', $eq) }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                            <button type="button" class="btn btn-danger btn-sm"
+                                data-confirm="Yakin ingin menghapus alat '{{ addslashes($eq->name) }}'?"
+                                data-confirm-title="Hapus Alat"
+                                data-confirm-type="danger"
+                                data-confirm-icon="🗑️"
+                                data-confirm-label="Ya, Hapus">
+                                Hapus
+                            </button>
                         </form>
                     </div>
                 </div>

@@ -63,6 +63,9 @@ Setiap transaksi dicatat dalam **audit log** (riwayat aktivitas) untuk keperluan
 | 🔒 Session Management | Middleware custom untuk enforce session lifetime dinamis |
 | 🌗 Dark Mode | Toggle mode gelap/terang |
 | 👤 Profil | User dapat mengedit nama, email, telepon, dan password |
+| 🎨 UI/UX Premium | Desain berbasis Glassmorphism, efek hover, dan gradient dinamis |
+| ⚡ Loading Dinamis | Loading bar interaktif dengan penanganan BFCache (pageshow) |
+| 💬 Smart Modal | Modal konfirmasi kustom interaktif (pengganti `window.confirm`) |
 
 ---
 

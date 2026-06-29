@@ -1,4 +1,4 @@
-@extends(auth()->user()->isMahasiswa() ? 'layouts.mahasiswa' : 'layouts.app')
+﻿@extends(auth()->user()->isMahasiswa() ? 'layouts.mahasiswa' : 'layouts.app')
 @section('title', 'Ajukan Peminjaman')
 @section('no_hero', true)
 
@@ -21,7 +21,7 @@
 {{-- Main Layout: 2 kolom di desktop, 1 kolom di mobile --}}
 <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;" id="createFormGrid">
 
-    {{-- ── Kolom Kiri: Form Utama ── --}}
+    {{--  Kolom Kiri: Form Utama  --}}
     <div class="glass-card animate-in animate-delay-1" style="padding:0;overflow:hidden;">
 
         {{-- Card Header --}}
@@ -181,7 +181,7 @@
         </form>
     </div>
 
-    {{-- ── Kolom Kanan: Sidebar Info ── --}}
+    {{--  Kolom Kanan: Sidebar Info  --}}
     <div style="display:flex;flex-direction:column;gap:1rem;" id="createFormSidebar">
 
         {{-- Info Alur Peminjaman --}}
@@ -297,7 +297,7 @@
 
 @push('scripts')
 <script>
-    // ── Kategori Info ──
+    //  Kategori Info 
     document.getElementById('equipmentSelect').addEventListener('change', function() {
         const selected = this.options[this.selectedIndex];
         const info = document.getElementById('categoryInfo');
@@ -321,7 +321,7 @@
         document.getElementById('equipmentSelect').dispatchEvent(new Event('change'));
     }
 
-    // ── Waktu Realtime ──
+    //  Waktu Realtime 
     function roundUpTo5(h, m) {
         const r = m % 5;
         if (r === 0) return { h, m };
@@ -354,7 +354,7 @@
         }
     });
 
-    // ── Counter Tujuan ──
+    //  Counter Tujuan 
     function updatePurposeCounter() {
         const ta = document.getElementById('purposeText');
         const counter = document.getElementById('purposeCounter');

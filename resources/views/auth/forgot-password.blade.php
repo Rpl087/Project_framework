@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -22,7 +22,7 @@
             padding: 1.5rem;
         }
 
-        /* ── Floating Particles Background ── */
+        /*  Floating Particles Background  */
         body::before {
             content: '';
             position: fixed;
@@ -40,7 +40,7 @@
             z-index: 1;
         }
 
-        /* ── Logo Block ── */
+        /*  Logo Block  */
         .logo-block { text-align: center; margin-bottom: 2rem; }
         .logo-icon {
             width: 56px; height: 56px;
@@ -53,7 +53,7 @@
         .logo-block h1 { font-size: 1.5rem; font-weight: 800; color: #f1f5f9; }
         .logo-block p  { color: #64748b; font-size: 0.85rem; margin-top: 0.25rem; }
 
-        /* ── Card ── */
+        /*  Card  */
         .card {
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(16px);
@@ -65,7 +65,7 @@
         .card-title { color: #f1f5f9; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
         .card-desc  { color: #64748b; font-size: 0.82rem; line-height: 1.6; margin-bottom: 1.5rem; }
 
-        /* ── Form ── */
+        /*  Form  */
         .form-group { margin-bottom: 1.25rem; }
         .form-label {
             display: block; font-size: 0.8rem; font-weight: 600;
@@ -90,7 +90,7 @@
             display: flex; align-items: center; gap: 0.3rem;
         }
 
-        /* ── Buttons ── */
+        /*  Buttons  */
         .btn-submit {
             width: 100%; padding: 0.75rem;
             background: linear-gradient(135deg, #4f46e5, #6366f1);
@@ -117,7 +117,7 @@
         }
         .btn-back:hover { color: #94a3b8; border-color: rgba(255,255,255,0.15); }
 
-        /* ── Alert Success ── */
+        /*  Alert Success  */
         .alert-success {
             background: rgba(16,185,129,0.1);
             border: 1px solid rgba(16,185,129,0.25);
@@ -128,7 +128,7 @@
         }
         .alert-success-icon { flex-shrink: 0; margin-top: 1px; }
 
-        /* ── Info box ── */
+        /*  Info box  */
         .info-box {
             background: rgba(99,102,241,0.08);
             border: 1px solid rgba(99,102,241,0.2);

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -30,7 +30,7 @@
 
         .wrap { width: 100%; max-width: 460px; position: relative; z-index: 1; }
 
-        /* ── Logo ── */
+        /*  Logo  */
         .logo-block { text-align: center; margin-bottom: 2rem; }
         .logo-icon {
             width: 56px; height: 56px;
@@ -43,7 +43,7 @@
         .logo-block h1 { font-size: 1.5rem; font-weight: 800; color: #f1f5f9; }
         .logo-block p  { color: #64748b; font-size: 0.85rem; margin-top: 0.25rem; }
 
-        /* ── Card ── */
+        /*  Card  */
         .card {
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(16px);
@@ -52,7 +52,7 @@
             text-align: center;
         }
 
-        /* ── Email illustration icon ── */
+        /*  Email illustration icon  */
         .email-illustration {
             width: 80px; height: 80px;
             background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.2));
@@ -71,7 +71,7 @@
         .card-desc  { color: #64748b; font-size: 0.875rem; line-height: 1.7; margin-bottom: 1.75rem; }
         .card-desc strong { color: #94a3b8; }
 
-        /* ── User email pill ── */
+        /*  User email pill  */
         .user-email {
             display: inline-flex; align-items: center; gap: 0.4rem;
             background: rgba(99,102,241,0.1);
@@ -81,7 +81,7 @@
             margin-bottom: 1.5rem;
         }
 
-        /* ── Steps ── */
+        /*  Steps  */
         .steps {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
@@ -116,7 +116,7 @@
             color: #c4b5fd; font-size: 0.72rem;
         }
 
-        /* ── Buttons ── */
+        /*  Buttons  */
         .btn-resend {
             width: 100%; padding: 0.75rem;
             background: linear-gradient(135deg, #4f46e5, #6366f1);
@@ -146,7 +146,7 @@
         }
         .btn-logout:hover { color: #94a3b8; border-color: rgba(255,255,255,0.15); }
 
-        /* ── Alerts ── */
+        /*  Alerts  */
         .alert-success {
             background: rgba(16,185,129,0.1);
             border: 1px solid rgba(16,185,129,0.25);
@@ -158,14 +158,14 @@
         }
         .alert-success svg { flex-shrink: 0; margin-top: 1px; }
 
-        /* ── Countdown ── */
+        /*  Countdown  */
         .countdown {
             font-size: 0.75rem; color: #475569;
             margin-top: 0.5rem; text-align: center;
         }
         .countdown span { color: #818cf8; font-weight: 600; }
 
-        /* ── Dev info ── */
+        /*  Dev info  */
         .dev-info {
             margin-top: 1.5rem;
             background: rgba(245,158,11,0.06);
@@ -202,7 +202,7 @@
 
     <div class="card">
 
-        {{-- Illustration ── --}}
+        {{-- Illustration  --}}
         <div class="email-illustration">
             <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="#10b981" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -232,7 +232,7 @@
             </div>
         @endif
 
-        {{-- Steps ── --}}
+        {{-- Steps  --}}
         <div class="steps">
             <p class="steps-title">Cara Verifikasi</p>
             <div class="step">
@@ -249,7 +249,7 @@
             </div>
         </div>
 
-        {{-- Resend button ── --}}
+        {{-- Resend button  --}}
         <form method="POST" action="{{ route('verification.resend') }}">
             @csrf
             <button type="submit" class="btn-resend" id="resendBtn">
@@ -264,7 +264,7 @@
             Tunggu <span id="countdownSec">60</span> detik sebelum kirim ulang lagi.
         </p>
 
-        {{-- Logout ── --}}
+        {{-- Logout  --}}
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="btn-logout">
@@ -275,7 +275,7 @@
             </button>
         </form>
 
-        {{-- Dev info ── --}}
+        {{-- Dev info  --}}
         <div class="dev-info">
             <p>
                 ⚠️ <strong>Mode Development:</strong> Email ditulis ke log, bukan inbox nyata.<br>

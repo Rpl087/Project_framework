@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -26,7 +26,7 @@
             padding: 1.5rem;
         }
 
-        /* ── Login Card ── */
+        /*  Login Card  */
         .login-wrap {
             width: 100%;
             max-width: 420px;
@@ -112,7 +112,7 @@
             transform: translateY(-1px);
         }
 
-        /* ── Register Button ── */
+        /*  Register Button  */
         .divider {
             display: flex; align-items: center; gap: 0.75rem;
             margin: 1.25rem 0;
@@ -141,7 +141,7 @@
             color: #a5b4fc;
         }
 
-        /* ── Alert ── */
+        /*  Alert  */
         .alert-success {
             background: rgba(16,185,129,0.12);
             border: 1px solid rgba(16,185,129,0.25);
@@ -152,7 +152,7 @@
             display: flex; align-items: flex-start; gap: 0.5rem;
         }
 
-        /* ── Password Toggle ── */
+        /*  Password Toggle  */
         .pw-wrap { position: relative; }
         .pw-wrap .form-input { padding-right: 2.75rem; }
         .pw-toggle {
@@ -164,7 +164,7 @@
         }
         .pw-toggle:hover { color: #818cf8; }
 
-        /* ── Demo box ── */
+        /*  Demo box  */
         .demo-box {
             margin-top: 1.5rem; text-align: center;
         }
@@ -175,9 +175,9 @@
             border-radius: 3px; color: #94a3b8;
         }
 
-        /* ════════════════════════════════
+        /* 
            Modal Register
-        ════════════════════════════════ */
+         */
         .modal-backdrop {
             position: fixed; inset: 0; z-index: 9999;
             background: rgba(0,0,0,0.65);
@@ -282,9 +282,9 @@
 </head>
 <body>
 
-{{-- ══════════════════════════════════════════
+{{-- 
      LOGIN CARD
-══════════════════════════════════════════ --}}
+ --}}
 <div class="login-wrap">
 
     {{-- Logo --}}
@@ -379,9 +379,9 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════
+{{-- 
      MODAL REGISTRASI
-══════════════════════════════════════════ --}}
+ --}}
 <div id="registerModal" class="modal-backdrop" onclick="handleBackdropClick(event)">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 

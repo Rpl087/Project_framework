@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -38,7 +38,7 @@
 
         body { background: var(--u-bg); min-height: 100vh; }
 
-        /* â•â•â• TOP NAVBAR â•â•â• */
+        /*  TOP NAVBAR  */
         .u-nav {
             position: sticky; top: 0; z-index: 100;
             background: rgba(255,255,255,0.9);
@@ -136,7 +136,7 @@
         .u-dropdown-item.danger:hover { background: #fee2e2; }
         .u-dropdown-divider { height: 1px; background: var(--u-border); margin: 0.25rem 0; }
 
-        /* â•â•â• HERO BANNER â•â•â• */
+        /*  HERO BANNER  */
         .u-hero {
             background: linear-gradient(135deg, #4f46e5 0%, #6366f1 40%, #8b5cf6 70%, #a78bfa 100%);
             position: relative; overflow: hidden;
@@ -179,10 +179,10 @@
         .u-hero-stat-num  { font-size: 1.6rem; font-weight: 900; color: #fff; }
         .u-hero-stat-label{ font-size: 0.7rem; color: rgba(255,255,255,0.7); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 
-        /* â•â•â• CONTENT WRAPPER â•â•â• */
+        /*  CONTENT WRAPPER  */
         .u-content { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
 
-        /* â•â•â• CARDS â•â•â• */
+        /*  CARDS  */
         .u-card {
             background: var(--u-surface);
             border: 1px solid var(--u-border);
@@ -201,7 +201,7 @@
         .u-card-title { font-size: 0.95rem; font-weight: 700; color: var(--u-txt1); }
         .u-card-body { padding: 1.25rem 1.5rem; }
 
-        /* â•â•â• STAT MINI CARDS â•â•â• */
+        /*  STAT MINI CARDS  */
         .u-stat {
             background: #fff; border: 1px solid var(--u-border); border-radius: 1rem;
             padding: 1.25rem; display: flex; align-items: center; gap: 1rem;
@@ -216,7 +216,7 @@
         .u-stat-label { font-size: 0.72rem; font-weight: 700; color: var(--u-txt3); text-transform: uppercase; letter-spacing: 0.05em; }
         .u-stat-value { font-size: 1.75rem; font-weight: 900; color: var(--u-txt1); line-height: 1; margin-top: 0.2rem; }
 
-        /* â•â•â• BUTTONS â•â•â• */
+        /*  BUTTONS  */
         .u-btn {
             display: inline-flex; align-items: center; gap: 0.5rem;
             padding: 0.6rem 1.25rem; border-radius: 0.625rem;
@@ -243,7 +243,7 @@
         .u-btn-danger { background: linear-gradient(135deg,#dc2626,#ef4444); color:#fff; }
         .u-btn-warning { background: linear-gradient(135deg,#d97706,#f59e0b); color:#fff; }
 
-        /* â•â•â• BADGE â•â•â• */
+        /*  BADGE  */
         .u-badge {
             display: inline-flex; align-items: center;
             padding: 0.3rem 0.75rem; border-radius: 9999px;
@@ -258,7 +258,7 @@
         .u-badge-cyan    { background: #cffafe; color: #155e75; }
         .u-badge-purple  { background: #f3e8ff; color: #6b21a8; }
 
-        /* â•â•â• FORM â•â•â• */
+        /*  FORM  */
         .u-form-input {
             width: 100%; padding: 0.7rem 1rem;
             border: 1.5px solid var(--u-border); border-radius: 0.625rem;
@@ -274,7 +274,7 @@
             color: var(--u-txt2); margin-bottom: 0.375rem;
         }
 
-        /* â•â•â• TABLE â•â•â• */
+        /*  TABLE  */
         .u-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .u-table thead th {
             padding: 0.75rem 1rem; background: #f8fafc;
@@ -289,7 +289,7 @@
         .u-table tbody tr:hover td { background: #fafbff; }
         .u-table tbody tr:last-child td { border-bottom: none; }
 
-        /* â•â•â• ALERTS â•â•â• */
+        /*  ALERTS  */
         .u-alert {
             display: flex; align-items: center; gap: 0.75rem;
             padding: 0.875rem 1.25rem; border-radius: 0.75rem;
@@ -303,7 +303,7 @@
             to   { opacity:1; transform:translateY(0); }
         }
 
-        /* â•â•â• BOTTOM NAV (Mobile) â•â•â• */
+        /*  BOTTOM NAV (Mobile)  */
         .u-bottom-nav {
             display: none;
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
@@ -326,7 +326,7 @@
         .u-bottom-nav-item.active { color: var(--u-accent); }
         .u-bottom-nav-item.active svg { stroke: var(--u-accent); }
 
-        /* â•â•â• MOBILE HAMBURGER â•â•â• */
+        /*  MOBILE HAMBURGER  */
         .u-mobile-menu-btn {
             display: none;
             background: none; border: none; cursor: pointer;
@@ -334,7 +334,7 @@
             color: var(--u-txt2);
         }
 
-        /* â•â•â• ANIMATIONS â•â•â• */
+        /*  ANIMATIONS  */
         .u-animate { animation: uFadeUp 0.35s ease-out forwards; }
         .u-delay-1 { animation-delay: 0.07s; opacity: 0; }
         .u-delay-2 { animation-delay: 0.14s; opacity: 0; }
@@ -349,7 +349,7 @@
         .u-hint { font-size: 0.72rem; color: var(--u-txt3); margin-top: 0.25rem; }
         .hint    { font-size: 0.72rem; color: var(--u-txt3); margin-top: 0.25rem; }
 
-        /* â•â•â• COMPATIBILITY ALIASES (agar komponen share bisa pakai di kedua layout) â•â•â• */
+        /*  COMPATIBILITY ALIASES (agar komponen share bisa pakai di kedua layout)  */
         .form-input  { width:100%;padding:0.7rem 1rem;border:1.5px solid var(--u-border);border-radius:0.625rem;font-size:0.875rem;background:#fff;color:var(--u-txt1);transition:all 0.2s; }
         .form-input:focus { outline:none;border-color:var(--u-accent);box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
         .form-label  { display:block;font-size:0.8rem;font-weight:700;color:var(--u-txt2);margin-bottom:0.375rem; }
@@ -387,7 +387,7 @@
         .animate-delay-3 { animation-delay:0.21s;opacity:0; }
         .animate-delay-4 { animation-delay:0.28s;opacity:0; }
 
-        /* â•â•â• RESPONSIVE â•â•â• */
+        /*  RESPONSIVE  */
         @media (max-width: 768px) {
             .u-hero { padding: 1.75rem 1.25rem; }
             .u-hero-title { font-size: 1.35rem; }
@@ -402,6 +402,60 @@
             .u-hero-stat { min-width: 90px; padding: 0.625rem 0.75rem; }
             .u-hero-stat-num { font-size: 1.25rem; }
         }
+
+            /* 
+               Deadline Alert Bar — Peringatan batas waktu pinjam
+             */
+            #u-deadline-alert-bar {
+                display: none;
+                position: sticky;
+                top: 0;
+                z-index: 200;
+                margin: 0 0 1rem 0;
+            }
+            .u-dbar-item {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                padding: 0.65rem 1.25rem;
+                font-size: 0.82rem;
+                font-weight: 600;
+                border-left: 4px solid transparent;
+                animation: uBarIn 0.4s cubic-bezier(0.22,1,0.36,1);
+            }
+            .u-dbar-warning {
+                background: #fffbeb;
+                color: #92400e;
+                border-left-color: #f59e0b;
+            }
+            .u-dbar-danger {
+                background: linear-gradient(90deg, #fef2f2, #fee2e2);
+                color: #991b1b;
+                border-left-color: #ef4444;
+                animation: uBarIn 0.4s cubic-bezier(0.22,1,0.36,1), pulseBg 2s ease-in-out infinite;
+            }
+            .u-dbar-item .u-dbar-icon { font-size: 1rem; flex-shrink: 0; }
+            .u-dbar-item .u-dbar-dismiss {
+                margin-left: auto;
+                background: none;
+                border: none;
+                cursor: pointer;
+                opacity: 0.6;
+                font-size: 1.1rem;
+                line-height: 1;
+                padding: 0 0.2rem;
+                color: inherit;
+                flex-shrink: 0;
+            }
+            .u-dbar-item .u-dbar-dismiss:hover { opacity: 1; }
+            @keyframes uBarIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes pulseBg {
+                0%, 100% { background: linear-gradient(90deg, #fef2f2, #fee2e2); }
+                50%       { background: linear-gradient(90deg, #fee2e2, #fecaca); }
+            }
     </style>
 </head>
 <body>
@@ -499,7 +553,7 @@
         </script>
 
 
-    {{-- â•â•â• TOP NAVIGATION â•â•â• --}}
+    {{--  TOP NAVIGATION  --}}
     <nav class="u-nav">
         <div class="u-nav-inner">
             {{-- Brand --}}
@@ -631,7 +685,7 @@
         </div>
     </nav>
 
-    {{-- ═══ HERO BANNER ═══ --}}
+    {{--  HERO BANNER  --}}
     @hasSection('no_hero')
     @else
     <div class="u-hero">
@@ -647,7 +701,7 @@
     </div>
     @endif
 
-    {{-- â•â•â• MAIN CONTENT â•â•â• --}}
+    {{--  MAIN CONTENT  --}}
     <div class="u-content">
         {{-- Flash Messages --}}
         @if(session('success'))
@@ -667,10 +721,17 @@
             </div>
         @endif
 
+        {{-- 
+             Deadline Alert Bar
+             Ditampilkan secara dinamis oleh JavaScript di bawah.
+             Mengingatkan mahasiswa tentang batas waktu pinjam.
+         --}}
+        <div id="u-deadline-alert-bar"></div>
+
         @yield('content')
     </div>
 
-    {{-- â•â•â• BOTTOM NAV (Mobile) â•â•â• --}}
+    {{--  BOTTOM NAV (Mobile)  --}}
     <nav class="u-bottom-nav">
         <div class="u-bottom-nav-inner">
             <a href="{{ route('dashboard') }}" class="u-bottom-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -817,6 +878,160 @@
         });
     })();
     </script>
+
+    @auth
+    {{-- 
+         Deadline Alert Engine (Mahasiswa)
+         Menampilkan peringatan real-time saat mendekati batas
+         waktu pengembalian alat (jam operasional 08:00 - 20:00).
+     --}}
+    @php
+        // Query peminjaman aktif mahasiswa untuk data alert
+        $uDeadlineAlertData = auth()->user()->borrowings()
+            ->where('status', 'active')
+            ->with('equipment:id,name')
+            ->select('id', 'end_date', 'equipment_id', 'created_at')
+            ->latest()
+            ->get()
+            ->map(fn($b) => [
+                'id'           => $b->id,
+                'end_date'     => $b->end_date,
+                'name'         => $b->equipment->name,
+                'url'          => route('borrowings.show', $b->id),
+                'created_today'=> $b->created_at->isToday(),
+            ]);
+    @endphp
+    <script>
+    (function () {
+        /*  Konfigurasi  */
+        const LAB_CLOSE      = '20:00';
+        const WARN_MINUTES   = 60;    // Mulai peringatan 60 menit sebelum tutup
+        const DANGER_MINUTES = 15;    // Level bahaya 15 menit sebelum tutup
+        const CHECK_INTERVAL = 30000; // Cek setiap 30 detik
+
+        const activeBorrowings = @json($uDeadlineAlertData);
+
+        /*  Helper  */
+        function toMins(hhmm) {
+            const [h, m] = hhmm.substring(0,5).split(':').map(Number);
+            return h * 60 + m;
+        }
+        function nowHHMM() {
+            const d = new Date();
+            return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+        }
+
+        /*  Bangun daftar alert  */
+        function buildAlerts() {
+            const nowMin   = toMins(nowHHMM());
+            const closeMin = toMins(LAB_CLOSE);
+            const alerts   = [];
+
+            /* [1] Peringatan penutupan lab */
+            const minsToClose = closeMin - nowMin;
+            if (minsToClose > 0 && minsToClose <= WARN_MINUTES) {
+                const isDanger = minsToClose <= DANGER_MINUTES;
+                alerts.push({
+                    id:    'lab-close',
+                    level: isDanger ? 'danger' : 'warning',
+                    icon:  isDanger ? '🚨' : '⏰',
+                    html:  isDanger
+                        ? 'Lab <strong>tutup dalam ' + minsToClose + ' menit</strong> (pukul 20:00). Segera kembalikan semua alat!'
+                        : 'Lab tutup dalam <strong>' + minsToClose + ' menit</strong> (pukul 20:00). Pastikan alat kembali tepat waktu.',
+                });
+            }
+
+            /* [2] Peringatan per-peminjaman */
+            activeBorrowings.forEach(function (b) {
+                // Kasus darurat: dipinjam kemarin/sebelumnya dan belum dikembalikan
+                if (!b.created_today) {
+                    alerts.push({
+                        id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                        html: '<strong>' + b.name + '</strong>: Peminjaman dari <strong>hari sebelumnya</strong> belum dikembalikan! <a href="' + b.url + '" style="text-decoration:underline;font-weight:700;color:inherit;">Segera kembalikan &rarr;</a>',
+                    });
+                    return;
+                }
+
+                const endMin   = toMins(b.end_date);
+                const minsLeft = endMin - nowMin;
+
+                if (minsLeft <= 0) {
+                    alerts.push({
+                        id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                        html: '<strong>' + b.name + '</strong>: Batas waktu pengembalian pukul ' + b.end_date + ' <strong>telah lewat!</strong> <a href="' + b.url + '" style="text-decoration:underline;font-weight:700;color:inherit;">Lihat detail &rarr;</a>',
+                    });
+                } else if (minsLeft <= DANGER_MINUTES) {
+                    alerts.push({
+                        id: 'borrow-' + b.id, level: 'danger', icon: '🔴',
+                        html: '<strong>' + b.name + '</strong>: Harus dikembalikan dalam <strong>' + minsLeft + ' menit</strong> (pukul ' + b.end_date + ')! <a href="' + b.url + '" style="text-decoration:underline;color:inherit;">Detail &rarr;</a>',
+                    });
+                } else if (minsLeft <= WARN_MINUTES) {
+                    alerts.push({
+                        id: 'borrow-' + b.id, level: 'warning', icon: '⚠️',
+                        html: '<strong>' + b.name + '</strong>: Batas pengembalian dalam <strong>' + minsLeft + ' menit</strong> (pukul ' + b.end_date + '). <a href="' + b.url + '" style="text-decoration:underline;color:inherit;">Lihat &rarr;</a>',
+                    });
+                }
+            });
+
+            return alerts;
+        }
+
+        /*  Render ke DOM  */
+        var dismissed = new Set();
+
+        function render() {
+            var container = document.getElementById('u-deadline-alert-bar');
+            if (!container) return;
+
+            var alerts  = buildAlerts();
+            var visible = alerts.filter(function (a) { return !dismissed.has(a.id); });
+
+            if (visible.length === 0) {
+                container.style.display = 'none';
+                container.innerHTML = '';
+                return;
+            }
+
+            container.style.display = 'block';
+
+            var existingIds = [].slice.call(container.querySelectorAll('[data-alert-id]'))
+                .map(function (el) { return el.dataset.alertId; });
+            var newIds = visible.map(function (a) { return a.id; });
+
+            existingIds.filter(function (id) { return !newIds.includes(id); }).forEach(function (id) {
+                var el = container.querySelector('[data-alert-id="' + id + '"]');
+                if (el) el.remove();
+            });
+
+            visible.forEach(function (a) {
+                if (existingIds.includes(a.id)) return;
+                var div = document.createElement('div');
+                div.className       = 'u-dbar-item u-dbar-' + a.level;
+                div.dataset.alertId = a.id;
+                div.innerHTML       = '<span class="u-dbar-icon">' + a.icon + '</span>' +
+                                      '<span>' + a.html + '</span>' +
+                                      '<button class="u-dbar-dismiss" aria-label="Tutup peringatan" title="Tutup">&times;</button>';
+                div.querySelector('.u-dbar-dismiss').addEventListener('click', function () {
+                    dismissed.add(a.id);
+                    div.remove();
+                    if (!container.querySelector('.u-dbar-item')) container.style.display = 'none';
+                });
+                container.appendChild(div);
+            });
+        }
+
+        /*  Jalankan  */
+        render();
+        setInterval(function () {
+            // Alert level danger selalu muncul kembali meski sudah di-dismiss
+            buildAlerts().forEach(function (a) {
+                if (a.level === 'danger') dismissed.delete(a.id);
+            });
+            render();
+        }, CHECK_INTERVAL);
+    })();
+    </script>
+    @endauth
 
     @stack('scripts')
 </body>

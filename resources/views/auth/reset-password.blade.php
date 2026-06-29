@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -75,7 +75,7 @@
             display: flex; align-items: center; gap: 0.3rem;
         }
 
-        /* ── Password strength indicator ── */
+        /*  Password strength indicator  */
         .strength-bar {
             height: 3px; border-radius: 2px;
             background: rgba(255,255,255,0.08);
@@ -90,7 +90,7 @@
             margin-top: 0.25rem; text-align: right;
         }
 
-        /* ── Input wrapper with toggle eye icon ── */
+        /*  Input wrapper with toggle eye icon  */
         .input-wrap { position: relative; }
         .eye-btn {
             position: absolute; right: 0.75rem; top: 50%;

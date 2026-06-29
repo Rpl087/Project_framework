@@ -1,4 +1,4 @@
-@extends(auth()->user()->isMahasiswa() ? 'layouts.mahasiswa' : 'layouts.app')
+﻿@extends(auth()->user()->isMahasiswa() ? 'layouts.mahasiswa' : 'layouts.app')
 @section('title', 'Edit Profil')
 @if(auth()->user()->isMahasiswa())
 @section('no_hero', true)
@@ -31,7 +31,7 @@
 {{-- 2-Column Layout --}}
 <div style="display:grid;grid-template-columns:1fr 300px;gap:1.5rem;align-items:start;" id="profileGrid">
 
-    {{-- ── Kolom Kiri: Form --}}
+    {{--  Kolom Kiri: Form --}}
     <div style="display:flex;flex-direction:column;gap:1.25rem;">
 
         {{-- Card: Informasi Akun --}}
@@ -229,7 +229,7 @@
         </div>
     </div>
 
-    {{-- ── Kolom Kanan: Info Sidebar --}}
+    {{--  Kolom Kanan: Info Sidebar --}}
     <div style="display:flex;flex-direction:column;gap:1rem;" id="profileSidebar">
 
         {{-- Info Akun --}}

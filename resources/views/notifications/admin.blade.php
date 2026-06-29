@@ -24,7 +24,7 @@
     {{-- Stats Summary --}}
     @php
         $totalCount = $notifications->total();
-        $unreadOnPage = $notifications->filter(fn($n) => !$n->isRead())->count();
+        $unreadCount = auth()->user()->unreadNotificationsCount();
     @endphp
     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:1rem;margin-bottom:1.5rem;" class="animate-in animate-delay-1">
         <div class="stat-card" style="display:flex;align-items:center;gap:1rem;">
@@ -42,7 +42,7 @@
             </div>
             <div>
                 <p style="font-size:0.72rem;font-weight:700;color:var(--txt-3);text-transform:uppercase;letter-spacing:0.05em;">Belum Dibaca</p>
-                <p style="font-size:1.5rem;font-weight:900;color:var(--txt-1);line-height:1;">{{ $unreadOnPage }}</p>
+                <p style="font-size:1.5rem;font-weight:900;color:var(--txt-1);line-height:1;">{{ $unreadCount }}</p>
             </div>
         </div>
     </div>
